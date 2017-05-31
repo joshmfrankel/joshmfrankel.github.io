@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Your awesome title
+title: Software Engineering Simplified
 email: joshmfrankel@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this
@@ -24,15 +24,29 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: joshmfrankel
 github_username:  joshmfrankel
 
-# Build settings
-markdown: kramdown
-sass:
-  style: compressed
+# Structure Settings
+permalink: /:year/:title/
+excerpt_separator: "#{excerpt seperator}"
 
+# Build Settings
+sass:
+  style: compact
+  sass_dir: _sass
+github: [metadata]
+highlighter: rouge
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+# Theme styles
 theme: minima
 
+# Gemfile
 gems:
   - jekyll-feed
+  - jekyll-redirect-from
+  - jekyll-sitemap
 exclude:
   - Gemfile
   - Gemfile.lock
