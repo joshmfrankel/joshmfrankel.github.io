@@ -26,7 +26,8 @@ github_username:  joshmfrankel
 
 # Structure Settings
 permalink: /:year/:title/
-excerpt_separator: "#{excerpt seperator}"
+excerpt_separator: "--excerpt--"
+paginate: 10
 
 # Build Settings
 sass:

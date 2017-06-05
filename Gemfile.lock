@@ -195,6 +195,7 @@ PLATFORMS
 DEPENDENCIES
   github-pages
   jekyll-feed
+  jekyll-paginate
   minima (~> 2.0)
 
 RUBY VERSION
