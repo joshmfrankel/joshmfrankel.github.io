@@ -213,7 +213,6 @@ DEPENDENCIES
   jekyll-feed
   jekyll-paginate
   jekyll-seo-tag
-  minima (~> 2.0)
   octopress (~> 3.0)
 
 RUBY VERSION
