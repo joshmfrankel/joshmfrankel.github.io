@@ -28,8 +28,6 @@ excerpt_separator: "--excerpt--"
 paginate: 10
 
 # Build Settings
-source: ./blog
-destination: ./_site/blog
 sass:
   style: compact
   sass_dir: _sass
@@ -41,9 +39,6 @@ markdown: kramdown
 kramdown:
   input: GFM
   hard_wrap: false
-
-# Theme styles
-theme: minima
 
 # Gemfile
 gems:
