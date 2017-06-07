@@ -28,9 +28,13 @@ excerpt_separator: "--excerpt--"
 paginate: 10
 
 # Build Settings
+source: ./blog
+destination: ./_site/blog
 sass:
   style: compact
   sass_dir: _sass
+
+# Display settings
 github: [metadata]
 highlighter: rouge
 markdown: kramdown
@@ -44,7 +48,6 @@ theme: minima
 # Gemfile
 gems:
   - jekyll-feed
-  - jekyll-redirect-from
   - jekyll-sitemap
   - jekyll-paginate
   - jekyll-seo-tag

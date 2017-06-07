@@ -1,0 +1,7 @@
+
+Rails:
+  Enabled: true
+
+# Enforce double quotes everywhere
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
