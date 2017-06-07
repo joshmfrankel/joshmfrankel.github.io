@@ -1,0 +1,142 @@
+---
+layout: post
+title: Leveling up CSS with Sass (Basics &amp; Setup - Part 1)
+categories:
+- Series
+tags: [Sass]
+published: true
+---
+<p>In this series of articles, I will go through the ends and out of Sass. I will focus on the Basics and Setup, Advanced Techniques, Project Organization, and Best Practices and Common Pitfalls. I would like to apologize now for all the terrible puns that will come up (Sass tends to lend itself well to them)</p>--excerpt--
+
+<blockquote>This is the first article in the series.
+    <nav>
+        <a href="#">Part 1 - Basics</a>
+        <a href="http://joshfrankel.me/blog/2014/series/Leveling-up-css-with-sass-advanced-techniques-part-2/">Part 2 - Advanced Techniques</a>
+    </nav>
+</blockquote>
+
+<p>Alright so now lets dive into Sass. But before we start writing code, what the heck is Sass anyway?</p>
+<h3>What is this Sass you speak of?</h3>
+<p>Sass or Syntactically Awesome Stylesheets, is pre-processor language for adding functionality and flexibility to CSS. A pre-processor is just a fancy way of saying that this code will be compiled in a syntax that is usable to another language, CSS in this case. More simply Sass adds variables, functions (mixins), inheritance, and nesting to make CSS awesome again.</p>
+
+<p>There are two types of sass syntax: indent-based (.sass) and traditional braces (.scss). I will be using the traditional style as it is closer to vanilla CSS. Indent-based might be more familiar to users of python and ruby.</p>
+<h3>Why should I use it?</h3>
+<p>There are plenty of reasons to use Sass. The biggest advantage is the sheer amount of re-usability of style code. On top of this for you people who love to super organize your code Sass has an awesome @import rule that doesn't slow down page load. Here are just a few awesome advantages of using a pre-processor language.</p>
+<ul>
+	<li>Functions (mixins)</li>
+	<li>Variables</li>
+	<li>Nesting Inheritance</li>
+	<li>@import rules that rule!</li>
+	<li>Project Organization</li>
+	<li>Unit Calculations (2px * 2px = 4px)</li>
+</ul>
+<p>Getting excited to start using Sass? Well then lets setup our dev environment.</p>
+<h3>Set it up!</h3>
+<p>There are number of excellent apps and command line processes for setting up a sass environment. So depending on your comfort level you can decide which option is the best fit for you.</p>
+
+<p>All compilers for Sass follow the same process. The compiler runs a polling process that checks for file changes. When a Sass file is updated all files that are affected by it are compiled into CSS. Instantaneous compiling.</p>
+
+<p>In addition to checking for file changes and compiling the output CSS many of the compilers feature additional options such as:</p>
+
+<p><strong>Debug mode</strong> - When enabled it will create comments in the compiled CSS that refer to the location they are created in the Sass. This is especially useful given that Sass compilers have a couple different compiler output methods</p>
+
+<p><strong>Output Style</strong> - There are four different output styles: Nested, Expanded, Compact and Compressed. Nested is the default and will properly indent nested styles. Expanded is exactly like vanilla CSS. Compact makes each rule take up a single line. Compressed removes all white space and essentially minifies the output.</p>
+<blockquote>"Scout is a cross-platform app that delivers the power of Sass &amp; Compass into the hands of web designers."</blockquote>
+<p>Scout is probably the quickest and most painless way of setting up a Sass development environment. The Scout app is an adobe air application that you run on your desktop which contains all the necessary files for compiling Sass specific code.</p>
+<ul>
+	<li>Download <a href="http://mhs.github.io/scout-app/">Scout</a> and install it</li>
+	<li>Create a new project by clicking the plus sign</li>
+	<li>Set the new project to your top most project directory</li>
+	<li>Edit the project's input (Sass file locations) and output (CSS file locations) folder settings</li>
+	<li>Press the play button on the project and get Sassy!</li>
+</ul>
+<strong>Alternatives</strong>: <a href="http://alphapixels.com/prepros/">Prepros</a>
+<br /><br />
+<blockquote>"Guard is a command line tool to easily handle events on file system modifications."</blockquote>
+<p>Guard is my preferred method of compiling Sass files. It runs in the command line with a few simple commands. Things to note is you need a working installation of ruby, ruby gems, and guard before you can use guard-sass. However, once setup it integrates nicely with growl or notification apps.</p>
+<ul>
+	<li>Install ruby</li>
+	<li>Run gem install guard</li>
+	<li>Run gem install guard-sass</li>
+	<li>Run guard init in your project directory</li>
+	<li>Edit the Guardfile according to the <a href="https://github.com/hawx/guard-sass">documentation</a></li>
+	<li>Run guard inside the directory and enjoy</li>
+</ul>
+<strong>Alternatives</strong>: <a href="http://compass-style.org/">Compass</a>
+
+<p>So now that we have our Sass environment setup we can start actually utilizing the pre-processor. Make sure your method of compiling Sass is active before the next steps</p>
+<h3>$heading: "Variables";</h3>
+<p>Lets take a look at Sass variables. These are the easiest to understand and use. Variables are defined by using a dollar sign($) to denote the start of them. A colon(:) is then used to separate the variable name from its value.</p>
+
+<p>One of the great things about Sass is that it doesn't try to reinvent the syntax of CSS. It just extends it the make it more powerful</p>
+{% highlight sass %}
+// Variables look like php except we use colon(:) instead of =
+$dark-blue: #1e427c;
+$green    : #7fb636;
+
+// A style using a variable
+h1 {
+    color: $dark-blue;
+}
+a {
+    background-color: $green;
+    color: #fff;
+}
+{% endhighlight %}
+
+{% highlight css %}
+/**
+ * This is the compiled CSS code
+ */
+h1 {
+    color: #1e4s7c;
+}
+a {
+    background-color: #7fb636;
+    color: #fff;
+}
+{% endhighlight %}
+<p>There it is, Sass at its most basic. By defining a variable before at the beginning of a file it can be reused later to create DRY code.</p>
+<h3>Nesting {<small>nesting</small>}</h3>
+<p>Nesting in Sass works logically and just makes sense.  By placing rules inside one another they inherit their parent rule selectors. By nesting Sass rules you also give yourself a visual cue for selectors that are further down in the DOM.</p><blockquote><strong>Pro Tip:</strong> While nesting selectors is awesome, don't get carried away with them. If a single class selector will suffice there is no need to nest it within html body etc. Too much nesting will create unnecessary code bloat.</blockquote>
+
+{% highlight sass %}
+// Top level nested style
+.twitter-feed {
+    float:right;
+    width: 300px;
+
+    // Inner nested
+    .heading {
+        font: 400 14px/20px Verdana, sans-serif;
+        color: #fff;
+    }
+    p {
+        color: #525252;
+
+        // Inner Inner nested
+        a {
+            text-decoration: none;
+            color: #00FF00;
+        }
+    }
+}{% endhighlight %}
+
+{% highlight css %}
+.twitter-feed {
+    float: right;
+    width: 300px;
+}
+.twitter-feed .heading {
+    font: 400 14px/20px Verdana, sans-serif;
+}
+.twitter-feed p {
+    color: #525252;
+}
+.twitter-feed p a {
+    text-decoration: none;
+    color: #00FF00;
+}{% endhighlight %}
+
+
+<p>By this point you have setup a Sass environment and created your very first Sass file. In the <strong>next article</strong> I will go through more advanced techniques for using Sass including mixins, string interpolation, placeholders, extending, and calculations.</p>

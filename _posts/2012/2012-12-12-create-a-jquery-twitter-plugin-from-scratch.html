@@ -1,0 +1,135 @@
+---
+layout: post
+title: Create a jQuery Twitter plugin from scratch
+categories:
+- Tutorials
+tags:
+- plugins
+- jQuery
+published: true
+---
+<p>Over the next couple posts in this series I will walk you through building your very own Twitter jQuery plugin from scratch. By the end of this series you will better understand the structure of a jQuery plugin, regular expressions, jQuery optimization, datetime manipulation, and jQuery chaining. Additionally, you will have a working plugin which will grab tweets directly from the twitter api. This is a solution based off something that I have used on a number of sites.</p>--excerpt--
+
+<p>Alright so first we need to build the file structure for our project. I like keeping my work space clean so here is the directory structure I am using with the starting point for index.html.</p>
+
+<p><a href="http://blog.joshmfrankel.com/wp-content/uploads/2012/11/IntroductionHowToBuildAJQueryPluginFromScratch-4.png"><img class="alignnone size-full wp-image-444" title="Introduction HowToBuildAJQueryPluginFromScratch Diagram" alt="" src="http://blog.joshmfrankel.com/wp-content/uploads/2012/11/IntroductionHowToBuildAJQueryPluginFromScratch-4.png" width="476" height="206" /></a></p>
+
+<p>First you should download the latest version of <a href="http://jquery.com/">jQuery</a> and place it into the jquery.js file. You should also create style.css and jquery.tweet.js. Index.html is where we will output our tweet listing, style.css is the layout code, and jquery.tweet.js is our plugin.</p>
+{% highlight html %}
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+
+	<!-- CONTENT GOES HERE -->
+	<div id="tweets"></div>
+
+	<!-- jQuery code goes at the bottom of the page -->
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/jquery.tweet.js"></script>
+	<script type="text/javascript">
+
+	</script>
+</body>
+</html>
+{% endhighlight %}
+<p>Now we are ready to start fleshing out the basic plugin structure. Our plugin name will be called Tweet. So lets add our jQuery document ready block and our plugin call.</p>
+{% highlight js %}
+$(document).ready(function(){
+
+	$('#tweets').tweet();
+
+});
+{% endhighlight %}
+<p>This will allow our plugin to be attached onto the id selector tweets from index.html and will come in handy later on.</p>
+<h3>Best Practices</h3>
+<p>There are a few best practices to keep in mind when creating a new plugin.</p>
+<ul>
+	<li>The plugin name must not interfere with any existing method names</li>
+	<li>The plugin should allow for jQuery chaining (this is THE most powerful aspect of jQuery, so lets try not to break it)</li>
+	<li>It should be highly flexible and allow the user to override default settings</li>
+</ul>
+<p>I have listed the basic plugin structure below with comments. This will cover the first two best practices.</p>
+{% highlight js %}// Wrap the plugin in the jquery dollar sign
+// This will prevent overriding other methods with
+// the same name as the plugin
+// Additionally we can use $ to reference jquery
+(function($){
+
+	// Map the plugin name as a function in jQuery
+	$.fn.tweet = function() {
+
+		// Allow chaining by returning the this keyword
+		return this.each(function() {
+
+                     // Output a console message to show the plugin
+                     // is working
+                     console.log('We have called the tweet plugin');
+		});
+
+	};
+
+})(jQuery);
+{% endhighlight %}
+<p>At this point we technically have a functional, albeit very basic,  jQuery plugin. This will serve as an excellent starting point for future plugin development.</p>
+
+<p>If you notice I included a console.log(); call which sends data to the browser console.  In Chrome under developer tools it is the last tab and is super helpful for javascript development.  You can output variables, arrays, and even objects in this manner.</p>
+
+<p>Something you might have seen in another jQuery solution is caching of the this keyword. This provides faster processing as you don't need to re-query to dom using jquery since it already exists in memory.</p>
+{% highlight js %}
+var $this = $(this);
+{% endhighlight %}
+<blockquote>One thing to note is that this is not necessary inside a jQuery plugin<ins datetime="2013-01-31T22:05:56+00:00">,but is necessary within the return this.each(function() since we are now in the plugin's immediate scope</ins>. This is because the plugin is already wrapped in the jQuery object and therefore when you call the keyword this it is already equal to $(this).</blockquote>
+<p>The final element I would like to cover before we start on the meat of the plugin, is including support for default and user overridden settings.</p>
+<h3>Default and User Settings</h3>
+<p>Nearly every single plugin has a way for the user to manipulate its settings.  Its a great way to provide flexibility and control to users so why not. This will be important later on for determining how many tweets we want to grab and what twitter username we grab from. More simply it will allow us not to hard-code data into our plugin.</p>
+
+<p>To implement default and user settings we first need to include a parameter in the original plugin's mapping.  Next we create an array called defaults which will hold the basic values for our plugin.  Finally using a little jQuery magic we merge our parameter array (options) into our default array with the $.extend method.</p>
+{% highlight js %}
+// Map the plugin name as a function in jQuery
+// Pass in the options parameter for overriding defaults
+$.fn.tweet = function(options) {
+
+	// Set the default plugin values
+	var defaults = {
+		username: 'the base username',
+		count: 5
+	};
+
+	// Use the jQuery method extend to merge
+	// the defaults and options arrays
+	var options = $.extend({}, defaults, options);
+};
+{% endhighlight %}
+<p>This will allow the user to change configuration settings by passing in key / value pairs. Try this out by adding console.log(options); where the previous console message was. You should see the output as 5. This is our default value which was merged into the options array.</p>
+
+<p>Now the real power comes in on index.html where we called our plugin on the id selector. Lets add the following user setting to our plugin call and check the console again.</p>
+{% highlight html %}<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+
+	<!-- CONTENT GOES HERE -->
+	<div id="tweets"></div>
+
+	<!-- jQuery code goes at the bottom of the page -->
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/jquery.tweet.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+
+			$('#tweets').tweet({
+				count: 10
+			});
+
+		});
+	</script>
+</body>
+</html>{% endhighlight %}
+<p>Your output should look like the following: Object {username: "the base username", count: 10}.  Our default value for the username is listed with our user overridden count value.  Pretty slick.</p>
+
+<p>So that's it for the basic plugin development. In the next post I will cover the twitter api, regular expressions, and date manipulation.  Continue to next lesson (Coming Soon)</p>

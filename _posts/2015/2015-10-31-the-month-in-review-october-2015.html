@@ -1,0 +1,101 @@
+---
+layout: post
+title: "The Month in Review: October 2015"
+date: 2015-10-31T13:29:30-05:00
+categories:
+- month-in-review
+tags:
+- updates
+- ruby
+- javascript
+- rails
+- apps
+---
+
+<p>In this first issue of "Month in review", I will detail a few key topics. In the first section I will list any recent development news that I have come across. The next section will detail any notable gems, extensions, or app. Then in the last section I will list any blog posts from other developers which I have found helpful and informative.</p>
+--excerpt--
+
+<h2>News</h2>
+
+<ul>
+  <li><a href="http://blog.getbootstrap.com/2015/08/19/bootstrap-4-alpha/" target="_blank">Bootstrap 4 is in alpha</a></li>
+  <li><a href="https://elementary.io/" target="_blank">ElementaryOS released Freya</a></li>
+</ul>
+<br />
+<hr />
+<h2>Notable gems, extensions, and apps</h2>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>Foreman <small>gem</small></h4><a href="https://github.com/ddollar/foreman" target="_blank">homepage</a></div>
+  <div class="panel-body">
+    Running the <strong>rails server, rspec, elasticsearch, mailcatcher, memcached, and fakes3</strong> at the same time can be quite annoying having to open six terminals. Luckily, <strong>foreman</strong> allows you to manage your app's processes in a <code>Procfile</code>. Once in the <code>Procfile</code> you can run everything from one terminal just by running <code>foreman start</code>.
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>FactoryGirl <small>gem</small></h4><a href="https://github.com/thoughtbot/factory_girl" target="_blank">homepage</a></div>
+  <div class="panel-body">
+    Dislike fixtures? If you do then <strong>FactoryGirl</strong> is for you as it provides dead simple factories for test data.
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>Capybara <small>gem</small></h4><a href="https://github.com/jnicklas/capybara" target="_blank">homepage</a></div>
+  <div class="panel-body">
+    Capybara is an easy to use <strong>acceptance testing framework</strong> that integrates nicely with Rspec.
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>Rubocop <small>gem</small></h4><a href="https://github.com/bbatsov/rubocop" target="_blank">homepage</a></div>
+  <div class="panel-body">
+    Is your code a mess? Put <strong>Rubocop</strong> to work patroling your code. <strong>Rubocop</strong> enforces many of the community best practices of coding in Ruby. It also has a sublime plugin.
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>Brew Bundler <small>extension</small></h4><a href="https://github.com/Homebrew/homebrew-bundle" target="_blank">homepage</a></div>
+  <div class="panel-body">
+    If you are on Mac OSX a your application requires specific libraries for running in development you can utilize <strong>Brew Bundler</strong> as a way of managing different brew configurations on a per-project basis. Basically identical to how the ruby <code>gemfile</code> works
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>MapTiler <small>app</small></h4><a href="http://www.maptiler.com/" target="_blank">homepage</a></div>
+  <div class="panel-body">
+    MapTiler provides a ton of custom mapping functionality in a simple to use app. Recently, I have used it on a personal project to overlay map markers onto a popular fantasy book series.
+  </div>
+</div>
+<br />
+<hr />
+
+<h2>Recommended blog posts from exceptional people</h2>
+<p><small>(At authors request I will remove their section)</small></p>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>Fisher-Yates shuffle algorithm <small>Mike Bostock</small></h4><a href="http://bost.ocks.org/mike/shuffle/" target="_blank">article</a></div>
+  <div class="panel-body">
+    I have been working on a node.js and socket.io card game in my free time and needed a proper way of shuffling a deck of cards. <strong>Mike Bostock's</strong> post is probably the best example of how to properly shuffle a deck of cards. He details the process from starting from a simple sorting algorithm up to implementing a full Fisher-Yates sorting algorithm. Additionally, he provides excellent interactive examples that show how the sort moves cards around.
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>OOP Javascript <small>JavaScript.isSexy</small></h4><a href="http://javascriptissexy.com/oop-in-javascript-what-you-need-to-know/" target="_blank">article</a></div>
+  <div class="panel-body">
+    Coming from JavaScript.isSexy, is a post describing how to implement object-oriented programming techniques with javascript. It is worded expertly and provides easy to follow examples. I frequently use it for reference when writing oop javascript.
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>Don't rescue exceptions <small>Daniel Fone</small></h4><a href="http://daniel.fone.net.nz/blog/2013/05/28/why-you-should-never-rescue-exception-in-ruby/" target="_blank">article</a></div>
+  <div class="panel-body">
+    A great post on the dangers of rescuing the base Exception class in ruby.
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><h4>Testing rails applications <small>Josh Steiner</small></h4><a href="https://robots.thoughtbot.com/how-we-test-rails-applications" target="_blank">article</a></div>
+  <div class="panel-body">
+    I love the <strong>Thoughtbot</strong> blog. These guys always have such awesome information. In this post they detail how they go about testing a rails application. Every facet of what they test is outlined in the article.
+  </div>
+</div>

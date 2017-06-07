@@ -1,0 +1,121 @@
+---
+layout: post
+title: "Drying out your content with Ruby on Rails Internationalization"
+date: 2015-10-03T15:53:27-04:00
+categories:
+- tips-and-tricks
+tags:
+- Ruby on Rails
+- Internationalization
+- DRY
+published: true
+---
+
+<p>Internationalization is an important topic for many corporations that have a multi-national client base. It allows for easy translation capabilities and helps to protect the future of the application against code debt. However, even if you are not providing translations for your application you can still use internationalization to dry up your content. Let's get started.</p>
+--excerpt--
+
+<h3>What is internationalization?</h3>
+<p>Internationalization or (<strong>I18n</strong> from now on), helps to provide translatable text files in the form of yaml inside the <code>config/locales/</code> folder. To start your rails application will most likely have something like <code>en.yml</code>. This allows you to create key value pairs to be used for the English language. The power with <strong>I18n</strong> is the keys specified can then be matched to another language file as long as the key name corresponds appropriately.</p>
+
+<blockquote><strong>Note: </strong> I18n is an abbreviation for internationalization as well as the class name in Ruby.</blockquote>
+
+<p>For example you could have a Russian translation file of <code>ru.yml</code> with a matching key that provides the russian translation as the key. Here it is in code format (Please forgive my Russian translation as I don't speak Russian and had to use Google translate)</p>
+
+{% highlight yaml %}
+
+# Example of en.yml
+en:
+  user:
+    access_denied: "You are not authorized to see this page"
+
+# Example of ru.yml
+ru:
+  user:
+    access_denied: "Вы не авторизованы , чтобы увидеть эту страницу"
+
+{% endhighlight %}
+
+<p>Now anytime a locale change is detected by the <strong>Rails</strong> app it will switch internationalization files. You can simulate this action in the browser by using a querystring with the locale filename like this <code>?locale=ru</code></p>
+
+<h3>Why should I use this if I don't plan on translating anything?</h3>
+
+<p>I'm glad you asked that. While using <strong>I18n</strong> for a site that doesn't require a translation seems like extra work at first it does lead to some good coding practices with keeping your application <strong>DRY</strong>. First lets talk about how you use <strong>I18n</strong> before I show you the benefits of it.</p>
+
+<h4>Using I18n</h4>
+
+<p>You can utilize your translation files by using the following methods: <code>I18n.t('key.name.goes.here')</code> for <strong>Models</strong> and <code>t('the.period.represents.the.colon.from.the.yml.file')</code> for <strong>Controllers</strong> and <strong>Views</strong>.</p>
+<blockquote><strong>Simplified: </strong>By placing these methods in your code you are essentially telling <strong>Rails</strong>, "Please print the value associated with this key based on my current locale".</blockquote>
+
+<h3>The benefit on small applications</h3>
+<p>Take a look at the following controller code.</p>
+{% highlight ruby %}
+def index
+  unless current_user.admin?
+    redirect_to :back, :alert => "Access denied."
+  end
+  @users = User.all
+end
+
+def show
+  @user = User.find(params[:id])
+  unless current_user.admin?
+    unless @user == current_user
+      redirect_to :back, :alert => "Access denied."
+    end
+  end
+end
+
+def update
+  @user = User.find(params[:id])
+  unless current_user.admin?
+    redirect_to :back, :alert => "Access denied."
+  end
+  if @user.update_attributes(secure_params)
+    redirect_to users_path, :notice => "User updated."
+  else
+    redirect_to users_path, :alert => "Unable to update user."
+  end
+end
+
+def destroy
+  user = User.find(params[:id])
+  unless current_user.admin?
+    redirect_to :back, :alert => "Access denied."
+  end
+  user.destroy
+  redirect_to users_path, :notice => "User deleted."
+end
+{% endhighlight %}
+<p><small><em>(Sample property of RailsApps)</em></small></p>
+<p>So what's wrong here?</p>
+<p>There is a lot of duplication in the code. For the purpose of this article just focus on the fact that the line <code>:alert => "Access Denied."</code> appears four times.</p>
+<blockquote><strong>Note: </strong>There are many other optimizations that could be accomplished including moving duplicate logic into a single method.</blockquote>
+<p>Now multiply that across even a small app and you might have something like 20 instances of the exact same text. What happens if the client wants you to change <strong>"Access Denied"</strong> to <strong>"I'm sorry dave, but I'm afraid I can't do that"</strong>. You better be ready to do a project wide find and replace on your code because you are going to need to change it <strong>20 times!</strong></p>
+<p>However, by using <strong>I18n</strong> we can significantly cut down on our code debt and future proof your application. Now the above code of <code>:alert => "Access Denied"</code> will become <code>:alert => t('user.alert.access_denied')</code>. Here is what the <strong>en.yml</strong> file looks like</p>
+{% highlight yaml %}
+en:
+  user:
+    alert:
+      access_denied: "Access Denied"
+{% endhighlight %}
+<p>Now when the client request comes in you can simply change your <strong>en.yml</strong> file to this.</p>
+{% highlight yaml %}
+en:
+  user:
+    alert:
+      access_denied: "I'm sorry dave, but I'm afraid I can't do that"
+{% endhighlight %}
+<p>Viola, you just changed 20 different instances of the exact same content from a single location. Bravo!</p>
+<img src="{{ site.url }}/img/2015/I18n-doge.png" alt="Generated from dogr.io" />
+<p>The only downside to this method is that you need to type a little more code to display the content. However, even though <code>"Access Denied"</code> is less typing than <code>t('user.alert.access_denied')</code> by using <strong>I18n</strong> to <strong>dry</strong> out your code, it will allow you to have a singularly defined location for content. I don't know about you but changing code in one place vs 20 is a big time saver.</p>
+
+<h3>TL;DR</h3>
+<ul>
+  <li><strong>I18n</strong> provides a single location to update content. This reduces code debt.</li>
+  <li>The code is slighly longer<code>:alert => "Access Denied"</code> vs. <code>:alert => t('users.alert.access_denied')</code></li>
+  <li>Models use <code>I18n.t('key.name')</code></li>
+  <li>Controllers and Views use <code>t('key.name')</code></li>
+  <li>Internationalization files are stored in <code>config/locales</code></li>
+</ul>
+
+

@@ -1,0 +1,169 @@
+---
+layout: post
+title: Leveling up CSS with Sass (Advanced Techniques - Part 2)
+categories:
+- Series
+tags: [Sass]
+published: true
+---
+
+<p>Since the last Sass article in this series was published over a year ago, here is a quick refresher. We covered the setup of Sass apps including: Guard, Compass, Prepross, and Scout. There was also info on variables and rule nesting. And we talked about why Sass is so awesome. In this article we are going to go through some more advanced techniques specifically: Functions, Mixins, Placeholders, Parent selector, Calculations, and conditional statements.</p>
+--excerpt--
+
+<blockquote>This is the second article in the series.
+    <nav>
+        <a href="http://joshfrankel.me/blog/2013/series/leveling-up-css-with-sass-basics-setup-part-1/">Part 1 - Basics</a>
+        <a href="#">Part 2 - Advanced Techniques</a>
+    </nav>
+</blockquote>
+
+<p>At its core, the goal of Sass is to avoid repetitive CSS styles. One efficient Sass practice is the use of variables which allow for a single location, or source of truth, on specific styles or values. These variables are easily reusable across multiple files. The next step to removing repetition in your styles is through the use of functions, mixins, and placeholders. These techniques allow you to use large blocks of code without duplicating it.</p>
+
+<h3>Functions, Mixins, and Placeholders. What is the difference?</h3>
+<p>Before we get into the differences lets get into a quick review of what each one is. If you have ever used a backend programming language like php or rails, then you already know the <em>function</em> of functions. If this is a new concept for you, then a function basically performs an operation and then explicitly returns a value for usage. Think of it like the addition button on a calculator. Mixins are very similar to functions except they do not have to explicitly return a value. They can instead return Sass styles directly to the file. Essentially a Mixin can output multiple styles within a selector while a function can only return a single value. Placeholders are a little more tricky. A placeholder provides a style or group of styles that can be extended or <em>included</em> into other styles. Let's take some time and break down each of these further.</p>
+
+<h4>Functions</h4>
+<p>As I mentioned before a function must explicitly return a value. Functions use the keyword <code>@return</code> to define what value is being output. When building a function a good rule to follow is that it should only perform a single operation or action. An example would be calculating a letter-spacing, a single CSS value, from a Photoshop design. A function that is specific can be used across more projects. Functions can also optionally take arguments as seen below <code>($value)</code>. These instance variables can then be used within the function. Functions are called just by using the declared function name in this instance <code>letter-spacing(50)</code>.</p>
+{% highlight scss %}
+
+/**
+ * Letter spacing function declaration
+ *
+ * Function accepts a value and then calculates the letter-spacing in em units
+ *
+ * @author Josh Frankel <josh@joshfrankel.me>
+ */
+@function letter-spacing ($value) {
+
+    // If the letter-spacing $value is negative
+    @if $value < 0 {
+
+        // Convert to negative and then change unit type to em
+        @return ($value * -1 / 1000) * -1em;
+    }
+
+    // If the letter-spacing $value is equal to zero
+    @else if $value == 0{
+
+        // return value unaltered
+        @return $value;
+    }
+
+    // Else the $value must be positive
+    @else {
+
+        // Calculate the letter-spacing and change unit to em
+        @return ($value / 1000) * 1em;
+    }
+}
+
+// Example Styles
+h1 {
+    // Call the letter-spacing function and pass in 50 as the $value
+    letter-spacing: letter-spacing(50);
+}
+{% endhighlight %}
+
+{% highlight css %}
+/* The calculated letter spacing */
+h1 {
+    letter-spacing: 0.05em;
+}
+{% endhighlight %}
+<p>In the function above I have also used conditional statements in the form of <code>@if</code>, <code>@else if</code>, and <code>@else</code>. These work in the same manner as other languages and allow for more functionality.</p>
+<p>Additionally, the function uses standard operators to perform math calculations. If you look at this line of code <code>@return ($value / 1000) * 1em;</code> it follows the order of operations with the parenthesis to find the correct letter-spacing value. The <code> * 1em</code> at the end of the line is a trick to convert a non-unit value into a unit of your choice.</p>
+
+<h4>Mixins</h4>
+<p>Mixins share a very similiar responsibility as functions do. They essentially could be used the same way, e.g. you could build a Mixin that outputs single value. The difference here is that Mixins don't use the <code>@return</code> keyword and Mixins can directly output styles when the are included into your Sass.</p>
+<p>Additionally like functions, Mixins can also accept arguments, which allow for some added functionality. To call a Mixin you use the <code>@include</code> keyword and then the mixin name. To declare a Mixin you use the <code>@mixin</code> keyword followed by any arguments.</p>
+{% highlight scss %}
+/**
+ * Pseudo Content Mixin
+ *
+ * Allows for easy pseudo elements
+ * @author Josh Frankel <josh@joshfrankel.me>
+ */
+@mixin pseudo-content ($pseudo, $url, $width, $height, $position: 0 0 no-repeat) {
+        // Make sure the parent is relative or else we will be positioning
+        // absolute for the pseudo element on the page width
+        position: relative;
+
+        // String interpolation and parent selector
+        &:#{$pseudo} {
+                background: url($url) $position;
+                content: '';
+                display: inline-block;
+                position: absolute;
+                height: $height;
+                width: $width;
+        }
+}
+
+// Example usage
+.sidebar {
+    @include pseudo-content ('before', 'images/icon-twitter.png', 20px, 20px, 0 0 no-repeat);
+}
+{% endhighlight %}
+
+{% highlight css %}
+    /* The mixin creates both of these rules by being placed inside .sidebar */
+    .sidebar {
+        position: relative;
+    }
+
+    /* The parent selector output */
+    .sidebar:before {
+        background: url(images/icon-twitter.png) 0 0 no-repeat;
+        content: '';
+        display: inline-block;
+        position: absolute;
+        height: 20px;
+        width: 20px;
+    }
+{% endhighlight %}
+<p>There is an important line in the pseudo-content Mixin that I glossed over. If you look at the code <code>&:#{$pseudo} {</code> it seems like a bunch of gibberish. I've actually utilized two Sass features on the same line: string interpolation and the parent selector.</p>
+<p><strong>String Interpolation</strong> is a method of outputting a value or variable so that Sass doesn't perform any operations on it. This is useful for inputting names into selectors as I have done above. The portion of the code <code>#{$pseudo}</code> says output the <code>$pseudo</code> variable directly at this location. So <code>#{$pseudo} {</code> is equal to <code>before {</code>. Since the original variable for $pseudo was a string, using string interpolation removes this formatting allowing us to use it as a selector.</p>
+<p>The <strong>parent selector</strong> is the first part of the line <code>&:</code> which tells the proceeding selector that it is the child of the current selector. Essentially, <code>.sidebar</code> is the parent selector so calling <code>&:#{$pseudo}</code> says that the new selector is the child of <code>.sidebar</code> and has a string interpolated variable as its name. The parent selector is not limiting to pseudo classes, you can also use <code>&.some-class-name</code> or <code>&:hover</code> for child classes and child pseudo selectors respectively.</p>
+
+<h4>Placeholders</h4>
+<p>Placeholders are basically super classes in CSS. Unlike, Mixins and Functions, placeholders do not allow for arguments to be passed in. They do directly output styles similar to Mixins. Placeholders are declared by using a <code>%</code> symbol and are called using the <code>@extend</code> keyword. Take a look at the below example.</p>
+{% highlight css %}
+.color-red {
+    color: red;
+}
+{% endhighlight %}
+<p>We could now declare html elements with the class of <code>.color-red</code> to make their font color red. This could then be reused on any number of elements. The downside is that we need to actually place this into the html. Sass solves this issue through Placeholders. Additionally by using Placeholders all the styles that extend them will be placed together into a single rule.</p>
+{% highlight scss %}
+/**
+ * Flexible Images
+ */
+%flexible-images {
+    height:auto;
+    width: 100%;
+}
+
+// Example calls to the placeholder
+.container img {
+    @extend %flexible-images;
+}
+.sidebar img {
+    @extend %flexible-images;
+}
+footer .menu img {
+    @extend %flexible-images;
+}
+{% endhighlight %}
+
+{% highlight css %}
+/* All styles are combined since they all use the same placeholder */
+.container img,
+.sidebar img,
+footer .menu img {
+    height:auto;
+    width: 100%;
+}
+
+{% endhighlight %}
+<p>As you can see above the placeholder combines all the styles using the current placeholder into a single rule. This drastically reduces the amount of CSS your webpage will be loading. Also you no longer have to keep adding classes to the html as you can now just write Sass. There are some bugs with using placeholder and media queries but the newer version of Sass should fix these.</p>
+<h3>Wrap up</h3>
+<p>I have talked about the differences of Functions, Mixins, and Placeholders. We have seen the power in using parent selectors and the utility of string interpolation. We briefly went over math calculations and how they follow the order of operations like other programming languages. In my next article we will step away from style techniques and focus on project and file organization.</p>

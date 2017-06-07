@@ -1,0 +1,90 @@
+---
+layout: post
+title: "How to validate attributes for serialized objects"
+date: 2016-06-03T11:54:38-04:00
+categories:
+- tutorials
+tags:
+- Ruby on Rails
+- Validation
+- Serialized Objects
+- Rspec
+---
+
+<p>Rail's out of the box validation feature set is fairly rich. You have the <code>validates</code> shortcut DSL which maps to all the default validators. The ability to override those default validators through <strong>custom validator classes</strong>. Finally, you can also write <strong>custom validator methods</strong> for specific use cases. For the purpose of this article, we'll focus on custom validator methods.</p>
+--excerpt--
+
+<h3>Custom Validator methods</h3>
+<p>I recently ran across a good use case for custom validator methods. Adding validation to attributes on a serialized object isn't possible by default in Rails without using a custom validator method. Here's our default code logic.</p>
+{% highlight ruby %}
+class Company < ApplicationRecord
+  serialize :settings, CompanySettings
+end
+
+class CompanySettings
+  SETTINGS_HASH = %w(
+    industry_speciality
+    company_email
+    branding_color # We want to validate this!
+  ).freeze
+end
+{% endhighlight %}
+<p>Looking at the above code, we can see that Company contains an association called <code>settings</code> that is based off the class <code>CompanySettings</code>. This class allows for new columns to be easily added to a settings hash but has the unfortunate downside of preventing the usage of Rail's built-in default validators (since CompanySettings is not a model in this case). Ideally, having every attribute properly validated and tested is the way to go, so finding a solution to this problem was a priority.</p>
+<p>A colleague and I came across <a href="http://guides.rubyonrails.org/active_record_validations.html#custom-methods" target="_blank">custom methods</a> within the Rail's validators documentation. This solved our issue via the ability of a custom validation method as well as a matching spec for the new method. An added benefit from this solution, was the freedom in the future to add additional branches and error conditions. See the full solution below.</p>
+{% highlight ruby %}
+class Company < ApplicationRecord
+  serialize :settings, CompanySettings
+
+  VALID_COLOR_REGEX = /\A#[0-9a-fA-F]{6}\z/
+
+  # Notice how this DSL uses validate instead of validates
+  #
+  # The reason for this is two-fold.
+  #
+  # 1. validates is the shortcut dsl for built-in validator classes
+  # 2. In order to use custom validator methods you first need to register
+  # the method with the validate API
+  validate :branding_color
+
+  def branding_color
+    if settings.branding_color.present? # This is equivalent to validates allow_blank: true attribute
+      && !VALID_COLOR_REGEX.match(settings.branding_color)
+      errors.add(:settings_branding_color, I18n.t("company_settings.branding_color.error_message"))
+    end
+  end
+end
+
+# spec/models/company_spec.rb
+describe Company do
+
+  describe "#branding_color" do
+    let(:company) { build(:company) }
+
+    it "is valid when custom link color is empty" do
+      expect(company.valid?).to be true
+    end
+
+    it "is valid when custom link color is a correct color hex code" do
+      company.settings.branding_color = "#abcdef"
+      expect(company.valid?).to be true
+    end
+
+    it "is invalid with a bad color hex code" do
+      company.settings.branding_color = "invalid_color"
+      expect(company.valid?).to be false
+    end
+  end
+end
+{% endhighlight %}
+<p>The previous code provides a way of properly validating a field that is within a serialized object. We also have the piece of mind that this will function how we expect thanks to a clear spec of the new validation method.</p>
+
+<h3>A little on custom validator classes</h3>
+<p>Generally, custom methods seem to work great for quick or difficult to validate attributes while custom validator classes are beneficial for multiple files that share the same validation method. Custom validator classes also give you the power to override the current implementations of default validators (like email or password) or write your own (MyValidatorClass).</p>
+
+<h3>Conclusion</h3>
+<p>Here are some quick basics for custom validation methods:</p>
+<ul>
+  <li>Must register a method with the <code>validate :method_name</code> syntax</li>
+  <li>Enables validation on otherwise difficult to validate attributes (e.g. serialized)</li>
+  <li>Allows for multiple error branches and messages</li>
+</ul>

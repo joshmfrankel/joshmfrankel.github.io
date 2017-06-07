@@ -1,0 +1,18 @@
+---
+layout: post
+title: Why is Modernizr.load broken for the development version
+categories:
+- Articles
+tags:
+- js
+- plugins
+- Modernizr
+published: true
+---
+<p>The current development version of Modernizr does not contain the yepnope.js bundle.  This is somewhat tricky as there is no error message or notification except in the console debugger.</p>--excerpt--
+
+{% highlight js %}
+Uncaught TypeError: Object has no method 'load'
+{% endhighlight %}
+
+<p>Luckily, there is an easy fix for this.  Just download the <strong>production version</strong> and make sure to mark the checkbox called Modernizr.load(yepnope).  Fixed!</p>

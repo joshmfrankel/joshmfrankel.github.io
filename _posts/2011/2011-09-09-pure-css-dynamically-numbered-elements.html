@@ -1,0 +1,44 @@
+---
+layout: post
+title: 'Pure CSS: Dynamically numbered elements'
+categories:
+- Techniques
+tags:
+- CSS 3
+published: true
+---
+<p>So this isn't a <mark title="Been around since CSS 2.1">new trick</mark> by any means, but it sure is handy (Think outlines, book chapters, line numbering...) The more markup you can minimize via CSS the better, in my book.</p>--excerpt--
+<blockquote title="http://www.w3.org/wiki/CSS/Properties/counter-increment">Counter-increment CSS Property
+"The counter-increment property accepts one or more names of counters (identifiers), each one optionally followed by an integer. The integer indicates by how much the counter is incremented for every occurrence of the element. The default increment is 1. Zero and negative integers are allowed." -W3.org</blockquote>
+<p>Fundamentally this property allows web developers to dynamically name html elements per element. I am using this to create line numbers for theme editor app</p>
+<h3>Background</h3>
+<p>The counter-reset property specifies when the counter should be reset. The identifier in this property is just a matter of preference. A lot of examples I have run across use section or chapter. To use this effectively you need to specify a parent element with the counter-reset property and the child element that should be incremented with the counter-increment property.</p>
+<h3>Example</h3>
+<h5>CSS</h5>
+{% highlight css %}
+body {
+  counter-reset: section;
+}
+
+div:before {
+  counter-increment: section;
+  content: counter(section);
+}
+{% endhighlight %}
+
+<h5>HTML</h5>
+{% highlight html %}
+<body>
+  <div>Some content goes here</div>
+  <div>More content goes here</div>
+  <div>Yep, more content</div>
+</body>
+{% endhighlight %}
+
+<h5>Output</h5>
+<blockquote>1 Some content goes here
+
+2 More content goes here
+
+3 Yep, more content</blockquote>
+<p>Check out my jsfiddle for a demo! <a href="http://jsfiddle.net/joshmfrankel/mbM9Z/7/">Dynamic Numbered CSS</a></p>

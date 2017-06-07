@@ -1,28 +1,19 @@
 # joshmfrankel.github.io
-Blog and Personal site
+Web Development Simplified
 
 ## Todo
-
-* About me
-* Skills
-* Resume
-* Conferences
-* Contact
-
-### Add
-- [ ] Update headshot
-- [ ] Add Specific skills:
-  * Ruby on Rails
-  * RSpec, Capybara
-  * SASS
-  * PostgreSQL
-  * Agile Development
-  * Rubocop / Stylelint
-  * Heroku
-  * Jekyll / Octopress
-  * Git
-  * Pundit, Devise
-
-### Remove
-- [ ] What I do: PHP, Laravel, Mongodb
-- [ ] Remove Portfolio
+- [ ] CSS
+  * Adjust background color
+  * Add visual interest separator lines
+- [ ] Header
+  * Add JF logo
+  * Remove Archives, Categories, Tags links (to footer)
+  * Add About page
+- [ ] Listing
+  * Add Excerpt
+- [ ] Remove Sharing plugin
+- [ ] Refresh footer
+- [ ] About page
+  * Contact
+  * What I do section
+  * Skills

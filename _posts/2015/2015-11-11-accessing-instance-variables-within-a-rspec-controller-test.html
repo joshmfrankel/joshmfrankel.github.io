@@ -1,0 +1,31 @@
+---
+layout: post
+title: "Accessing instance variables within a Rspec controller test"
+date: 2015-11-11T21:31:03-05:00
+categories:
+- tips-and-tricks
+tags:
+- rspec
+- ruby
+- rails
+- testing
+---
+
+<p>If you have ever tried to write functional tests for a controller, you will know that they can be a little tricky. One such trip up point that I ran into was accessing instance variables from within the controller spec. You can't just use <code>expect(@variable).to be_valid</code> because <code>@variable</code> is an instance variable and won't be defined in your spec's scope.</p>--excerpt--
+
+<h3>Rspec and hashes</h3>
+<p>Instead Rails provides a number of hash objects for easier functional testing. To grab the instance variable one only needs to use the following format <code>assigns(:variable)</code>. This will grab the <code>@variable</code> from the controller so you can use it in your tests.</p>
+
+<div class="well">
+  <p><strong>More hashes</strong></p>
+  <p>There are a total of 4 hashes that can be utilized in your tests</p>
+  <ul>
+    <li><strong>assigns</strong> - Any objects that are stored as instance variables in actions for use in views.</li>
+    <li><strong>cookies</strong> - Any cookies that are set.</li>
+    <li><strong>flash</strong> - Any objects living in the flash.</li>
+    <li><strong>session</strong> - Any object living in session variables.</li>
+  </ul>
+  <p><small>reference:</small> http://guides.rubyonrails.org/</p>
+</div>
+
+<p>Got any tips for working with Rspec controller specs? Leave a comment below.</p>

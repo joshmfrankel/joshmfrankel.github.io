@@ -1,0 +1,72 @@
+---
+layout: post
+title: Restrict an integer to a specific range in Ruby
+categories:
+- how-to
+tags:
+- Ruby
+published: true
+---
+
+<p>Ever wanted an integer to be allowed a specific range of valid numbers rounding when necessary? Well, unfortunately in the Ruby community this has been a point of contention because no built-in function exists. We can however easily replicate the intended behavior through the clever usage of the enumerable sort method.</p>
+--excerpt--
+<h3>This may be a bit overkill...</h3>
+<img src="{{ site.url }}/img/2015/clamp-integer-post-clamp.jpg" alt="Image property of amazon.com" />
+<p><small><em>Image property of amazon.com</em></small></p>
+<p>Because we want to return an integer that has been "clamped" to a specific range we need a way to set a minimum and maximum value. The Enumerable sort method comes in handy for this purpose. We'll be using the sort method while grabbing the second element in the returned array to gather the appropriate clamp value.</p>
+<h3>All about sort</h3>
+<p><code>Enumerable#sort</code> takes an array and attempts to sort the elements either alphabetically or by number unless a custom sort is passed to the block. This allows something like the following to occur.</p>
+{% highlight ruby %}
+%w(rhea kea flea).sort     #=> ["flea", "kea", "rhea"]
+{% endhighlight %}
+
+<p class="well"><strong>Sort Defined:</strong><br />"Returns an array containing the items in enum sorted, either according to their own <=> method, or by using the results of the supplied block."</p>
+
+<p>For the sake of this post we will use the <strong>following integer range of 0 to 10</strong> to set the min and max values. These values will use the sort method to order them in rising order. I will show a couple examples below to demonstrate how this method works.</p>
+{% highlight ruby %}
+x = 20
+[x, 0, 10].sort[1]  #=> 10
+
+x = -10
+[x, 0, 10].sort[1]  #=> 0
+
+x = 6
+[x, 0, 10].sort[1]  #=> 6
+
+x = 10
+[x, 0, 10].sort[1]  #=> 10
+
+{% endhighlight %}
+<p>Pretty slick looking, albeit a bit cryptic. Never fear it is actually quite simple to explain.</p>
+<p>By using three integers, one of which is our input integer, and then calling sort on them we receive the integers in rising order from lowest to smallest. The trick here is <code>.sort[1]</code>. This says sort the previous array and return the 2nd element from it. Since arrays start at 0 then <code>[1]</code> means the second or middle element.</p>
+<p class="well"><strong>Clamp Equation:</strong><br />[x, a, b].sort[1] <br /><br />x - input<br />a - minimum value<br />b - maximum value</p>
+
+<h3>Disassemble it!</h3>
+<img src="{{ site.url }}/img/2015/clamp-disassemble.jpg" alt="Image property of http://genius.com/" />
+<p><small><em>Image property of http://genius.com/</em></small></p>
+<p>So now we will always return the proper clamped value. Lets take a look at an example of what is happening. I'll reuse the first example from above with comments to disassemble what is happening in the intermediate steps.</p>
+{% highlight ruby %}
+
+# Usage
+x = 20
+[x, 0, 10].sort[1]
+
+# Explanation
+[x, 0, 10]
+# [20, 0, 10]  This is what the array looks like in reality
+
+[20, 0, 10].sort
+# [0, 10, 20]  What the array looks like after the sort method is called
+
+[0, 10, 20].sort[1]
+# .sort[1] returns 10 because 10 is the second index in the array
+{% endhighlight %}
+<p>There you have it. A simple and easy way to clamp integers between a range. Also you might be wondering why I keep using the phrase clamp. That is because in other programming languages the clamp method is built-in to accomplish this from the start.</p>
+
+<h3>TL;DR</h3>
+<p>Here it is in method form for easy copy and pasting.</p>
+{% highlight ruby %}
+def clamp (input, min, max)
+    [input, min, max].sort[1]
+end
+{% endhighlight %}

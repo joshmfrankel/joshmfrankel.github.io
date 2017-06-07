@@ -1,0 +1,6 @@
+<div class="article-image" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+  <img src="{{ site.url }}/img/{{ include.src }}" alt="{{ include.caption }}" />
+  <meta itemprop="url" content="{{ site.url }}/img/{{ include.src }}" />
+  <meta itemprop="width" content="{{ include.width }}" />
+  <meta itemprop="height" content="{{ include.height }}" />
+</div>

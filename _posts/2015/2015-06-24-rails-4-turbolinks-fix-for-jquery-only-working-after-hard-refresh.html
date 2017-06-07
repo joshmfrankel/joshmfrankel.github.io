@@ -1,0 +1,25 @@
+---
+layout: post
+title: Rails 4 turbolinks fix for jQuery only working after hard refresh
+categories:
+- Fix
+tags:
+- Ruby on Rails
+- jQuery
+- Turbolinks
+---
+
+<p>The Rails asset pipeline uses a feature called Turbolinks for serving faster CSS and JS assets to the browser. It works by using AJAX to re-load assets without refreshing the page. Unfortunately, it also can mess up scripts that work with the document ready event such as jQuery. The only way to make the assets work is with a hard refresh. Let's fix this.</p>
+--excerpt--
+<p>Luckily for us the fix for this issue is fairly simple, though towards the bottom of the documentation. <strong title="Step 1">First</strong> we need to add a new gem to our Gemfile <code>gem 'jquery-turbolinks'</code> to add jQuery support for Turbolinks. Make sure to run <code>bundle</code> to reload your gems.</p>
+<p><strong title="Step 2">Next</strong> we need to add the jquery-turbolinks files into our <mark>application.js</mark> asset load order. Make sure to place <code>//= require jquery.turbolinks</code> exactly after <code>//= require jquery</code> and before <code>//= require turbolinks</code> for this to work correctly.</p>
+<h4>Application.js</h4>
+{% highlight ruby %}
+//= require jquery
+//= require jquery.turbolinks
+//= require jquery_ujs
+//= require bootstrap-sprockets
+//= require turbolinks
+//= require_tree .
+{% endhighlight %}
+<p><strong title="Step 3">Lastly</strong>, make sure to stop any running instances of the Rails server to reload your assets and environment. Then just restart the server with <code>rails s</code>. At this point everything should be up and running smoothly again.</p>

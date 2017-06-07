@@ -1,0 +1,52 @@
+---
+layout: post
+title: Guard fix for could not start Spork server for Rspec
+categories:
+- Fix
+tags:
+- Ruby on Rails
+- Rspec
+- Guard
+- TDD
+- Automation
+published: true
+---
+
+<p>While working through the expertly written <a href="http://www.railstutorial.org/book">"The Ruby on Rails Tutorial"</a> by Michael Hartl, I ran into a small configuration issue.  The issue I experienced was with Guard not properly starting a Spork server from the command line.  My system was able to run Rspec, Spork, and Guard with no errors as long as Guard didn't try to load Spork.  Here is what my terminal output looks like.</p>--excerpt--
+
+{% highlight console %}
+josh@Josh-eOS:~/Web/Freelance/qstate$ guard
+15:28:49 - INFO - Guard is using Libnotify to send notifications.
+15:28:49 - INFO - Guard is using TerminalTitle to send notifications.
+15:28:49 - INFO - Starting Spork for RSpec, Test::Unit
+Couldn't find a supported test framework that begins with 'testunit'
+
+Supported test frameworks:
+( ) Cucumber
+(*) RSpec
+
+Legend: ( ) - not detected in project   (*) - detected
+Using RSpec, Rails
+Preloading Rails environment
+Loading Spork.prefork block...
+Spork is ready and listening on 8989!
+15:29:19 - ERROR - Could not start Spork server for RSpec, Test::Unit after 30 seconds. I will continue waiting for a further 60 seconds.
+{% endhighlight %}
+
+<p>I'm positive that others have experienced this same error.  The hint for the fix comes from the lines <code>15:28:49 - INFO - Starting Spork for RSpec, Test::Unit.  Couldn't find a supported test framework that begins with 'testunit'</code>.  This means that Guard was attempting to run tests using the testunit framework (which was not installed).  To fix this add <code>:test_unit => false</code> to your Guardfile's Spork block.  It should look something like this.</p>
+
+{% highlight ruby %}
+guard 'spork', :test_unit => false, :cucumber_env => { 'RAILS_ENV' => 'test' }, :rspec_env => { 'RAILS_ENV' => 'test' } do
+...
+{% endhighlight %}
+
+<h3>Additional Issues</h3>
+<p>For troubleshooting surrounding Guard and Spork, take a look at the <a href="https://github.com/guard/guard-spork">github page</a> for guard-spork.  Here are a couple of the most basic things you can check.</p>
+
+<blockquote>
+    <ul>
+        <li>If you can start Spork manually but get the following error message when using Guard::Spork:</li>
+        <li>Starting Spork for RSpec ERROR: Could not start Spork for RSpec/Cucumber. Make sure you can use it manually first.</li>
+        <li>Try to increase the value of the :wait => 60 option before any further investigation. It's possible that this error is the result of an unnecessary /test directory in the root of your application. Removing the /test directory entirely may resolve this error.</li>
+    </ul>
+</blockquote>

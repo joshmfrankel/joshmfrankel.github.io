@@ -1,0 +1,187 @@
+---
+layout: post
+title: Jedi or Sith Lord&#58; Ruby's inject method
+date: 2016-04-03T09:55:57-04:00
+categories:
+- enumerables
+tags:
+- Ruby
+published: true
+---
+
+<p>"Remember, a Jedi's strength flows from the Force."</p>
+<p itemprop="description">The ruby inject method is a powerful ally in a jedi (ruby) master's arsenal. It is wielded easily to those who train with it and mastered by a jedi with both knowledge of the light and dark side of the force. The light side of inject involves the different usages for the method as well as the basic format of it. The dark side involves inject's power using symbol#to_proc shortcut methods.</p>
+--excerpt--
+<h3>Inject <small>a.k.a. Reduce</small></h3>
+
+<p>The inject method in ruby is a powerful method for reducing (or folding) all the elements of a collection, into a single value. It is commonly known as the reduce or fold method in other programming languages. Ruby provides an alias to reduce via inject.</p>
+<p>Let's walk through a typical use case for the inject method in ruby. I originally thought of this idea after reading <a href="http://www.globalnerdy.com/2008/09/03/enumerating-enumerable-a-cute-trick-for-explaining-inject-reduce-fold/" target="_blank">this awesome post</a>, by Joey Devilla. He uses folding paper to demostrate how inject works. Rather than recreate his post, I've decided to use playing cards to demonstrate another type of explanation.</p>
+
+{% include rich-snippets/article-image src="2016/inject/post-intro-1.jpg" caption="The darkside collection" width="700" height="560" %}
+
+<p>Thought I was done with the Star Wars theme, eh? Not quite.</p>
+<p>If you look at the above picture, I've grabbed five cards out of the deck. For now just assign them number values: 1 for ace, 2 for 2, and so on. Our goal is to calculate the total number of points that we hold in our hand. The cards directly represent our ruby collection that is passed into the block.</p>
+<p>The inject method works by taking values and injecting, or folding, them into themselves. For instance the following code is an example of calculating the sum for the above collection using the inject method.</p>
+{% highlight ruby %}
+[1, 2, 3, 4, 5].inject { |sum, n| sum + n }
+# => 15
+{% endhighlight %}
+<p>Using our smaller deck of cards above, I'll show you exactly what is happening step-by-step. First we take our first card (Ace or 1) and combine with the second card that we drew (2) from the deck.</p>
+<div class="card-container">
+  <div class="card-drawn">
+    <h4>Drawn</h4>
+    <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
+  </div>
+  <div class="card-collection">
+    <h4>In Hand</h4>
+    <div class="card-collection-in-hand">
+      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
+    </div>
+  </div>
+</div>
+{% highlight ruby %}
+# Inject, or fold, 2 into the starting sum of 1
+[1, 2, 3, 4, 5].inject { |1, 2| 1 + 2 } # => 3
+{% endhighlight %}
+<p>The inject method takes the first two indexes from the cards in our hand, or the collection, and applies them to the block. Essentially, 1 becomes the <strong>sum</strong> and 2 becomes <strong>n</strong>. This is the typical implementation of inject.</p>
+
+<p>Next, drawing a new card from the deck we recieve 3.</p>
+<div class="card-container">
+  <div class="card-drawn">
+    <h4>Drawn</h4>
+    <img src="{{ site.url }}/img/2016/inject/Card-3.jpg" alt="2">
+  </div>
+  <div class="card-collection">
+    <h4>In Hand</h4>
+    <div class="card-collection-in-hand">
+      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
+    </div>
+  </div>
+</div>
+{% highlight ruby %}
+# Inject 3 into the sum
+[1, 2, 3, 4, 5].inject { |3, 3| 3 + 3 } # => 6
+{% endhighlight %}
+<p>Note that on this iteration of the inject method we already have the cards, ace and 2, in our hand. Therefore, the current sum is 3 and n, or the current drawn card is also 3. This gives us a resulting sum of 6.</p>
+
+<p>Let's draw another card from the deck.</p>
+<div class="card-container">
+  <div class="card-drawn">
+    <h4>Drawn</h4>
+    <img src="{{ site.url }}/img/2016/inject/Card-4.jpg" alt="4">
+  </div>
+  <div class="card-collection">
+    <h4>In Hand</h4>
+    <div class="card-collection-in-hand">
+      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="{{ site.url }}/img/2016/inject/Card-3.jpg" alt="3">
+    </div>
+  </div>
+</div>
+{% highlight ruby %}
+# Inject 4 into the sum
+[1, 2, 3, 4, 5].inject { |6, 4| 6 + 4 } # => 10
+{% endhighlight %}
+<p>Sensing a pattern here? The previous sum is 6 and the new card is 4 giving us a current sum of 10.</p>
+
+<p>Draw the last card</p>
+<div class="card-container">
+  <div class="card-drawn fix-md">
+    <h4>Drawn</h4>
+    <img src="{{ site.url }}/img/2016/inject/Card-5.jpg" alt="5">
+  </div>
+  <div class="card-collection">
+    <h4>In Hand</h4>
+    <div class="card-collection-in-hand">
+      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="{{ site.url }}/img/2016/inject/Card-3.jpg" alt="3">
+      <img src="{{ site.url }}/img/2016/inject/Card-4.jpg" alt="4">
+    </div>
+  </div>
+</div>
+{% highlight ruby %}
+# Inject 4 into the sum
+[1, 2, 3, 4, 5].inject { |10, 5| 10 + 5 } # => 15
+{% endhighlight %}
+<p>Finally, our last card (5) gets added to the total for a grand total of 15 points for our hand.</p>
+<div class="card-container">
+  <div class="card-collection">
+    <h4>In Hand</h4>
+    <div class="card-collection-in-hand">
+      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="{{ site.url }}/img/2016/inject/Card-3.jpg" alt="3">
+      <img src="{{ site.url }}/img/2016/inject/Card-4.jpg" alt="4">
+      <img src="{{ site.url }}/img/2016/inject/Card-5.jpg" alt="5">
+    </div>
+  </div>
+</div>
+
+
+<p>This is the power of inject in that it can reduce a collection down to a single value. All in a single line of code no less!</p>
+<p>Here are some alternative formats for accomplishing the same thing.</p>
+{% highlight ruby %}
+(0..5).inject(:+) # => 15, Whoa! We'll talk about (:+) a little later.
+(0..5).reduce { |sum, n| sum + n } # => 15, reduce is an alias to inject
+{% endhighlight %}
+
+<h3>If you only knew the power of Ruby's inject method!</h3>
+<img src="{{ site.url }}/img/2016/inject/power-of-darkside.gif" alt="You dont know the power of the darkside - From http://heavy-metal-aesthetic.tumblr.com/">
+<p>The inject method has a couple of tricks up its sleeve (card pun). Here are several of the formats that you can utilize. These are taken straight from the ruby docs.</p>
+{% highlight ruby %}
+inject(initial, sym) → obj
+inject(sym) → obj
+inject(initial) { |memo, obj| block } → obj
+inject { |memo, obj| block } → obj
+{% endhighlight %}
+<h4>inject(initial) { |memo, obj| block } → obj</h4>
+<p>This format of inject allows the developer to pass in an optional initial value to be used as the first element. Other than that this format is exactly the same as <code>inject { |memo, obj| block } → obj</code>.</p>
+<p>Looking at our above example we essentially could say the initial value of the block is the ace (1), or our first card. Inject assumes the first index as your initial value unless you specify it using the <code>inject(initial)</code> optional format. This is what would happen if instead of using the ace we had drawn another 5 before the other cards.</p>
+{% highlight ruby %}
+[1, 2, 3, 4, 5].inject(5) { |sum, n| sum + n } # => 20
+{% endhighlight %}
+<p>Now our first iteration of the loop yields <code>{ |5, 1| 5 + 1 }</code> and increases the ending sum by 5 making it 20. This can come in handy if you have an existing collection and need to use a different starting point.</p>
+
+<h4>Staying on target in the real world <small>with an example</small></h4>
+<img src="{{ site.url }}/img/2016/inject/stay-on-target.gif" alt="From giphy.com" />
+<p>Let's take a look at a real world example. Say we had a forum for asking questions on our website between buyers and sellers. The buyer creates questions that can be shared between multiple projects. On these projects, the seller answers the required questions.</p>
+<p>Now the project requirement is to lock the buyer out of editing a question, if that particular question is used on more than one project or location in the app. We need to make sure that we have a starting value of 0 in this example which is where our initial value comes into play.</p>
+{% highlight ruby %}
+[seller.projects.questions, seller.other_locations.questions].inject(0) do |sum, n|
+  break sum if sum > 1
+  sum + n.size
+end
+{% endhighlight %}
+
+<blockquote class="floating-quote floating-quote-right" cite="https://en.wikipedia.org/wiki/Lazy_evaluation"><div class="page-header">Lazy Evaluation</div>
+"...lazy evaluation, or call-by-need is an evaluation strategy which delays the evaluation of an expression until its value is needed (non-strict evaluation) and which also avoids repeated evaluations..."
+<p>- Wikipedia</blockquote>
+
+<p>The above code will check the size of the collection within the array (e.g. seller.projects.questions), and add its size to the sum.</p>
+<p>Then by adding a stop condition to the inject statement <code>break sum if sum > 1;</code>, the inject iteration will stop once we determine that a question is in use elsewhere in the app. This utilizes a technique called <strong>lazy evaluation</strong> to essentially not do any more work than is necessary.</p>
+<p>Now that we have an understanding into the inner workings of inject, we'll now take look at the darkside of the force with Symbol#to_proc.</p>
+
+
+<h3>It’s true. All of it. Enumerables, Symbol#to_proc. They’re real.</h3>
+<img src="{{ site.url }}/img/2016/inject/Its_true_all_of_it.gif" alt="From polygon.com" />
+
+<p>Do you remember seeing this example above? <code>(0..5).inject(:+) #=> 15</code>. This format is known as Symbol#to_proc or <code>inject(sym) → obj</code>. This is also known as using some of Ruby's built-in syntactical sugar.</p>
+<h4>inject(sym) → obj</h4>
+<p>In more simple terms, <code>inject(sym)</code>, allows you to pass in a symbol which is then executed against the collection. For instance <code>:+</code>, would take the elements from the collection and add them to each other one at a time.</p><p>
+Some addtional examples of valid symbols include: <code>:+</code>, <code>:-</code>, <code>:*</code>, and <code>:/</code>.</p>
+<p>Let's take a look at the two bits of code that accomplish the exact same thing.</p>
+{% highlight ruby %}
+[1, 2, 3, 4, 5].inject { |sum, n| sum + n } #=> 15
+[1, 2, 3, 4, 5].inject(:+) => 15
+(0..5).reduce(:+) => 15, this is the same thing again just different format
+{% endhighlight %}
+<p>This can be quite handy for quickly implementing basic logic against a collection. Additionally, just like above the <code>inject(sym) → obj</code> format can also accept an initial value in the following format <code>inject(initial, sym) → obj</code>
+<img src="{{ site.url }}/img/2016/inject/yoda-strength.jpg" alt="Yoda inspirational quote">
+<p>Pretty awesome, no?</p>
+<div class="well floated"><p><strong>Symbol confusion</strong></p><p>There two different symbol formats you may encounter online. Up until Ruby 1.8.7, the inject method required that you prepend symbols with an ampersand (<code>&:+</code>) to convert them to a Proc so that inject could understand them. With 1.8.7 the inject method will accept both <code>:+</code> and <code>&:+</code> as valid symbols.</p></div>
+<p>Now before you go applying <code>:+</code> and <code>:*</code> to other enumerable methods such as <code>(0..5).map</code>, keep in mind that these require the usage of the ampersand to convert them to proc. Only inject and reduce have this functionality of current.</p>
+<p>In the next Enumerables series post, we'll take a look at the map method. So keep reading to learn more about how powerful Ruby's enumerable methods really are.</p>
+<p>Got a method you'd like to see analyzed? Leave me a comment below.</p>

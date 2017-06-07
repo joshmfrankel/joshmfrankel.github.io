@@ -1,0 +1,35 @@
+---
+layout: post
+title: "Saving Script Output From Heroku to a Local File"
+date: 2017-03-28T15:45:24-04:00
+categories:
+- tips
+tags:
+- heroku
+- ruby on rails
+---
+
+<p>Have you ever needed to gather a large amount of data from your production server but didn't have the script available on the server? You could remote into the server and write the script in rails console but what if the volume of data was in the hundreds of thousands? And you needed it in CSV format? Well, recently I recently discovered a great little command for gathering remote data and saving it to a local file.</p>
+--excerpt--
+
+{% highlight ruby %}
+heroku run rails runner 'Your full script pasted here' -a my-app-name > data.txt # Stores the return data into a file called data.txt
+{% endhighlight %}
+<p>If you are exporting to a CSV you'll need to make sure that the script uses <code>puts</code> before the generated data. This will properly print out the CSV string and save it to the data.txt file listed in the above snippet.</p>
+<p>In one of my previous posts, <a href="http://joshfrankel.me/blog/2016/tips-and-tricks/fast-reports-exporting-to-csv-in-rails/">Exporting to a CSV</a>, I mentioned how to go about exporting data into CSV format. Building upon that lesson let's see what the the new command would look like.</p>
+{% highlight ruby %}
+# Multi-line scripts are not a problem
+# Try classes as well
+heroku run rails runner 'users = User.all
+headers = ["Name", "Email", "Role"]
+
+csv = CSV.generate do |csv|
+  csv << headers # Add the headers to the csv
+
+  users.each do |user|
+    csv << [user.name, user.email, user.role]
+  end
+end
+
+puts csv' -a my-app-name > data.txt # We now have production data in a local file
+{% endhighlight %}

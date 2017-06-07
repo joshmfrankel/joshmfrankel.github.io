@@ -1,0 +1,91 @@
+---
+layout: post
+title: "Custom Named Belongs_to Associations in Rails with foreign key constraints"
+date: 2016-09-01T09:45:46-04:00
+categories:
+- tutorials
+tags:
+- Ruby on Rails
+- ActiveRecord
+---
+
+<p itemprop="description">Associations are great in Rails. There is a ton of
+functionality baked right in. One such feature is the ability to change the
+name of association columns.</p>
+--excerpt--
+<p>First, lets talk through some setup data. We are working with two
+models: <strong>Journal</strong> and <strong>User</strong>. And their respective
+association:</p>
+<ul>
+  <li>A User has_many Journals</li>
+  <li>A Journal belongs_to a User</li>
+</ul>
+<p>Given this information you might come up with something like</p>
+{% highlight ruby %}
+rails generate AddUserToJournal user:references
+
+# app/models/journal.rb
+class Journal < ActiveRecord::Base
+  belongs_to :user
+end
+
+# app/models/user.rb
+class User < ActiveRecord::Base
+  has_many :journals
+end
+
+user = User.new(...)
+Journal.create(user: user)
+{% endhighlight %}
+
+<h3>Who is the creator of the Journal?</h3>
+<p>The previous setup works as you would expect, but what if you wanted to better describe
+who <em>created</em> a <strong>Journal</strong> without changing the classname for <strong>User</strong>?
+You might want a column named <code>creator</code> that stores the user who created the journal.
+This would allow for more readable association language for future developers.</p>
+
+<p>Rails has some built in support to achieve just this using some additional arguments
+within the belongs_to method. Note: this requires no changes to the User model.</p>
+{% highlight ruby %}
+rails generate AddCreatorToJournal creator_id:integer # Can't use references since we are now aliasing to creator
+
+# app/models/journal.rb
+class Journal < ActiveRecord::Base
+  belongs_to :creator, class_name: :User
+end
+
+user = User.new(...)
+Journal.create(creator: user) # Check this out! Rails magic allows us to pass in a user as a creator
+{% endhighlight %}
+
+<p>Our model now responds to the column name creator the same way it would to a
+standard user reference.</p>
+
+<h3>One step further</h3>
+<p>You can improve on this approach by adding an index and foreign key to the
+creator_id column in the migration. This ensures referential integrity as well as
+speeding up any queries based on creator_id.</p>
+{% highlight ruby %}
+# What the migration might look like
+class AddCreatorToJournal < ActiveRecord::Migration
+  def change
+
+    # Notice how the index is for :creator but references users
+    add_reference :journals, :creator, references: :users, index: true
+
+    # Just like the belongs_to contained class_name: :User, the foreign key
+    # also needs a specific custom column name as :creator_id
+    add_foreign_key :journals, :users, column: :creator_id
+  end
+end
+
+# app/models/journal.rb
+class Journal < ActiveRecord::Base
+  # Sets the specific name of the foreign key to the creator_id like in the
+  # migration above
+  belongs_to :creator, class_name: :User, foreign_key: :creator_id
+end
+{% endhighlight %}
+<p>Now you have a custom named column, that is constrained based on a foreign key
+, and indexed for faster querying. There are plenty of other tricks with
+associations that can also be found on <a href="http://guides.rubyonrails.org/association_basics.html" target="_blank">Rails Guides</a>.</p>

@@ -1,0 +1,48 @@
+---
+layout: post
+title: "How to output a string from the elusive non-output block method; concat"
+date: 2015-09-03T10:36:16-04:00
+categories:
+- how-to
+tags:
+- Ruby
+published: true
+---
+
+<p>As a developer, there are many times when printing a value is essential to debugging an application. Sometimes you are unable to use the <code><%= string %></code> output block method.</p>
+--excerpt--
+
+<h3>Concat</h3>
+<blockquote>The preferred method of outputting text in your views is to use the <%= “text” %> eRuby syntax. The regular puts and print methods do not operate as expected in an eRuby code block. If you absolutely must output text within a non-output code block (i.e., <% %>), you can use the concat method.</blockquote>
+<p>In other words the concat TextHelper method allows you to output strings within a <% code %> non-output code block. This can be helpful in debbuging by saving some time instead of writing something like this: </p>
+{% highlight ruby %}
+<%
+  string = 'Q: What is a Concat?'
+  choice = 2
+
+  if choice != 2
+    output = 'A cat who is a con artist'
+  else
+    output = "I'm pretty sure it's a country, right?"
+  end
+%>
+<%= string + "A:" + output %>
+{% endhighlight %}
+<p>We could instead while debugging or potentially for output reasons (though I wouldn't recommend it) use the method concat to output the string directly from the <% %> block as so.</p>
+{% highlight ruby %}
+<%
+  string = 'Q: What is a Concat?'
+  choice = 2
+
+  if choice != 2
+    concat 'My choice was not 2'
+    output = 'A cat who is a con artist'
+  else
+    concat 'My choice was definitely 2!'
+    output = "I'm pretty sure it's a country, right?"
+  end
+
+  concat string + 'A:' + output
+%>
+{% endhighlight %}
+<p>Although there are plenty of instances where using the concat method could be avoided via other output methods, having an additional tool for non-output blocks can sometimes come in handy.</p>

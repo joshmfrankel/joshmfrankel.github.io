@@ -1,0 +1,218 @@
+---
+layout: post
+title: "What It Means to Stub the System Under Test"
+date: 2017-02-09T14:34:02-05:00
+categories:
+- articles
+tags:
+- testing
+- ruby on rails
+---
+
+<p itemprop="description">Has anyone else felt confused by the phrase stubbing the system under test? I've felt like the phrases that we use in the dev community to label concepts are designed for the sole purpose to obfuscate the truth.</p>
+--excerpt--
+<p>Obfuscate, see what I did there?</p>
+
+<p>There's a popular quote that I always keep in the back of my mind when I use terminology or jargon.</p>
+
+<blockquote>"If you can't explain it simply, you don't understand it well enough."</blockquote>
+
+<p>It isn't just enough to tell developer not to stub the system under test, you have to define and explain it (preferably with an example). Because if you don't understand the underlying concept or terminology how on earth can you stop introducing it to your code.</p>
+
+<p>Short answer, you can't</p>
+
+<p>So let's properly define and explain (simply) what exactly it means to stub the system under test.</p>
+
+<h3>What is a stub?</h3>
+
+<blockquote class="floating-quote floating-quote-right"><div class="page-header">Stubs vs Mocks</div>A stub defines specific behavior for an object's method. A mock acts as a stand-in object for another. The double keyword in RSpec creates a pseudo-mock object.</blockquote>
+
+<p>To stub a method means to define its behavior. When you stub in a test you are basically saying, "For an object that calls a specific method return this result". There is also another term called <strong>mocks</strong> which are sometimes used interchangeably but are fundamentally different.</p>
+
+<p>For example, let's say that you have a simple User model that defines name and role attributes for each record.</p>
+
+{% highlight ruby %}
+  # app/models/user.rb
+  class User
+    validates :name, prescense: true
+    validates :role, prescence: true
+
+    # We will focus on testing this method
+    def welcome_message
+      if admin?
+        "Welcome, #{name}. You can find admin actions under the settings menu"
+      else
+        "Welcome, guest"
+      end
+    end
+
+    private
+
+    def admin?
+      role == "admin"
+    end
+  end
+
+  # db/migrate/2017_create_users.rb
+  class CreateUsers < ActiveRecord::Migration
+    def change
+      create_table :users do |t|
+        t.string   :name
+        t.string   :role
+        t.timestamps
+      end
+    end
+  end
+{% endhighlight %}
+
+<p>Now for your corresponding spec we'd like to test the <code>#welcome_message</code> method and through it the <code>#admin?</code> method as well.</p>
+
+<p>Here's the updated spec:</p>
+
+{% highlight ruby %}
+  let(:user) { create(:user, name: "Christian Bale") }
+
+  describe "#welcome_message" do
+    it "returns true for user's of role 'admin'" do
+      allow(user).to receive(:admin?).and_return(true)
+
+      expect(user.welcome_message).to eq "Welcome, #{user.name}. You can find admin actions under the settings menu"
+    end
+
+    it "returns guest message for user's not of type 'admin'" do
+      expect(user.welcome_message).to eq "Welcome, guest"
+    end
+  end
+{% endhighlight %}
+
+<p>Everything is green and passing.</p>
+
+<p>But there is a slight problem with the code above. What happens when the client asks for a slight change for when the admin welcome message displays. Specifically, they only want users whom are admin and have been created in the last 3 months to recieve the message.</p>
+
+{% highlight ruby %}
+  def admin?
+    # User has to be of role admin
+    # and created in the last 3 months
+    role == "admin" && created_at > (DateTime.current - 3.months)
+  end
+{% endhighlight %}
+
+<p>Does our test suite still pass?</p>
+
+<p>It actually does and with flying colors, but why? Well, because in the early step we allows user to accept the message admin? and return the value true, now in the context of that test the #admin? method now always returns true.</p>
+
+{% highlight ruby %}
+    it "returns true for user's of role 'admin'" do
+      allow(user).to receive(:admin?).and_return(true) # Stubbing the system under test
+
+      expect(user.welcome_message).to eq "Welcome, #{user.name}. You can find admin actions under the settings menu"
+    end
+{% endhighlight %}
+
+<blockquote class="floating-quote floating-quote-right"><div class="page-header">Private methods</div>Something to keep in mind is that the #admin? method is listed as private. I'm paraphrasing Sandi Metz here, messages that we send to self (current class) aren't things that we care about testing since they don't effect other parts of our system.</blockquote>
+
+<p>The test above, while a farily contrived example, shows how stubbing the <code>#admin?</code> method's response to true can hide our codes actual intent. This produces an unreliable testing suite that over time becomes hard to trust and maintain.</p>
+
+<p>Here's how I would test the above scenario including the guest branch, the admin that was created recently branch, and the admin that was created in the past branch.</p>
+
+{% highlight ruby %}
+  let(:user) { create(:user, name: "Christian Bale") }
+
+  describe "#welcome_message" do
+    context "when admin" do
+      let(:current_time) { DateTime.current }
+      let(:the_past) { current_time - 5.months }
+      let(:admin) { create(:user, name: "Nic Cage", role: "admin")
+
+      context "and created recently" do
+        before do
+          admin.created_at = current_time
+          admin.save
+        end
+
+        it "returns the welcome message with instructions" do
+          expect(admin.welcome_message).to eq "Welcome, #{user.name}. You can find admin actions under the settings menu"
+        end
+      end
+
+      context "and created in the far past" do
+        before do
+          admin.created_at = the_past
+          admin.save
+        end
+
+        it "returns the guest message" do
+          expect(admin.welcome_message).to eq "Welcome, guest"
+        end
+      end
+    end
+
+    context "when basic user" do
+      let(:user) { create(:user, name: "Christian Bale") }
+
+      it "returns the guest message" do
+        expect(user.welcome_message).to eq "Welcome, guest"
+      end
+    end
+  end
+{% endhighlight %}
+
+<p>Now future changes to the <code>#admin?</code> method are able to effect the <code>#welcome_message</code> method and we're covered against tests that pass when in reality they are broken.  This is the basic premise behind not stubbing the system under test.</p>
+
+<h3>What does system refer to?</h3>
+
+{% include rich-snippets/article-image src="2017/morpheus-specs.jpg" caption="Morpheus quote modified from the Matrix" width="500" height="303" %}
+
+<p>This one stumped me for some time.</p>
+
+<p>"the system" refers to the current class or logic that you are attempting to harness and test. No it isn't what they talk about in The Matrix, though I always have this thought when I hear the phrase. Think of it more like your application logic or flow. You want to ensure that they are functioning as you intend and more importantly how the code is written. When you stub over functionality in your tests you get the all satisfying green but in reality your test isn't worth much.</p>
+
+<p>For the example above the system under test is specifically the User model. Our goal is to directly test its functionality in the corresponding spec.</p>
+
+<p>So when do you stub? Well, this is something that is constantly evolving for me but here are a few general guidelines I think about when I start the reach for stubbing.</p>
+
+<h3>What to stub?</h3>
+
+<h4>Third-party services and apis</h4>
+<p>Essentially, anything that you don't have direct control over fits this category. You can use stubs to ensure your system appropriately handles both error cases and happy path cases. This also improves test suite performance by avoiding waiting on the third-party service to respond(~100ms every request will start to add up).</p>
+
+<h4>Outgoing messages that you expect to send</h4>
+<p>Controllers that call service objects are a good example of this. In a hypothetical controller test you wouldn't want to unit test the service class as well. Ideally, it would be properly tested in isolation within its own spec.</p>
+<p>With that being said we still want to ensure that it is being sent a message (essentially being called) in the controller spec context.</p>
+{% highlight ruby %}
+  # Example controller #index action
+  def index
+    CreateUserService.perform(params: params)
+  rescue StandardError => e
+    head :bad_request
+  end
+
+  # Example test ensuring a message is sent
+  it "ensures message is sent to CreateUserService" do
+    expect(CreateUserService).to receive(:perform).with(params: params)
+
+    get :index
+  end
+{% endhighlight %}
+<p>This spec says, "Given the #index action for the controller, ensure that the CreateUserService receives the message of perform with the arguments of params: params"</p>
+<p>We aren't directly testing the CreateUserService here because it already has its own associated unit test (not shown here) which ensures that it is functioning as expected. Not stubbing the service class above is just duplicating testing effort.</p>
+
+<h4>Minimizing database interactions</h4>
+<p>If you have a model with a scope that returns its active users (we'll call is :active) which already has unit tests ensuring that it functions as expected, then anytime you have to use the same scope elsewhere you could stub out the response.</p>
+<p>This avoids having to hit the database in the test which greatly speeds up the test suite. Be warned though if you are writing tests specific to database interactions it is probably wise to over-test rather than under-test. Minimizing database interactions is a delicate balancing act between performance and confidence.</p>
+
+<h3>What to avoid stubbing?</h3>
+
+<h4>Private methods (messages to self)</h4>
+<p>Like I mentioned above, these tend to directly deal with the current class that you are testing (system under test). You want to make sure that they are working as you expect and stubbing over the implementation is going to lead to unreliable results.</p>
+
+<h4>Integration Tests</h4>
+<p>This is end-to-end testing and as such you want to ensure that all steps along the path are in working order. I would also argue that it is ok for these specs to be a little slower at the great benefit of higher confidence.</p>
+
+<h3>Conclusion</h3>
+<p>As with all programming, knowing when to stub and when not to can be fairly opionated. There is always room for breaking the rules in certain situations and as such its important to remain flexible with your approach to testing. Using your best judgement to decide what to directly test and what to stub is something that takes a lot of practice (I'm still learning this as well).</p>
+<p>I took loads of inspiration from Sandi Metz's talk about Magic Tricks of Testing, which is an excellent in-depth discussion of what to test and what not to. I highly recommend <a href="https://www.youtube.com/watch?v=URSWYvyc42M">watching it</a> and following along with the slides on <a href="https://speakerdeck.com/skmetz/magic-tricks-of-testing-railsconf">SpeakerDeck</a>.</p>
+
+<p>Did I miss something that should be stubbed? How about something else not to stub? I'd love to add to the above list based on your comments below.</p>
+
+<p>Thanks for reading</p>

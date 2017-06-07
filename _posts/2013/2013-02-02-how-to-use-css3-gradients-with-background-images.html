@@ -1,0 +1,44 @@
+---
+layout: post
+title: How to use CSS3 gradients with background images
+categories:
+- how-to
+tags:
+- CSS 3
+- Gradients
+published: true
+---
+<p>Using the background property in css you can specify a background image and a css3 gradient. This is particularly useful for png icons on top of gradients. In this instance the icon has a transparent background and is placed on top of the css3 gradient.</p>--excerpt--
+
+<p>The proper format is background: <code>[background-image], [background-gradient]</code>.
+<blockquote><strong>Quick Tip:</strong> The comma tells CSS "Hey! There is a secondary rule, display it also."</blockquote>
+<p>When working with gradients, or CSS3 properties in general, it is important to specify a fallback style. In this case a standard background image and color should suffice.</p>
+{% highlight css %}
+/* Fallback css for browsers that don't support gradients */
+background: url('/images/sprites.png') -260px -134px no-repeat #ae4446;
+
+/**
+ *
+ * CSS generated from ultimate css gradient generator
+ * www.colorzilla.com/gradient-editor
+ *
+ **/
+background: url('/images/sprites.png') -260px -134px no-repeat,
+     -moz-linear-gradient(top, #ae4446 0%, #9b262b 100%); /* FF3.6+ */
+
+background: url('/images/sprites.png') -260px -134px no-repeat,
+     -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ae4446), color-stop(100%,#9b262b)); /* Chrome,Safari4+ */
+
+background: url('/images/sprites.png') -260px -134px no-repeat,
+     -webkit-linear-gradient(top, #ae4446 0%,#9b262b 100%); /* Chrome10+,Safari5.1+ */
+
+background: url('/images/sprites.png') -260px -134px no-repeat,
+     -o-linear-gradient(top, #ae4446 0%,#9b262b 100%); /* Opera 11.10+ */
+
+background: url('/images/sprites.png') -260px -134px no-repeat,
+     -ms-linear-gradient(top, #ae4446 0%,#9b262b 100%); /* IE10+ */
+
+background: url('/images/sprites.png') -260px -134px no-repeat,
+     linear-gradient(to bottom, #ae4446 0%,#9b262b 100%); /* W3C */
+{% endhighlight %}
+<p>A great resource for building CSS3 Gradients is <a href="www.colorzilla.com/gradient-editor">Ultimate CSS Gradient Generator</a>. It will generate proper styles for the gradients in all major browsers along with fallback styles for older ones.  All you have to do is add the first line for the background image url and you are good to go.</p>

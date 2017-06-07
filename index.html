@@ -5,7 +5,10 @@ layout: page
 <section class="listing">
   <!-- This loops through the paginated posts -->
   {% for post in paginator.posts %}
-    <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+    <h1>
+      <a href="{{ post.url }}">{{ post.title }}</a>
+    </h1>
+
     <p class="author">
       <time class="meta-date" datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %-d, %Y" }}</time>
     </p>

@@ -1,0 +1,87 @@
+---
+layout: post
+title: Should I use px or ems for css font-size? Neither, use rem!
+categories:
+- Articles
+tags:
+- CSS 3
+- Flexible Typography
+- Responsive
+published: true
+---
+<p>While setting the size of a font is relatively simple; choosing the unit of measuring the size can become complex quickly.</p>
+
+<p>At their core there are two types of font-size units; relative and absolute. Relative units are calculated by their parent element's font-size while absolute units are set at a fixed value. Both types of units are useful.</p>--excerpt--
+
+<p>I often will use both px and em for font-size but recently in CSS3 development there has been a new unit. This unit is called <a href="#rem">rem</a> or root em unit and allows for far greater flexibility with typography.</p>
+<h3>Units for Special Cases</h3>
+<p>..Unless you have a good reason for using these, there are far more efficient and easy to understand units.</p>
+<h4>%</h4>
+<p>Percentage is a relative unit and works exactly how you would think. The unit sizes a font based on its parent's font size. So if the parent is 100% and the child is 25% the child element is 25% of its parent's 100%.</p>
+
+<p>One area for using a percentage is to style a top level html element like body or html to allow units like em to have easier size calculations. This will set the top level parent element so that converting an em to pixel is as easy as moving the decimal point.</p>
+{% highlight css %}
+
+html {
+
+    /* ems now are base ten so 1.4em = 14px */
+    font-size: 62.5%;
+}
+{% endhighlight %}
+<h4>pt</h4>
+<p>The pt or Point unit is something you have probably seen before in your favorite word processing application. A pt unit refers to physical space on a sheet of paper and is therefore an absolute unit. Because of this they should only ever be used with printer friendly stylesheets.</p>
+<h3>Units to Avoid like the Plague</h3>
+<h4>Keyword</h4>
+<p>I really dislike this unit of measure and generally try to avoid it. Although using a keyword font size ensures that there will be no scaling due to it being a unit of absolute size; they provide little to no fine tuning. This is because there are only 6 different keywords. They range from xx-small to medium and back up to xx-large. Lets move on to something more useful.</p>
+<h3>Units that are Useful</h3>
+<h4>px</h4>
+<p>Pixels are the by far the most accurate and easiest to understand unit of measurement. By setting a font-size in px you are literally instructing the browser to render the font at that exact pixel height. The font will never have a height greater than the pixel value set. This is my bread-and-butter unit.  When you need exact measurements go with px.</p>
+<h4>em</h4>
+<p>According to w3.org an em unit is measured by, "the computed font size of the parent element". So what does this mean for us? It means that the em unit is dependent upon it's parent's font-size and is also another relative unit of measure.</p>
+
+<p>Since it is dependent upon the parent element the em has a potential to become compounded.  This can lead to some unexpected results. An example of this is if the parent has a font-size of 4em and the child has a font-size of 2em. In actuality the child element will have a font-size of 8em.</p>
+
+<p>To calculate the size of an em you take the parent and multiply it by the child. However, keep in mind that if we have additional parents that they must be calculated as well. This can make em units somewhat difficult to keep track of as the font size can compound quickly.</p>
+<h3 id="rem">A Real Unit of Measure</h3>
+<h4>rem</h4>
+<p>The rem unit or root em is such a sublime solution to the problem of font sizing. The root element of a page is always the html tag. So by defining a % (yes, this would be a good place to use this method) on the html element, you now have control over every single element using the rem unit.</p>
+
+<p>Back to the previous code example.</p>
+{% highlight css %}
+html {
+
+    /* rems now are base ten so 1.4em = 14px */
+    font-size: 62.5%;
+}
+
+h1 {
+     font-size: 2.8rem;
+}
+{% endhighlight %}
+<p>By using this we can now set an h1 tag to 2.8rem and it will render as if it is 28px.</p>
+<h3>Flexible Typography</h3>
+<p>If we are by chance using media queries it is possible to utilize them to typography that will scales with the page size. This is accomplished by redeclaring the font-size percentage for the html element inside a media query. Now all we have to do is change 1 value to affect all font-sizes on multiple devices. This is getting pretty handy now.</p>
+
+{% highlight css %}
+@media only screen and (min-width: 1140px) {
+
+	/**
+	 * Set the Base Font Size
+	 */
+	html {
+		font-size: 90%;
+	}
+}
+{% endhighlight %}
+
+<p>As with any new unit there is a catch which is browser support. Fortunately all modern browsers support the rem unit. For older non-compliant browsers by using a font-size with a pixel measurement directly before the rem value allows us to specify a default value.</p>
+{% highlight css %}
+h1 {
+    /* The default value if rem units aren't supported */
+    font-size: 20px;
+
+    /* Our fancy new rem unit */
+    font-size: 2rem;
+}
+{% endhighlight %}
+<p>So there you have it a new unit of measuring font-size and a method for creating flexible typography.</p>

@@ -1,0 +1,28 @@
+---
+layout: post
+title: "Fast Reports: Exporting to a CSV in Ruby"
+date: 2016-09-14T13:35:17-04:00
+categories:
+- tips-and-tricks
+tags:
+- ruby
+- reporting
+---
+<p itemprop="description">Need to quickly export a collection as a CSV? Ruby has an awesome class just for this (named CSV of course). With this class you can quickly output a csv string which can then be imported into Excel, Libre Office, etc.</p>
+--excerpt--
+<p>Here's a quick example that is displaying some user information. **Note**: the last line is important for displaying the csv string without the <code>\n</code> character.</p>
+{% highlight ruby %}
+users = User.all
+headers = ["Name", "Email", "Role"]
+
+csv = CSV.generate do |csv|
+  csv << headers # Add the headers to the csv
+
+  users.each do |user|
+    csv << [user.name, user.email, user.role]
+  end
+end
+
+puts csv # output the csv string
+{% endhighlight %}
+<p>Now just copy paste the string from your console into a new spreadsheet and it should properly delineate the columns and data. Easy!</p>
