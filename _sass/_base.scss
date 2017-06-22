@@ -1,0 +1,54 @@
+body {
+  border-top: 5px solid $primary-color;
+}
+h1 {
+  font: normal 300 72px/1 $lato;
+}
+a {
+  @extend .transition;
+
+  color: $primary-color;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+
+  &:hover {
+    border-bottom: 2px solid $primary-color;
+  }
+}
+p {
+  color: $p-color;
+  font: 300 19px/30px $railway;
+  letter-spacing: 0.4px;
+}
+
+// Layout
+header {
+  @extend .flex-container;
+  padding: 15px;
+}
+
+// Classes
+.transition {
+  transition: all 150ms ease;
+}
+.flex-container {
+  display: flex;
+}
+.flex-column {
+  @extend .flex-container;
+  flex-direction: column;
+}
+.flex-left {
+  align-self: center;
+  margin-right: auto;
+}
+.flex-right {
+  align-self: center;
+  margin-left: auto;
+}
+
+// Grid
+// .grid {
+//   display: grid;
+//   grid-template
+// }

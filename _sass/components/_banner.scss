@@ -1,0 +1,6 @@
+.Banner {
+  @extend .flex-container;
+
+  background-color: $primary-color;
+  color: $primary-inverse-color;
+}

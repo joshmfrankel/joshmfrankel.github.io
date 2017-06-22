@@ -10,7 +10,7 @@ tags:
 ---
 
 <p>Have you ever needed to gather a large amount of data from your production server but didn't have the script available on the server? You could remote into the server and write the script in rails console but what if the volume of data was in the hundreds of thousands? And you needed it in CSV format? Well, recently I recently discovered a great little command for gathering remote data and saving it to a local file.</p>
---excerpt--
+<!--excerpt-->
 
 {% highlight ruby %}
 heroku run rails runner 'Your full script pasted here' -a my-app-name > data.txt # Stores the return data into a file called data.txt

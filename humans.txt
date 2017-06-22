@@ -1,15 +1,16 @@
 # humanstxt.org/
-# The humans responsible & technology colophon
 
 # TEAM
 
-    <name> -- <role> -- <twitter>
+  Josh Frankel -- Developer -- joshmfrankel
 
 # THANKS
 
-    <name>
+    Megan Oed
 
 # TECHNOLOGY COLOPHON
 
-    CSS3, HTML5
-    Apache Server Configs, jQuery, Modernizr, Normalize.css
+  Libraries: Jekyll, Normalize
+  Languages: Ruby, CSS3, SASS, HTML5
+  Icons: Devicons
+

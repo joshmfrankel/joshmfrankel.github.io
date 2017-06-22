@@ -1,4 +1,12 @@
 ---
 ---
-@import "normalize";
-@import "pygments";
+
+// Vendors
+@import "vendors/normalize";
+@import "vendors/pygments";
+
+// Components
+@import "styleguide";
+@import "base";
+@import "components/author";
+@import "components/banner";

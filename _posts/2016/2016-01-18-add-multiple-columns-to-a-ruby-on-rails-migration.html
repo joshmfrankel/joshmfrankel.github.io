@@ -9,7 +9,7 @@ tags:
 - ruby on rails
 ---
 <p>There are plenty of shortcuts with Ruby on Rail's implementation of migrations. Adding columns, removing column, add indexes, altering table or columns to just name a few. I recently ran across a simple trick that can be utilized to add multiple columns quickly to a migration</p>
---excerpt--
+<!--excerpt-->
 <p>By utilizing the following formula with the Rails generator, you can add multiple columns to a single migration.</p>
 {% highlight ruby %}
 rails g migration add_first_column_and_second_column_to_model first_column:string second_column:string
