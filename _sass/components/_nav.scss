@@ -1,0 +1,10 @@
+nav {
+  a {
+    padding: 15px 10px;
+    border-bottom: 2px solid transparent;
+
+    &:hover {
+      border-bottom: 2px solid lighten($primary-color, 5%);
+    }
+  }
+}
