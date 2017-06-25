@@ -31,38 +31,38 @@ tags:
 
 <p>For example, let's say that you have a simple User model that defines name and role attributes for each record.</p>
 
-{% highlight ruby %}
-  # app/models/user.rb
-  class User
-    validates :name, prescense: true
-    validates :role, prescence: true
+{% highlight ruby linenos %}
+# app/models/user.rb
+class User
+  validates :name, prescense: true
+  validates :role, prescence: true
 
-    # We will focus on testing this method
-    def welcome_message
-      if admin?
-        "Welcome, #{name}. You can find admin actions under the settings menu"
-      else
-        "Welcome, guest"
-      end
-    end
-
-    private
-
-    def admin?
-      role == "admin"
+  # We will focus on testing this method
+  def welcome_message
+    if admin?
+      "Welcome, #{name}. You can find admin actions under the settings menu"
+    else
+      "Welcome, guest"
     end
   end
 
-  # db/migrate/2017_create_users.rb
-  class CreateUsers < ActiveRecord::Migration
-    def change
-      create_table :users do |t|
-        t.string   :name
-        t.string   :role
-        t.timestamps
-      end
+  private
+
+  def admin?
+    role == "admin"
+  end
+end
+
+# db/migrate/2017_create_users.rb
+class CreateUsers < ActiveRecord::Migration
+  def change
+    create_table :users do |t|
+      t.string   :name
+      t.string   :role
+      t.timestamps
     end
   end
+end
 {% endhighlight %}
 
 <p>Now for your corresponding spec we'd like to test the <code>#welcome_message</code> method and through it the <code>#admin?</code> method as well.</p>

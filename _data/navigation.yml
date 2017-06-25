@@ -1,0 +1,11 @@
+- name: Articles
+  url: articles
+
+- name: Today I Learned
+  url: today-I-learned
+
+- name: Series
+  url: series
+
+- name: About Me
+  url: about

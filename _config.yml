@@ -9,6 +9,10 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # Author Settings
 twitter_username: joshmfrankel
 github_username:  joshmfrankel
+social:
+  name: Josh Frankel
+  links:
+    - https://twitter.com/Joshmfrankel
 
 # Structure Settings
 permalink: /:year/:title/

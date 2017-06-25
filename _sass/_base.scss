@@ -1,8 +1,13 @@
+html {
+  // Allow rem to be sized similarly to px
+  // https://snook.ca/archives/html_and_css/font-size-with-rem
+  font-size: 62.5%;
+}
 body {
   border-top: 5px solid $primary-color;
 }
 h1 {
-  font: normal 300 72px/1 $lato;
+  font: normal 300 7.2rem/1 $lato;
 }
 a {
   @extend .transition;
@@ -14,10 +19,21 @@ a {
     color: lighten($primary-color, 10%);
   }
 }
+p, blockquote, figure.highlight {
+  font: 300 1.9rem/30px $railway;
+  letter-spacing: 0.4px;
+}
 p {
   color: $p-color;
-  font: 300 19px/30px $railway;
-  letter-spacing: 0.4px;
+}
+blockquote {
+  background-color: $primary-color;
+  color: $white;
+  margin:0;
+  padding:20px;
+}
+figure.highlight {
+  margin: 0;
 }
 
 // Layout

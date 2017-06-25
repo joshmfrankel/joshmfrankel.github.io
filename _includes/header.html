@@ -1,9 +1,9 @@
 <header>
-  <a href="{{ site.github.url }}" class="Author"><span class="Author Author--first-name">Josh</span> <span class="Author Author--last-name">Frankel</span></a>
+  <a href="{{ site.github.url }}/" class="Author"><span class="Author Author--first-name">Josh</span> <span class="Author Author--last-name">Frankel</span></a>
   <nav class="flex-right">
-    <a href="{{ site.github.url }}/articles">Articles</a>
-    <a href="{{ site.github.url }}/today-I-learned">Today I Learned</a>
-    <a href="{{ site.github.url }}/series">Series</a>
-    <a href="{{ site.github.url }}/about">About Me</a>
+    {% for nav in site.data.navigation %}
+      {% assign nav_page_url = nav.url | prepend: "/" | append: "/" %}
+      <a href="{{ site.github.url }}/{{ nav.url }}" {% if page.url == nav_page_url %} class="active" {% endif %}>{{ nav.name }}</a>
+    {% endfor %}
   </nav>
 </header>

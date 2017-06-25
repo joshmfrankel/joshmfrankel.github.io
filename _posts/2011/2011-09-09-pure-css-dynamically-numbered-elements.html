@@ -15,7 +15,7 @@ published: true
 <p>The counter-reset property specifies when the counter should be reset. The identifier in this property is just a matter of preference. A lot of examples I have run across use section or chapter. To use this effectively you need to specify a parent element with the counter-reset property and the child element that should be incremented with the counter-increment property.</p>
 <h3>Example</h3>
 <h5>CSS</h5>
-{% highlight css %}
+{% highlight css lineos %}
 body {
   counter-reset: section;
 }
@@ -27,7 +27,7 @@ div:before {
 {% endhighlight %}
 
 <h5>HTML</h5>
-{% highlight html %}
+{% highlight html lineos %}
 <body>
   <div>Some content goes here</div>
   <div>More content goes here</div>
