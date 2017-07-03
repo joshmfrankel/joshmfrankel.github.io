@@ -7,7 +7,18 @@ body {
   border-top: 5px solid $primary-color;
 }
 h1 {
-  font: normal 300 7.2rem/1 $lato;
+  font: normal 300 7.2rem/1.1 $lato;
+}
+h2 {
+  color: $darker-gray-hover;
+  font: normal 700 3.2rem/1 $lato;
+  text-transform: capitalize;
+}
+h3 {
+  color: $darker-gray-hover;
+  font: normal 700 1.8rem/1 $lato;
+  margin-top: 32px;
+  text-transform:uppercase;
 }
 a {
   @extend .transition;
@@ -16,21 +27,18 @@ a {
   text-decoration: none;
 
   &:hover {
-    color: lighten($primary-color, 10%);
+    color: $accent-color;
   }
 }
-p, blockquote, figure.highlight {
+p, blockquote, figure.highlight, li {
   font: 300 1.9rem/30px $railway;
   letter-spacing: 0.4px;
 }
+blockquote {
+  @extend .Info;
+}
 p {
   color: $p-color;
-}
-blockquote {
-  background-color: $primary-color;
-  color: $white;
-  margin:0;
-  padding:20px;
 }
 figure.highlight {
   margin: 0;
@@ -40,6 +48,18 @@ figure.highlight {
 header {
   @extend .flex-container;
   padding: 15px;
+}
+.tagline {
+  color: $lighter-gray;
+  font-style: italic;
+  font-size: 13px;
+}
+footer {
+  background: $lightest-gray;
+  padding-top: 20px;
+  padding-bottom: 50px;
+  text-align: center;
+  margin: 30px auto 0;
 }
 
 // Classes
@@ -60,6 +80,16 @@ header {
 .flex-right {
   align-self: center;
   margin-left: auto;
+}
+.circular-image {
+  border-radius: 50%;
+}
+.clearfix {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
 }
 
 // Grid

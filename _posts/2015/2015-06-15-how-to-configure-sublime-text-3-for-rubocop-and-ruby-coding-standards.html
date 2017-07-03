@@ -20,20 +20,20 @@ published: true
 
 <p>I suggest that you read through, or at least skim through, some of the suggested standards. These were created by some of the top people in the industry and are really great for becoming a <strong>Ruby</strong> master. Some of the standards proposed can be directly translated into a Sublime Text configuration file which we will now begin to build.</p>
 
-<h3>"You have the right to remain silent." <small>Multiple Sublime configurations</small></h3>
+<h2>"You have the right to remain silent." <small>Multiple Sublime configurations</small></h2>
 <img src="{{ site.url }}/img/2015/robocop-right-to.jpg" alt="Image property of http://www.telegraph.co.uk/" title="Image property of http://www.telegraph.co.uk/" />
 <p><small><em>Image property of http://www.telegraph.co.uk/</em></small></p>
 <p>Since, most developers are more or less polyglot's when it comes to programming languages, separating our different coding standards becomes a must. Fortunately, for us Sublime Text 3 has a nifty feature for creating syntax specific user configuration files.</p>
 <p>Under the preferences menu in the <strong>Settings - More</strong> menu you will see the option for <strong>Syntax Specific</strong> user configuration. By selecting this option Sublime Text will take your currently active file's code syntax and create a config file specific to it (e.g. JSON.sublime-settings). This file will then only be applicable to files that are also using this language syntax.</p>
 <p>Create the ruby specific user configuration by clicking the <strong>Syntax Specific - User</strong> option and then renaming the file to <code>Ruby.sublime-settings</code>. Once created we can now start following the proposed Ruby style guide.</p>
 
-<h3>"Serve the public trust, protect the innocent, uphold the law." <small>Ruby Proposed Standards</small></h3>
+<h2>"Serve the public trust, protect the innocent, uphold the law." <small>Ruby Proposed Standards</small></h2>
 <img src="{{ site.url }}/img/2015/robocop-uphold-law.jpg" alt="Image property of http://www.salon.com/" title="Image property of http://www.salon.com/" />
 <p><small><em>Image property of http://www.salon.com/</em></small></p>
 
 <p>This section includes the cherry-picked settings that can be configured in your <code>Ruby.sublime-settings</code> file. These will help bring your coding environment one step closer to being a highly efficient and up to standards workflow.</p>
 
-<h4>"Use UTF-8 as the source file encoding."</h4>
+<h3>"Use UTF-8 as the source file encoding."</h3>
 <p>Using the UTF-8 file encoding is pretty much a standard for most files.</p>
 {% highlight json %}
 {
@@ -41,7 +41,7 @@ published: true
 }
 {% endhighlight %}
 
-<h4>"Use Unix-style line endings."</h4>
+<h3>"Use Unix-style line endings."</h3>
 <p>Like I mentioned in my other article, <a href="{{ site.url }}/2014/how%20to/How-to-configure-sublime-text-for-psr-standards/">How to configure Sublime Text for PSR Standards</a>, utilizing unix line endings helps to keep all developers on the same page when using version control.</p>
 {% highlight json %}
 {
@@ -49,7 +49,7 @@ published: true
 }
 {% endhighlight %}
 
-<h4>"Limit lines to 80 characters."</h4>
+<h3>"Limit lines to 80 characters."</h3>
 <p>By setting the ruler to 80 and word wrap to true, we can impose a soft limit of 80 characters on a file.</p>
 {% highlight json %}
 {
@@ -61,7 +61,7 @@ published: true
 }
 {% endhighlight %}
 
-<h4>"End each file with a newline."</h4>
+<h3>"End each file with a newline."</h3>
 <p>Enough said.</p>
 {% highlight json %}
 {
@@ -69,7 +69,7 @@ published: true
 }
 {% endhighlight %}
 
-<h4>"Use two spaces per indentation level (aka soft tabs). No hard tabs."</h4>
+<h3>"Use two spaces per indentation level (aka soft tabs). No hard tabs."</h3>
 <p>Unlike the PHP world of 4 spaces, Ruby developers generally use 2 spaces for indentation. I find this leads to more compact and readable code.</p>
 {% highlight json %}
 {
@@ -78,7 +78,7 @@ published: true
 }
 {% endhighlight %}
 
-<h4>"Avoid trailing whitespace."</h4>
+<h3>"Avoid trailing whitespace."</h3>
 <p>Another setting that teams of developers will all need to use to avoid git conflicts. Kill the whitespace!</p>
 {% highlight json %}
 {
@@ -86,7 +86,7 @@ published: true
 }
 {% endhighlight %}
 
-<h4>Final Ruby.sublime-settings file</h4>
+<h3>Final Ruby.sublime-settings file</h3>
 <p>I've listed the completed <code>Ruby.sublime-settings</code> file for easy copy-pasting. Enjoy.</p>
 {% highlight json %}
 {
@@ -105,7 +105,7 @@ published: true
 {% endhighlight %}
 <p>The <strong>Ruby</strong> style guide has many more standards and best practices contained within it. Some of which we won't be able to configure via a simple settings file. Good thing we have the awesome gem <strong>Rubocop</strong> to tell us how to fix our code.</p>
 
-<h3>"They'll fix you. They fix everything." <small>Rubocop</small></h3>
+<h2>"They'll fix you. They fix everything." <small>Rubocop</small></h2>
 <img src="{{ site.url }}/img/2015/robocop-enters.jpg" alt="Image property of http://geektyrant.com/news/top-10-movie-quotes-from-robocop" />
 <p><small><em>Image property of http://geektyrant.com/news/top-10-movie-quotes-from-robocop</em></small></p>
 
@@ -118,7 +118,7 @@ AllCops:
 {% endhighlight %}
 <p>This tells <strong>Rubocop</strong> to in addition to running the regular Ruby style cops (syntax checkers) to also run the Rails cops as well. You can find additional documentation on Sublimelinter-rubocop <a href="https://github.com/SublimeLinter/SublimeLinter-rubocop" target="_blank" rel="nofollow">here</a> and <strong>Rubocop</strong> itself documentation <a href="https://github.com/bbatsov/rubocop" target="_blank" rel="nofollow">here</a>.</p>
 
-<h3>"Thank you for your co-operation. Good night."</h3>
+<h2>"Thank you for your co-operation. Good night."</h2>
 <img src="{{ site.url }}/img/2015/robocop-thanks.jpg" alt="Image property of http://images.fandango.com/images/fandangoblog/" title="Image property of http://images.fandango.com/images/fandangoblog/" />
 <p><small><em>Image property of http://images.fandango.com/images/fandangoblog/</em></small></p>
 <p>All Robocop quotes aside, by using the above setup you can prevent some of the common syntax pitfalls with Ruby. In addition to the automated setup reading the two unofficial guides can be a lifesaver in determining what method to use or how to structure an application.</p>

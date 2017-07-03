@@ -9,7 +9,7 @@ published: true
 ---
 <p>Double line letterpress-esque borders are all the rage right now in web development. And why not? They look clean and provide some depth to your site.  So lets dive right in with a few of my favorite techniques for achieving this effect.</p><!--excerpt-->
 
-<h3>1. Horizontal rule with a border</h3>
+<h2>1. Horizontal rule with a border</h2>
 <p>The first method of building a double border relies on the use of the hr tag. By setting the background color and height, you can change the color of the hr tag. Combine this with adding a border-bottom and you have yourself a double line border. One problem with this approach is that the background color comes after the border-bottom.</p>
 {% highlight css %}
 .doubleBorder hr{
@@ -22,7 +22,7 @@ published: true
 <strong>Pros: </strong>Uses semantic html element<br />
 <strong>Cons: </strong>The border order is confusing, horizontal rule must have a height
 </blockquote>
-<h3>2. The Border / Outline double border</h3>
+<h2>2. The Border / Outline double border</h2>
 <p>This is by far the easiest method to use. It doesn't require any bizarre css or html and utilizes css properties properly by their function. Something to keep in mind is that the border property directly surrounds the element, while the outline property will always surround the outside of the element. Because of this the outline property will add extra width and height to the element. Making it larger than you would normally assume. </p><p>Unfortunately, outline is not as customizable as border; an outline must always be on all sides of an element while the border can be set to a specific side.</p>
 {% highlight css %}
 .doubleBorder {
@@ -32,7 +32,7 @@ published: true
 {% endhighlight %}
 <blockquote><strong>Pros: </strong>Easiest method to implement!<br />
 <strong>Cons: </strong>The outline property always surrounds element on all sides with a border, Outline adds additional width and height.</blockquote>
-<h3>3. The Border / Drop-Shadow border</h3>
+<h2>3. The Border / Drop-Shadow border</h2>
 <p>This method is very similar to the outline / border method except we use the new CSS3 box-shadow property. Box-Shadow differs from outline because it can accommodate particular sides of the element having a border. Unfortunately, despite being all rad CSS3, box-shadow is not supported in every available browser. So if you need to make this work in IE 8 or less then you should use a different method.</p>
 
 <p><strong>Tip: </strong>If you want all the sides of an element to have a box shadow increase the spread (fourth pixel value) while leaving vertical and horizontal offsets at zero. This will essentially push the shadow out in all directions.</p>
@@ -46,7 +46,7 @@ published: true
 {% endhighlight %}
 <blockquote><strong>Pros: </strong>CSS3 is rad!, Allows for a variety of designs<br />
 <strong>Cons:</strong> Requires a CSS3 compatible browser (sorry no IE less than 9), Can be tricky to apply to multiple sides of an element</blockquote>
-<h3>4. The ::after pseudo border</h3>
+<h2>4. The ::after pseudo border</h2>
 <p>This is probably one of my favorite techniques even if it isn't the most elegant.  The trick to this method is that there are two css rules.  One for the initial element (.doubleBorder) and one for the pseudo element ::after. </p>
 <p>::after seems like it should do exactly what it says (style any element that occurs directly after the initial selector).  However for this to work properly there needs to be content to style which is where the content property comes in.  By setting this to a blank value you trick the browser into thinking there is data present which allows you to style the initial tag separately.  In addition to the content property, setting display:block and the height value will render the border.</p>
 
@@ -64,7 +64,7 @@ published: true
 
 <blockquote><strong>Pros: </strong> Cool technique that allows for a wide variety of features, Has good browser support<br />
 <strong>Cons: </strong> Requires more css properties than other methods, Requires blank css property</blockquote>
-<h3>5. The background-image border</h3>
+<h2>5. The background-image border</h2>
 <p>Ok, ok.  I know what your are thinking.  But this is supposed to only be CSS solutions, right?  Well this last method does use an image to create a border but the real magic happens by using the css repeat-x value in the background attribute.  This allows the image to repeat itself in a horizontal orientation.  The final image that is in use only needs to be 1px wide to render correctly using this method.</p>
 <p>I find that if I am struggling with a particularly difficult design that this method will cover most (if not all) border designs</p>
 

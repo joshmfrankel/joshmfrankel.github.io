@@ -1,0 +1,12 @@
+.Container {
+  width: 60%;
+  margin: 0 auto;
+
+  &-flex {
+    @extend .flex-container;
+  }
+  &--wrap {
+    flex-wrap: wrap;
+  }
+}
+

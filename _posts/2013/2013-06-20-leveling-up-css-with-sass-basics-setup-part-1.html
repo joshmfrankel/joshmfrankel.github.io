@@ -16,11 +16,11 @@ published: true
 </blockquote>
 
 <p>Alright so now lets dive into Sass. But before we start writing code, what the heck is Sass anyway?</p>
-<h3>What is this Sass you speak of?</h3>
+<h2>What is this Sass you speak of?</h2>
 <p>Sass or Syntactically Awesome Stylesheets, is pre-processor language for adding functionality and flexibility to CSS. A pre-processor is just a fancy way of saying that this code will be compiled in a syntax that is usable to another language, CSS in this case. More simply Sass adds variables, functions (mixins), inheritance, and nesting to make CSS awesome again.</p>
 
 <p>There are two types of sass syntax: indent-based (.sass) and traditional braces (.scss). I will be using the traditional style as it is closer to vanilla CSS. Indent-based might be more familiar to users of python and ruby.</p>
-<h3>Why should I use it?</h3>
+<h2>Why should I use it?</h2>
 <p>There are plenty of reasons to use Sass. The biggest advantage is the sheer amount of re-usability of style code. On top of this for you people who love to super organize your code Sass has an awesome @import rule that doesn't slow down page load. Here are just a few awesome advantages of using a pre-processor language.</p>
 <ul>
 	<li>Functions (mixins)</li>
@@ -31,7 +31,7 @@ published: true
 	<li>Unit Calculations (2px * 2px = 4px)</li>
 </ul>
 <p>Getting excited to start using Sass? Well then lets setup our dev environment.</p>
-<h3>Set it up!</h3>
+<h2>Set it up!</h2>
 <p>There are number of excellent apps and command line processes for setting up a sass environment. So depending on your comfort level you can decide which option is the best fit for you.</p>
 
 <p>All compilers for Sass follow the same process. The compiler runs a polling process that checks for file changes. When a Sass file is updated all files that are affected by it are compiled into CSS. Instantaneous compiling.</p>
@@ -65,7 +65,7 @@ published: true
 <strong>Alternatives</strong>: <a href="http://compass-style.org/">Compass</a>
 
 <p>So now that we have our Sass environment setup we can start actually utilizing the pre-processor. Make sure your method of compiling Sass is active before the next steps</p>
-<h3>$heading: "Variables";</h3>
+<h2>$heading: "Variables";</h2>
 <p>Lets take a look at Sass variables. These are the easiest to understand and use. Variables are defined by using a dollar sign($) to denote the start of them. A colon(:) is then used to separate the variable name from its value.</p>
 
 <p>One of the great things about Sass is that it doesn't try to reinvent the syntax of CSS. It just extends it the make it more powerful</p>
@@ -97,7 +97,7 @@ a {
 }
 {% endhighlight %}
 <p>There it is, Sass at its most basic. By defining a variable before at the beginning of a file it can be reused later to create DRY code.</p>
-<h3>Nesting {<small>nesting</small>}</h3>
+<h2>Nesting {<small>nesting</small>}</h2>
 <p>Nesting in Sass works logically and just makes sense.  By placing rules inside one another they inherit their parent rule selectors. By nesting Sass rules you also give yourself a visual cue for selectors that are further down in the DOM.</p><blockquote><strong>Pro Tip:</strong> While nesting selectors is awesome, don't get carried away with them. If a single class selector will suffice there is no need to nest it within html body etc. Too much nesting will create unnecessary code bloat.</blockquote>
 
 {% highlight sass %}

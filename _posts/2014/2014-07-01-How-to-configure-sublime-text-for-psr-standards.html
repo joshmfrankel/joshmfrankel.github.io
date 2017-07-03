@@ -12,11 +12,11 @@ published: true
 <p>Created by the <acronym title="PHP Framework Interoperability Group">PHP-FIG</acronym>, the PSR specification is a unified push to create standards across all PHP projects.  The committee is formed from over 20 developers representing some of the most popular frameworks.  Having a unified standard has been a much needed endeavor since PHP standards have been somewhat lacking in the past.</p>
 <!--excerpt-->
 
-<h3>Sublime Text - User Settings</h3>
+<h2>Sublime Text - User Settings</h2>
 
 <p>While some of the proposed standards tell you how to format code, we can configure some of the more basic options directly into Sublime.  First off if you don't yet know how to modify your Sublime settings got to <code>Preferences -> Settings-User</code>.  You should always modify the "User" files in Sublime because the default files will be overwritten with each new update.</p>
 
-<h4>"Code MUST use 4 spaces for indenting, not tabs."</h4>
+<h3>"Code MUST use 4 spaces for indenting, not tabs."</h3>
 <p>Since PSR states we must use spaces, we need to make sure that when we press the tab key it is translated to spaces.  Additionally, since all of our tabs are now spaces setting the tab size to 4 will actually set the amount of spaces to 4.</p>
 {% highlight json %}
 {
@@ -26,7 +26,7 @@ published: true
 {% endhighlight %}
 
 
-<h4>"There MUST NOT be a hard limit on line length; the soft limit MUST be 120 characters; lines SHOULD be 80 characters or less."</h4>
+<h3>"There MUST NOT be a hard limit on line length; the soft limit MUST be 120 characters; lines SHOULD be 80 characters or less."</h3>
 <p>The rulers options allows you to place lines in the editor at the 80 and 120 character marks.  Word wrap will not impose a hard limit.</p>
 {% highlight json %}
 {
@@ -41,7 +41,7 @@ published: true
 
 
 
-<h4>"All PHP files MUST use the Unix LF (linefeed) line ending."</h4>
+<h3>"All PHP files MUST use the Unix LF (linefeed) line ending."</h3>
 <p>If your company is using git and the developers have both Mac and Windows systems, you can save yourself a ton of headaches by making sure everyone is using Unix line endings.  This prevents the file from changing line ending type and misleading git into thinking that every single line has changed between commits.</p>
 {% highlight json %}
 {
@@ -51,7 +51,7 @@ published: true
 
 
 
-<h4>"All PHP files MUST end with a single blank line."</h4>
+<h3>"All PHP files MUST end with a single blank line."</h3>
 <p>This one is pretty self explanatory.</p>
 {% highlight json %}
 {
@@ -61,7 +61,7 @@ published: true
 
 
 
-<h4>"There MUST NOT be trailing whitespace at the end of non-blank lines."</h4>
+<h3>"There MUST NOT be trailing whitespace at the end of non-blank lines."</h3>
 <p>This is another all or nothing option if your company is using git.  Some editors will place spaces at the end of non-blank lines.  PSR states that there should be no whitespace on these lines.</p>
 {% highlight json %}
 {
@@ -70,7 +70,7 @@ published: true
 {% endhighlight %}
 
 
-<h3>Conclusion</h3>
+<h2>Conclusion</h2>
 <p>So with all these options placed into your <code>User - Settings</code> file you have a good baseline for transitioning into using PSR.  Before starting this make sure that you have all developers on board especially if you are using git.  Additionally, I highly recommend reading the full documentation of the standards which you can find at the <a href="http://www.php-fig.org/">php-fig website</a>.  For easy copy-pasting, here is the final settings file.</p>
 {% highlight json %}
 {

@@ -18,20 +18,20 @@ published: true
 {% highlight html %}
 <html>
 <head>
-	<title></title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
 
-	<!-- CONTENT GOES HERE -->
-	<div id="tweets"></div>
+  <!-- CONTENT GOES HERE -->
+  <div id="tweets"></div>
 
-	<!-- jQuery code goes at the bottom of the page -->
-	<script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="js/jquery.tweet.js"></script>
-	<script type="text/javascript">
+  <!-- jQuery code goes at the bottom of the page -->
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript" src="js/jquery.tweet.js"></script>
+  <script type="text/javascript">
 
-	</script>
+  </script>
 </body>
 </html>
 {% endhighlight %}
@@ -39,17 +39,17 @@ published: true
 {% highlight js %}
 $(document).ready(function(){
 
-	$('#tweets').tweet();
+  $('#tweets').tweet();
 
 });
 {% endhighlight %}
 <p>This will allow our plugin to be attached onto the id selector tweets from index.html and will come in handy later on.</p>
-<h3>Best Practices</h3>
+<h2>Best Practices</h2>
 <p>There are a few best practices to keep in mind when creating a new plugin.</p>
 <ul>
-	<li>The plugin name must not interfere with any existing method names</li>
-	<li>The plugin should allow for jQuery chaining (this is THE most powerful aspect of jQuery, so lets try not to break it)</li>
-	<li>It should be highly flexible and allow the user to override default settings</li>
+  <li>The plugin name must not interfere with any existing method names</li>
+  <li>The plugin should allow for jQuery chaining (this is THE most powerful aspect of jQuery, so lets try not to break it)</li>
+  <li>It should be highly flexible and allow the user to override default settings</li>
 </ul>
 <p>I have listed the basic plugin structure below with comments. This will cover the first two best practices.</p>
 {% highlight js %}// Wrap the plugin in the jquery dollar sign
@@ -58,18 +58,18 @@ $(document).ready(function(){
 // Additionally we can use $ to reference jquery
 (function($){
 
-	// Map the plugin name as a function in jQuery
-	$.fn.tweet = function() {
+  // Map the plugin name as a function in jQuery
+  $.fn.tweet = function() {
 
-		// Allow chaining by returning the this keyword
-		return this.each(function() {
+    // Allow chaining by returning the this keyword
+    return this.each(function() {
 
                      // Output a console message to show the plugin
                      // is working
                      console.log('We have called the tweet plugin');
-		});
+    });
 
-	};
+  };
 
 })(jQuery);
 {% endhighlight %}
@@ -83,7 +83,7 @@ var $this = $(this);
 {% endhighlight %}
 <blockquote>One thing to note is that this is not necessary inside a jQuery plugin<ins datetime="2013-01-31T22:05:56+00:00">,but is necessary within the return this.each(function() since we are now in the plugin's immediate scope</ins>. This is because the plugin is already wrapped in the jQuery object and therefore when you call the keyword this it is already equal to $(this).</blockquote>
 <p>The final element I would like to cover before we start on the meat of the plugin, is including support for default and user overridden settings.</p>
-<h3>Default and User Settings</h3>
+<h2>Default and User Settings</h2>
 <p>Nearly every single plugin has a way for the user to manipulate its settings.  Its a great way to provide flexibility and control to users so why not. This will be important later on for determining how many tweets we want to grab and what twitter username we grab from. More simply it will allow us not to hard-code data into our plugin.</p>
 
 <p>To implement default and user settings we first need to include a parameter in the original plugin's mapping.  Next we create an array called defaults which will hold the basic values for our plugin.  Finally using a little jQuery magic we merge our parameter array (options) into our default array with the $.extend method.</p>
@@ -92,15 +92,15 @@ var $this = $(this);
 // Pass in the options parameter for overriding defaults
 $.fn.tweet = function(options) {
 
-	// Set the default plugin values
-	var defaults = {
-		username: 'the base username',
-		count: 5
-	};
+  // Set the default plugin values
+  var defaults = {
+    username: 'the base username',
+    count: 5
+  };
 
-	// Use the jQuery method extend to merge
-	// the defaults and options arrays
-	var options = $.extend({}, defaults, options);
+  // Use the jQuery method extend to merge
+  // the defaults and options arrays
+  var options = $.extend({}, defaults, options);
 };
 {% endhighlight %}
 <p>This will allow the user to change configuration settings by passing in key / value pairs. Try this out by adding console.log(options); where the previous console message was. You should see the output as 5. This is our default value which was merged into the options array.</p>
@@ -108,26 +108,26 @@ $.fn.tweet = function(options) {
 <p>Now the real power comes in on index.html where we called our plugin on the id selector. Lets add the following user setting to our plugin call and check the console again.</p>
 {% highlight html %}<html>
 <head>
-	<title></title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
 
-	<!-- CONTENT GOES HERE -->
-	<div id="tweets"></div>
+  <!-- CONTENT GOES HERE -->
+  <div id="tweets"></div>
 
-	<!-- jQuery code goes at the bottom of the page -->
-	<script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="js/jquery.tweet.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function(){
+  <!-- jQuery code goes at the bottom of the page -->
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript" src="js/jquery.tweet.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
 
-			$('#tweets').tweet({
-				count: 10
-			});
+      $('#tweets').tweet({
+        count: 10
+      });
 
-		});
-	</script>
+    });
+  </script>
 </body>
 </html>{% endhighlight %}
 <p>Your output should look like the following: Object {username: "the base username", count: 10}.  Our default value for the username is listed with our user overridden count value.  Pretty slick.</p>

@@ -12,7 +12,7 @@ published: true
 <p>As a developer, there are many times when printing a value is essential to debugging an application. Sometimes you are unable to use the <code><%= string %></code> output block method.</p>
 <!--excerpt-->
 
-<h3>Concat</h3>
+<h2>Concat</h2>
 <blockquote>The preferred method of outputting text in your views is to use the <%= “text” %> eRuby syntax. The regular puts and print methods do not operate as expected in an eRuby code block. If you absolutely must output text within a non-output code block (i.e., <% %>), you can use the concat method.</blockquote>
 <p>In other words the concat TextHelper method allows you to output strings within a <% code %> non-output code block. This can be helpful in debbuging by saving some time instead of writing something like this: </p>
 {% highlight ruby %}

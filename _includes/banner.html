@@ -1,3 +1,11 @@
 <div class="Banner">
-  <h1>{{ page.title | default: site.title }}</h1>
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner Banner-heading">{{ page.title | default: "Development Simplified" }}</h1>
+
+    {% if page.date %}
+      <p class="Banner Banner-information">
+        <time>{{ page.date | date: "%B %-d, %Y" }}</time>
+      </p>
+    {% endif %}
+  </div>
 </div>

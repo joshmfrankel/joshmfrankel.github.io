@@ -22,14 +22,14 @@ tags:
 <br />
 <h2 id="1">A server is already running</h2>
 <hr />
-<h4><strong>What it looks like:</strong></h4>
+<h3><strong>What it looks like:</strong></h3>
 {% highlight bash %}
 A server is already running. Check /Users/username/Rails/sourcing/tmp/pids/server.pid.
 {% endhighlight %}
-<h4><strong>What it means:</strong></h4>
+<h3><strong>What it means:</strong></h3>
 <p>Occassionally, when halting or using <code>ctrl+c</code> to stop a rails server instance it will fail to unlock its process id. This will prevent you from starting a new server for the project as the server will think it is still running when it is in fact not.</p>
 
-<h4><strong>How to fix it: </strong></h4>
+<h3><strong>How to fix it: </strong></h3>
 <div class="well">
   <p>Remove the server.pid file from the project.</p>
   <p><code>rm /tmp/pids/server.pid</code></p>
@@ -37,7 +37,7 @@ A server is already running. Check /Users/username/Rails/sourcing/tmp/pids/serve
 <br />
 <h2 id="2">Address already in use</h2>
 <hr />
-<h4><strong>What it looks like:</strong></h4>
+<h3><strong>What it looks like:</strong></h3>
 {% highlight bash %}
 => Booting WEBrick
 => Rails 4.2.4 application starting in development on http://localhost:3000
@@ -49,10 +49,10 @@ Exiting
 /Users/jfrankel/.rvm/rubies/ruby-2.2.1/lib/ruby/2.2.0/socket.rb:206:in `bind': Address already in use - bind(2) for 127.0.0.1:3000 (Errno::EADDRINUSE)
 {% endhighlight %}
 
-<h4><strong>What it means:</strong></h4>
+<h3><strong>What it means:</strong></h3>
 <p>This error means that the port number you specified is still in use by another application or potentially an unclosed instance of your rails server. Typically the port Rails uses is 3000 so we need to make sure that there isn't another process already using it.</p>
 
-<h4><strong>How to fix it:</strong></h4>
+<h3><strong>How to fix it:</strong></h3>
 <div class="well">
   <p>List out all the processes using the port your Rails server is using (default 3000). Switch tcp:3000 to just tcp if you want to list all processes.</p>
   <code>lsof -wni tcp:3000</code>
@@ -70,7 +70,7 @@ Exiting
 <br />
 <h2 id="3">Rails console gives errors in terminal after closing with Ctrl+z</h2>
 <hr />
-<h4><strong>What it looks like:</strong></h4>
+<h3><strong>What it looks like:</strong></h3>
 {% highlight bash %}
 jfrankel$ rails c
 Loading development environment (Rails 4.2.4)
@@ -85,9 +85,9 @@ jfrankel$ ruby -v
 jfrankel$ exit
 NameError: undefined local variable or method `vei' for main:Object
 {% endhighlight %}
-<h4><strong>What it means:</strong></h4>
+<h3><strong>What it means:</strong></h3>
 <p>Rails console doesn't exit cleanly when you use <code>ctrl+z</code>. This is due to the fact that <code>ctrl+z</code> doesn't actually exit a command line program but instead pauses them. Because of this the commands in the terminal get all jumbled up.</p>
-<h4><strong>How to fix it:</strong></h4>
+<h3><strong>How to fix it:</strong></h3>
 <div class="well">
   Typing the keyword <code>exit</code> or using the preferred stop command of <code>ctrl+c</code> will properly stop rails console, but this is only valid for the next time you run rails console. For now you will have to restart the current terminal session or just close the window and start a new terminal session up.
 </div>
@@ -96,29 +96,29 @@ NameError: undefined local variable or method `vei' for main:Object
 <br />
 <h2 id="4">Name Error</h2>
 <hr />
-<h4><strong>What it looks like:</strong></h4>
+<h3><strong>What it looks like:</strong></h3>
 {% highlight bash %}
 NameError at /awards/11
 uninitialized constant User::NotificationSetting
 {% endhighlight %}
-<h4><strong>What it means:</strong></h4>
+<h3><strong>What it means:</strong></h3>
 <p>This is a farily straight forward error. Try re-reading the output error message and it starts to make sense. It is saying that there is an uninitalized constant, which could be a class or variable.</p>
 <p>This most likely is a class and or variable name that has a typo in it or doesn't exist yet in this context.</p>
-<h4><strong>How to fix it:</strong></h4>
+<h3><strong>How to fix it:</strong></h3>
 <div class="well">
   Make sure to double check spellings of classes and variables.<br /><br />Additionally, something that can trip you up is to make sure the plurality of the constant is correct. Models are singular while controllers are plural.
 </div>
 <br />
 <h2 id="5">MultiJson::ParseError with cookies</h2>
 <hr />
-<h4><strong>What it looks like:</strong></h4>
+<h3><strong>What it looks like:</strong></h3>
 {% highlight bash %}
 MultiJson::ParseError at /login
 Oj::ParseError
 {% endhighlight %}
-<h4><strong>What it means:</strong></h4>
+<h3><strong>What it means:</strong></h3>
 <p>This error is indicating that some JSON is not being parsed correctly. In the case of cookies it could mean that the cookie doesn't exist or is an valid that is not able to be parsed.</p>
-<h4><strong>How to fix it:</strong></h4>
+<h3><strong>How to fix it:</strong></h3>
 <div class="well">
   There are a couple of fixes for this issue. The easiest is to remove all cookies for the domain in question using chrome resource tab inside developer tools. This will force the cookies to be recreated.<br /><br />
   Additionally, writing code that gracefully degrades to a default valid value could also fix it. For example adding an empty json array as a backup value as shown below. <code>|| "{}"</code>

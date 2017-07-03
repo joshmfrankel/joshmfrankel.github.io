@@ -1,5 +1,13 @@
-<header>
-  <a href="{{ site.github.url }}/" class="Author"><span class="Author Author--first-name">Josh</span> <span class="Author Author--last-name">Frankel</span></a>
+<header class="Container">
+
+  <a href="{{ site.github.url }}/" class="Author-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Author Author-avatar" />
+    <div class="Author Author-logo">
+      <span class="Author Author-first-name">Josh</span>
+      <span class="Author Author-last-name">Frankel</span>
+    </div>
+  </a>
+
   <nav class="flex-right">
     {% for nav in site.data.navigation %}
       {% assign nav_page_url = nav.url | prepend: "/" | append: "/" %}

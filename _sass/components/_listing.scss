@@ -1,0 +1,17 @@
+.Listing {
+  &-title {
+    letter-spacing: -0.2rem;
+    margin-bottom: 0;
+  }
+  &-subtitle {
+    font: italic 300 1.9rem/30px $lato, sans-serif;
+    margin-top:0;
+  }
+  &-date {
+    font-weight: 700;
+  }
+  &-article {
+    border-bottom: 1px solid $lighter-light-gray;
+    padding-bottom:20px;
+  }
+}

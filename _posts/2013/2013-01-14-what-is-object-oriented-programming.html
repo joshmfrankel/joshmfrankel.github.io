@@ -22,7 +22,7 @@ excerpt: "Phew... that was a mouthful. Here is how I would define Object Oriente
 	<li>Parameter - <em>The variable passed in the method declaration</em></li>
 </ul>
 <p>As I am a kinesthetic learner I find the best way to learn something is to practice it. So lets walk through an example of OOP using a real world system. The following code examples are written in php but the concepts can be used regardless of language.</p>
-<h3>A Car is Object Oriented</h3>
+<h2>A Car is Object Oriented</h2>
 <p>Think about the following statement, "A car is an object oriented system". What this means is that you can think of a car as a physical object in space. The object accomplishes a specific purpose and has attributes that are specific to it. Learning object oriented programming in the context of a real-world system is also easier to understand than trying to use an abstract programming example. So from now on whenever I say Car think object.</p>
 {% highlight php %}
 <?php
@@ -33,7 +33,7 @@ class Car {
 }
 ?>
 {% endhighlight %}
-<h3>A Car has Specifications</h3>
+<h2>A Car has Specifications</h2>
 <p>There are about a million different specifications associated with a car. These are based on the type of car, year, and model. If we look at two cars of the same type, year, and model they should... theoretically... be identical.</p>
 
 <p>For our representation of the Car object lets create the following properties: manufacturer, weight, turned on status, and the current speed.</p>
@@ -55,9 +55,9 @@ $Car = new Car();
 
 ?>
 {% endhighlight %}
-<h3>A Car Performs Specific Functions</h3>
+<h2>A Car Performs Specific Functions</h2>
 <p>Cars perform many different methods of function. We will limit ours to the following: Brake, Accelerate, and Start Ignition. What we have just done is provided the structure for our object. We now know exactly the amount of functionality needed and even the names for the methods we will use. Planning out the design of an Object Oriented system from the beginning is important to help keep code efficient and <a title="Don't Repeat Yourself" href="#">DRY</a>.</p>
-<h4><strong>Methods</strong></h4>
+<h3><strong>Methods</strong></h3>
 {% highlight php %}
 <?php
 
@@ -87,7 +87,7 @@ $Car = new Car();
 
 ?>{% endhighlight %}
 <blockquote><strong>Conceptualize:</strong> A method such as Repair Car Engine would not be suited for our Car Object. A car would not repair itself. This would be performed by a Mechanic (a potential other object).</blockquote>
-<h3>Visibility and Encapsulation</h3>
+<h2>Visibility and Encapsulation</h2>
 <p>You may have noticed the word "public" before the methods. This is what is known as visibility. Visibility refers to how accessible a method or property is to other classes. This is necessary for understanding proper encapsulation.</p>
 
 <p>There are three types of visibility. Public, Protected, and Private. A <strong>public</strong> method/property is accessible to the class it originates inside, any child class that extends it, as well as other classes. A <strong>protected</strong> method/property is visible to only the class where it originates and child classes. A <strong>private</strong> method/property is visible to only the class it originates in.</p>
@@ -95,7 +95,7 @@ $Car = new Car();
 <p>Encapsulation is the idea of hiding the implementation of your class and exposing its functionality in a limited way. This prevents overriding of functionality and reduces duplicate code.</p>
 
 <p>In order to properly encapsulate our class we need to set the visibility for each of our properties and methods. Lucky for you it has already been done. Our methods were all listed as public and our properties were labeled private. The properties now are only accessible to the class Car. A common design pattern is to create helper methods called getters and setters.</p>
-<h3>Getters and Setters</h3>
+<h2>Getters and Setters</h2>
 <p>This is actually a fairly straight forward concept. They literally do exactly what they say and nothing more. A getter method returns a property while a setter method sets it. These allow other methods to access the Car objects private variable for manufacturer.</p>
 {% highlight php %}
 <?php
@@ -134,7 +134,7 @@ $manufacturer = $Car->getManufacturer();
 echo $manufacturer;
 ?>
 {% endhighlight %}
-<h3>Gentleman, Start Your Engines</h3>
+<h2>Gentleman, Start Your Engines</h2>
 <p>Now that we have some of the basics completed, lets move onto some actual functionality. First lets flesh out the startIgnition method. This method will check the isTurnedOn property to see if it is false (turned off) and if so will change it to True.</p>
 {% highlight php %}
 <?php
@@ -186,7 +186,7 @@ public function brake ($value) {
 	<li>Is there a top speed or limit to how fast the car can travel?</li>
 	<li>Does a car take time to accelerate or brake</li>
 </ul>
-<h3>88 MPH</h3>
+<h2>88 MPH</h2>
 <p>The last piece of our Car class will be to output some information that the user can utilize. This will include a new getter method for the car's speed and an output method to display a string that is user readable.</p>
 {% highlight php %}
 <?php
@@ -226,5 +226,5 @@ $Car->brake(88);
 echo $Car->outputCurrentSpeed();
 ?>
 {% endhighlight %}
-<h3>Summary</h3>
+<h2>Summary</h2>
 <p>There you have it. A working OOP class structure. Feel free to build upon this or add other methods.</p>

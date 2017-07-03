@@ -38,7 +38,7 @@ user = User.new(...)
 Journal.create(user: user)
 {% endhighlight %}
 
-<h3>Who is the creator of the Journal?</h3>
+<h2>Who is the creator of the Journal?</h2>
 <p>The previous setup works as you would expect, but what if you wanted to better describe
 who <em>created</em> a <strong>Journal</strong> without changing the classname for <strong>User</strong>?
 You might want a column named <code>creator</code> that stores the user who created the journal.
@@ -61,7 +61,7 @@ Journal.create(creator: user) # Check this out! Rails magic allows us to pass in
 <p>Our model now responds to the column name creator the same way it would to a
 standard user reference.</p>
 
-<h3>One step further</h3>
+<h2>One step further</h2>
 <p>You can improve on this approach by adding an index and foreign key to the
 creator_id column in the migration. This ensures referential integrity as well as
 speeding up any queries based on creator_id.</p>

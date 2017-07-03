@@ -23,9 +23,9 @@ tags:
 
 <p>So let's properly define and explain (simply) what exactly it means to stub the system under test.</p>
 
-<h3>What is a stub?</h3>
+<h2>What is a stub?</h2>
 
-<blockquote class="floating-quote floating-quote-right"><div class="page-header">Stubs vs Mocks</div>A stub defines specific behavior for an object's method. A mock acts as a stand-in object for another. The double keyword in RSpec creates a pseudo-mock object.</blockquote>
+<blockquote class="Info Info-right"><div class="page-header">Stubs vs Mocks</div>A stub defines specific behavior for an object's method. A mock acts as a stand-in object for another. The double keyword in RSpec creates a pseudo-mock object.</blockquote>
 
 <p>To stub a method means to define its behavior. When you stub in a test you are basically saying, "For an object that calls a specific method return this result". There is also another term called <strong>mocks</strong> which are sometimes used interchangeably but are fundamentally different.</p>
 
@@ -109,7 +109,7 @@ end
     end
 {% endhighlight %}
 
-<blockquote class="floating-quote floating-quote-right"><div class="page-header">Private methods</div>Something to keep in mind is that the #admin? method is listed as private. I'm paraphrasing Sandi Metz here, messages that we send to self (current class) aren't things that we care about testing since they don't effect other parts of our system.</blockquote>
+<blockquote class="Info Info-right"><div class="page-header">Private methods</div>Something to keep in mind is that the #admin? method is listed as private. I'm paraphrasing Sandi Metz here, messages that we send to self (current class) aren't things that we care about testing since they don't effect other parts of our system.</blockquote>
 
 <p>The test above, while a farily contrived example, shows how stubbing the <code>#admin?</code> method's response to true can hide our codes actual intent. This produces an unreliable testing suite that over time becomes hard to trust and maintain.</p>
 
@@ -159,7 +159,7 @@ end
 
 <p>Now future changes to the <code>#admin?</code> method are able to effect the <code>#welcome_message</code> method and we're covered against tests that pass when in reality they are broken.  This is the basic premise behind not stubbing the system under test.</p>
 
-<h3>What does system refer to?</h3>
+<h2>What does system refer to?</h2>
 
 {% include rich-snippets/article-image src="2017/morpheus-specs.jpg" caption="Morpheus quote modified from the Matrix" width="500" height="303" %}
 
@@ -171,12 +171,12 @@ end
 
 <p>So when do you stub? Well, this is something that is constantly evolving for me but here are a few general guidelines I think about when I start the reach for stubbing.</p>
 
-<h3>What to stub?</h3>
+<h2>What to stub?</h2>
 
-<h4>Third-party services and apis</h4>
+<h3>Third-party services and apis</h3>
 <p>Essentially, anything that you don't have direct control over fits this category. You can use stubs to ensure your system appropriately handles both error cases and happy path cases. This also improves test suite performance by avoiding waiting on the third-party service to respond(~100ms every request will start to add up).</p>
 
-<h4>Outgoing messages that you expect to send</h4>
+<h3>Outgoing messages that you expect to send</h3>
 <p>Controllers that call service objects are a good example of this. In a hypothetical controller test you wouldn't want to unit test the service class as well. Ideally, it would be properly tested in isolation within its own spec.</p>
 <p>With that being said we still want to ensure that it is being sent a message (essentially being called) in the controller spec context.</p>
 {% highlight ruby %}
@@ -197,19 +197,19 @@ end
 <p>This spec says, "Given the #index action for the controller, ensure that the CreateUserService receives the message of perform with the arguments of params: params"</p>
 <p>We aren't directly testing the CreateUserService here because it already has its own associated unit test (not shown here) which ensures that it is functioning as expected. Not stubbing the service class above is just duplicating testing effort.</p>
 
-<h4>Minimizing database interactions</h4>
+<h3>Minimizing database interactions</h3>
 <p>If you have a model with a scope that returns its active users (we'll call is :active) which already has unit tests ensuring that it functions as expected, then anytime you have to use the same scope elsewhere you could stub out the response.</p>
 <p>This avoids having to hit the database in the test which greatly speeds up the test suite. Be warned though if you are writing tests specific to database interactions it is probably wise to over-test rather than under-test. Minimizing database interactions is a delicate balancing act between performance and confidence.</p>
 
-<h3>What to avoid stubbing?</h3>
+<h2>What to avoid stubbing?</h2>
 
-<h4>Private methods (messages to self)</h4>
+<h3>Private methods (messages to self)</h3>
 <p>Like I mentioned above, these tend to directly deal with the current class that you are testing (system under test). You want to make sure that they are working as you expect and stubbing over the implementation is going to lead to unreliable results.</p>
 
-<h4>Integration Tests</h4>
+<h3>Integration Tests</h3>
 <p>This is end-to-end testing and as such you want to ensure that all steps along the path are in working order. I would also argue that it is ok for these specs to be a little slower at the great benefit of higher confidence.</p>
 
-<h3>Conclusion</h3>
+<h2>Conclusion</h2>
 <p>As with all programming, knowing when to stub and when not to can be fairly opionated. There is always room for breaking the rules in certain situations and as such its important to remain flexible with your approach to testing. Using your best judgement to decide what to directly test and what to stub is something that takes a lot of practice (I'm still learning this as well).</p>
 <p>I took loads of inspiration from Sandi Metz's talk about Magic Tricks of Testing, which is an excellent in-depth discussion of what to test and what not to. I highly recommend <a href="https://www.youtube.com/watch?v=URSWYvyc42M">watching it</a> and following along with the slides on <a href="https://speakerdeck.com/skmetz/magic-tricks-of-testing-railsconf">SpeakerDeck</a>.</p>
 

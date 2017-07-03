@@ -13,7 +13,7 @@ tags:
 <!--excerpt-->
 <p>Luckily for us the fix for this issue is fairly simple, though towards the bottom of the documentation. <strong title="Step 1">First</strong> we need to add a new gem to our Gemfile <code>gem 'jquery-turbolinks'</code> to add jQuery support for Turbolinks. Make sure to run <code>bundle</code> to reload your gems.</p>
 <p><strong title="Step 2">Next</strong> we need to add the jquery-turbolinks files into our <mark>application.js</mark> asset load order. Make sure to place <code>//= require jquery.turbolinks</code> exactly after <code>//= require jquery</code> and before <code>//= require turbolinks</code> for this to work correctly.</p>
-<h4>Application.js</h4>
+<h3>Application.js</h3>
 {% highlight ruby %}
 //= require jquery
 //= require jquery.turbolinks

@@ -10,11 +10,11 @@ published: true
 
 <p>Ever wanted an integer to be allowed a specific range of valid numbers rounding when necessary? Well, unfortunately in the Ruby community this has been a point of contention because no built-in function exists. We can however easily replicate the intended behavior through the clever usage of the enumerable sort method.</p>
 <!--excerpt-->
-<h3>This may be a bit overkill...</h3>
+<h2>This may be a bit overkill...</h2>
 <img src="{{ site.url }}/img/2015/clamp-integer-post-clamp.jpg" alt="Image property of amazon.com" />
 <p><small><em>Image property of amazon.com</em></small></p>
 <p>Because we want to return an integer that has been "clamped" to a specific range we need a way to set a minimum and maximum value. The Enumerable sort method comes in handy for this purpose. We'll be using the sort method while grabbing the second element in the returned array to gather the appropriate clamp value.</p>
-<h3>All about sort</h3>
+<h2>All about sort</h2>
 <p><code>Enumerable#sort</code> takes an array and attempts to sort the elements either alphabetically or by number unless a custom sort is passed to the block. This allows something like the following to occur.</p>
 {% highlight ruby %}
 %w(rhea kea flea).sort     #=> ["flea", "kea", "rhea"]
@@ -41,7 +41,7 @@ x = 10
 <p>By using three integers, one of which is our input integer, and then calling sort on them we receive the integers in rising order from lowest to smallest. The trick here is <code>.sort[1]</code>. This says sort the previous array and return the 2nd element from it. Since arrays start at 0 then <code>[1]</code> means the second or middle element.</p>
 <p class="well"><strong>Clamp Equation:</strong><br />[x, a, b].sort[1] <br /><br />x - input<br />a - minimum value<br />b - maximum value</p>
 
-<h3>Disassemble it!</h3>
+<h2>Disassemble it!</h2>
 <img src="{{ site.url }}/img/2015/clamp-disassemble.jpg" alt="Image property of http://genius.com/" />
 <p><small><em>Image property of http://genius.com/</em></small></p>
 <p>So now we will always return the proper clamped value. Lets take a look at an example of what is happening. I'll reuse the first example from above with comments to disassemble what is happening in the intermediate steps.</p>
@@ -63,7 +63,7 @@ x = 20
 {% endhighlight %}
 <p>There you have it. A simple and easy way to clamp integers between a range. Also you might be wondering why I keep using the phrase clamp. That is because in other programming languages the clamp method is built-in to accomplish this from the start.</p>
 
-<h3>TL;DR</h3>
+<h2>TL;DR</h2>
 <p>Here it is in method form for easy copy and pasting.</p>
 {% highlight ruby %}
 def clamp (input, min, max)

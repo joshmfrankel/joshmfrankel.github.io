@@ -14,7 +14,7 @@ tags:
 <p>Rail's out of the box validation feature set is fairly rich. You have the <code>validates</code> shortcut DSL which maps to all the default validators. The ability to override those default validators through <strong>custom validator classes</strong>. Finally, you can also write <strong>custom validator methods</strong> for specific use cases. For the purpose of this article, we'll focus on custom validator methods.</p>
 <!--excerpt-->
 
-<h3>Custom Validator methods</h3>
+<h2>Custom Validator methods</h2>
 <p>I recently ran across a good use case for custom validator methods. Adding validation to attributes on a serialized object isn't possible by default in Rails without using a custom validator method. Here's our default code logic.</p>
 {% highlight ruby %}
 class Company < ApplicationRecord
@@ -78,10 +78,10 @@ end
 {% endhighlight %}
 <p>The previous code provides a way of properly validating a field that is within a serialized object. We also have the piece of mind that this will function how we expect thanks to a clear spec of the new validation method.</p>
 
-<h3>A little on custom validator classes</h3>
+<h2>A little on custom validator classes</h2>
 <p>Generally, custom methods seem to work great for quick or difficult to validate attributes while custom validator classes are beneficial for multiple files that share the same validation method. Custom validator classes also give you the power to override the current implementations of default validators (like email or password) or write your own (MyValidatorClass).</p>
 
-<h3>Conclusion</h3>
+<h2>Conclusion</h2>
 <p>Here are some quick basics for custom validation methods:</p>
 <ul>
   <li>Must register a method with the <code>validate :method_name</code> syntax</li>

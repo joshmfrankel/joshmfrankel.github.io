@@ -9,19 +9,19 @@ tags:
 published: true
 ---
 <p>I believe Jeffrey Way has a quote somewhere that goes like, <mark>"think about the developer who can save a couple seconds on a task. At the end of the year he will have accomplished that much more than the developer who didn't".</mark> If you have begun to streamline your process learning shorthand css is one method for increasing efficiency.</p><!--excerpt-->
-<h3>1. Background</h3>
+<h2>1. Background</h2>
 <p>A staple of every web developer's css tool kit. 99% of websites will require the use of this property, making it an excellent way to reduce time on task. I seem to use this type of shorthand whenever I am using a sprites image file.</p>
 <blockquote><strong>background:</strong> [background-color] [background-image] [background-repeat] [background-attachment] [background-position];</blockquote>
 {% highlight css %}.bg {
      background: #323232 url(../images/layout/sprites.png) no-repeat scroll 10px 20px;
 }{% endhighlight %}
-<h3>2. Font</h3>
+<h2>2. Font</h2>
 <p>Probably my favorite css shorthand property. Combines everything you need to style a font. Super quick and concise format. The only thing it doesn't include is letter-spacing.</p>
 <blockquote><strong>font:</strong> [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];</blockquote>
 {% highlight css %}p {
      font: italic small-caps 600 12px/23px "SophiaProLight", Verdana, sans-serif;
 }{% endhighlight %}
-<h3>3. Margin / Padding</h3>
+<h2>3. Margin / Padding</h2>
 <p>A truly tricky shorthand property. This is one I still get mixed up.</p>
 
 <p>The format goes as such: margin-top margin-right margin-bottom margin-left. If you think about the short hand like the face of a clock and imagine the clock starting at 12 this becomes a whole lot easier.</p>
@@ -46,14 +46,14 @@ em {
      /* All four sides */
      padding: 15px;
 }{% endhighlight %}
-<h3>4. Border</h3>
+<h2>4. Border</h2>
 <p>Similar to the margin / padding shorthand, you can declare all sides of a border with one declaration. However, unlike margin / padding this is the only format for the border shorthand.  Addtionally, properties such as border-width, border-style, and border-color can be combined into a single line.</p>
 
 <blockquote><strong>border:</strong> [border-width] [border-style] [border-color];</blockquote>
 {% highlight css %}div {
      border: 1px solid red;
 }{% endhighlight %}
-<h3>5. List</h3>
+<h2>5. List</h2>
 
 <p>This is lesser used shorthand property for styling ordered and unordered lists.</p>
 <blockquote><strong>list-style:</strong> [list-style-type] [list-style-position] [list-style-image];</blockquote>
@@ -62,7 +62,7 @@ em {
 list-style: disc inside url(bullet.gif);
 {% endhighlight %}
 
-<h3>Box Shadow</h3>
+<h2>Box Shadow</h2>
 <p>While this is not a shorthand property, box-shadow's default format is very akin to earlier css shorthand properties.</p>
 
 <blockquote><strong>box-shadow:</strong> [horizontal-length] [vertical-length] [blur] [spread] [color] [inset]</blockquote>

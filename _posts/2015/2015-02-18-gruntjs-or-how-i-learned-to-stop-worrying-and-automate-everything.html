@@ -16,7 +16,7 @@ published: true
     <img src="{{ site.url }}/img/2015/grunt-logo.png" alt="Grunt.js Logo all rights reserved to http://gruntjs.com/" />
     <p><small>Logo property of http://gruntjs.com/</small></p>
 </div>
-<h3>Build Tools</h3>
+<h2>Build Tools</h2>
 <p>While I can't speak on behalf of Gulp, I have used both Guard and Grunt.js in my projects. In one of my earlier posts (<a href="http://joshfrankel.me/blog/2013/series/leveling-up-css-with-sass-basics-setup-part-1/">Leveling up CSS with Sass</a>) I mentioned the usage of Guard for compiling Sass files. For this purpose it is really useful but I have found that Grunt.js is just a little easier for me. I still use Guard for Rails based projects though as it integrates well.</p>
 
 <p>Now before I begin to explain how to setup Grunt.js lets conceptualize what we wish to accomplish from the final configuration. We want a Grunt.js build system that has automatically loaded plugins, an easy way of maintaining tasks, and external plugin configurations. Over the next couple sections I will detail how we can get such a grunt setup working. Additionally, for developers new to Grunt this article will serve as a crash course into the world of task runners.</p>
@@ -27,13 +27,13 @@ published: true
 <a href="#gruntfile">Step 3: Configure the Gruntfile.js</a>
 <a href="#optimize-structure">Step 4: Optimize Gruntfile.js with load-grunt-config</a>
 </nav>
-<h3 id="setup-node">Setup Node.js</h3>
+<h2 id="setup-node">Setup Node.js</h2>
 <p>Before we can begin using grunt you need to first make sure you have node installed so we can use <acronym title="Node Package Manager">npm</acronym>. NPM is like <a href="https://rubygems.org/" target="_blank">Ruby Gems</a>, <a href="https://getcomposer.org/" target="_blank">Composer</a>, or <a href="http://bower.io/" target="_blank">Bower</a>, in that it manages specific packages for your project.</p>
 <p>To install node, download the proper version based on your OS from <a href="http://nodejs.org/download/" title="Node Download Page" target="_blank">here</a>. Once installed run the following initialize command in the project directory from your terminal. <code>npm init</code></p>
 
 <p>This will walk you through creating a package.json file that contains all the necessary project information. Just use the defaults for the purposes of this article. Once completed you will be ready to move onto the next step.</p>
 
-<h3 id="basic-gruntjs">Basic Grunt.js Setup</h3>
+<h2 id="basic-gruntjs">Basic Grunt.js Setup</h2>
 <p>Just like step one we need to install grunt, which is made trivial now that have npm installed. Run the following command to install grunt as a devDependency (--save-dev). <code>npm install grunt --save-dev</code>. If your system balks then try running the command as <code>sudo</code>. The format of <code>npm install [grunt-plugin] --save-dev</code> is generally the easiest way to install plugins. Additionally, a devDependency is just a way of letting npm know that the plugin or module is only required for the development environment.</p>
 <p>Install a few more plugins on your own for Grunt.js's usage. <strong>grunt-contrib-watch</strong>, <strong>grunt-notify</strong>, <strong>grunt-contrib-compass</strong>. Watch looks for file directory changes, notify displays growl like notifications to your OS, and compass compiles sass and adds compass features.</p>
 <p class='well'><strong>Note:</strong><br /> You will need to run the above plugins in the standard npm install [plugin-name] --save-dev format</p>
@@ -56,9 +56,9 @@ module.exports = function(grunt) {
 
 };
 {% endhighlight %}
-<h3 id="gruntfile">Configure the Gruntfile.js</h3>
+<h2 id="gruntfile">Configure the Gruntfile.js</h2>
 <p>There are three basic parts to each Gruntfile: loading plugins, task definitions, and configurations. Loading just places plugins into the grunt. Tasks are basically a chain of actions that can be called. And configurations set up external data and internal plugins.</p>
-<h4>Loading plugins</h4>
+<h3>Loading plugins</h3>
 <p>The loading of plugins is really quite simple. After install a plugin you just use the built in function loadNpmTasks to load the plugin into your grunt file for usage. If you are thinking to yourself, "There has got to be an easier way to load plugins", you would be correct. I will discuss an improved plugin loading method in <a href="#optimize-structure">Step 4</a>. Here is a sample of code from above showing this section.</p>
 {% highlight javascript %}
 // Loading of plugins
@@ -67,7 +67,7 @@ grunt.loadNpmTasks('grunt-contrib-watch');
 grunt.loadNpmTasks('grunt-notify');
 {% endhighlight %}
 
-<h4>Configurations</h4>
+<h3>Configurations</h3>
 <p>Configurations are the soldiers of Grunt.js. They do exactly as they are told and nothing else.</p>
 <p>The main configuration is created through the usage of the initConfig configuration object. This allows you to pass in external values and plugin configurations. For instance we placed <code>pkg: grunt.file.readJSON('package.json')</code> in the above code. This reads our package.json file created from <code>npm init</code> and places it into the config variable pkg.</p>
 
@@ -117,7 +117,7 @@ grunt.loadNpmTasks('grunt-notify');
 <p>Congratulations, you have just run your very first grunt task, albeit somewhat lengthly and not really automated yet. Don't worry we will fix that soon.</p>
 <p class="well"><strong>Cool Trick:</strong><br /> Try running just <code>grunt notify</code> without the target. It will run both notify:welcome and notify:another. Essentially running any target under the notify task.</p>
 
-<h4>Tasks</h4>
+<h3>Tasks</h3>
 <p>The task is essentially an order the commander (you) gives. The order outlines which platoon (target configurations) should go to the battlefield to run their attack plans.</p>
 <p>In other words, a task is at its most basic a shortcut to run a list of configurations. Tasks are loaded by using the function <code>grunt.registerTask('shortcutName', ['runFirst', 'runSecond']);</code>. It includes the task name or as I like to call it the shortcut, followed by a list of tasks to run in a specific order.</p>
 <p>So how would we setup a task that would run the welcome target from notify and afterwards run the compile target for compass? It would probably look something like this.</p>
@@ -191,10 +191,10 @@ module.exports = function(grunt) {
 };
 {% endhighlight %}
 <p>There is nothing wrong with this setup. It is actually totally functionally and usable at this point. However, say we were to add 3 or 4 more tasks and 3 or 4 more plugins. You can imagine that this file can get quite big in a hurry. This leads us to the next step which is to abstract some the logic to make it cleaner to manage multiple plugins and multiple tasks.</p>
-<h3 id="optimize-structure">Optimize Gruntfile.js with load-grunt-config</h3>
+<h2 id="optimize-structure">Optimize Gruntfile.js with load-grunt-config</h2>
 <p>There are a number of popular plugins out there to help organize Gruntfile's. The one I always kept running into was <code>load-grunt-tasks</code>.</p>
 <p>Load grunt tasks automatically loads all of your plugins. So instead of typing grunt.loadNpmTasks('...'); half a hundred times you would just use a single line of code <code>require('load-grunt-tasks')(grunt);</code>. While this is really useful it unfortunately still leaves the configuration settings in the Gruntfile which is typically the bulk of the content.</p>
-<h4>Enter load-grunt-config</h4>
+<h3>Enter load-grunt-config</h3>
 <p>Load grunt config takes the awesome loading cabilities of load-grunt-tasks and adds the ability to abstract configurations and task defintions to external files. This makes managing your Grunt setup a lot easier. Run the following to install it <code>npm i --save-dev load-grunt-tasks</code>.</p>
 <p>We now can use a better folder structure for our grunt plugin configurations. Load-grunt-config enables the usage of a folder called grunt/ where you can now place files where the file name is actually the taskname.</p>
 <p>For example lets abstract the notify logic into its own file called <strong>notify.js</strong> inside the <strong>grunt/</strong> folder. It should look like this.</p>
@@ -234,7 +234,7 @@ custom:
     - 'notify:welcome'
     - 'watch:compass'
 {% endhighlight %}
-<h3>Conclusion</h3>
+<h2>Conclusion</h2>
 <p>So lets see what we have accomplished so far. We have setup node as well as grunt. There were a number of grunt plugins installed as devDependencies. All grunt plugins are automatically loaded via load-grunt-config. And finally we have abstracted our plugin configurations and task definitions into separate files.</p>
 <p>We now have a highly efficient grunt setup configured. Adding new tasks and/or plugins should be a breeze from here on forward. I highly suggest looking more into <a href="https://github.com/firstandthird/load-grunt-config" target="_blank">load-grunt-config</a> as there are a number of features to making your life easier in the world of task runners.</p>
 <p>Did I miss something? Have a favorite grunt plugin? I would love to hear your feedback and comments.</p>

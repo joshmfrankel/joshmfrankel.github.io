@@ -14,7 +14,7 @@ published: true
 <p>Internationalization is an important topic for many corporations that have a multi-national client base. It allows for easy translation capabilities and helps to protect the future of the application against code debt. However, even if you are not providing translations for your application you can still use internationalization to dry up your content. Let's get started.</p>
 <!--excerpt-->
 
-<h3>What is internationalization?</h3>
+<h2>What is internationalization?</h2>
 <p>Internationalization or (<strong>I18n</strong> from now on), helps to provide translatable text files in the form of yaml inside the <code>config/locales/</code> folder. To start your rails application will most likely have something like <code>en.yml</code>. This allows you to create key value pairs to be used for the English language. The power with <strong>I18n</strong> is the keys specified can then be matched to another language file as long as the key name corresponds appropriately.</p>
 
 <blockquote><strong>Note: </strong> I18n is an abbreviation for internationalization as well as the class name in Ruby.</blockquote>
@@ -37,16 +37,16 @@ ru:
 
 <p>Now anytime a locale change is detected by the <strong>Rails</strong> app it will switch internationalization files. You can simulate this action in the browser by using a querystring with the locale filename like this <code>?locale=ru</code></p>
 
-<h3>Why should I use this if I don't plan on translating anything?</h3>
+<h2>Why should I use this if I don't plan on translating anything?</h2>
 
 <p>I'm glad you asked that. While using <strong>I18n</strong> for a site that doesn't require a translation seems like extra work at first it does lead to some good coding practices with keeping your application <strong>DRY</strong>. First lets talk about how you use <strong>I18n</strong> before I show you the benefits of it.</p>
 
-<h4>Using I18n</h4>
+<h3>Using I18n</h3>
 
 <p>You can utilize your translation files by using the following methods: <code>I18n.t('key.name.goes.here')</code> for <strong>Models</strong> and <code>t('the.period.represents.the.colon.from.the.yml.file')</code> for <strong>Controllers</strong> and <strong>Views</strong>.</p>
 <blockquote><strong>Simplified: </strong>By placing these methods in your code you are essentially telling <strong>Rails</strong>, "Please print the value associated with this key based on my current locale".</blockquote>
 
-<h3>The benefit on small applications</h3>
+<h2>The benefit on small applications</h2>
 <p>Take a look at the following controller code.</p>
 {% highlight ruby %}
 def index
@@ -109,7 +109,7 @@ en:
 <img src="{{ site.url }}/img/2015/I18n-doge.png" alt="Generated from dogr.io" />
 <p>The only downside to this method is that you need to type a little more code to display the content. However, even though <code>"Access Denied"</code> is less typing than <code>t('user.alert.access_denied')</code> by using <strong>I18n</strong> to <strong>dry</strong> out your code, it will allow you to have a singularly defined location for content. I don't know about you but changing code in one place vs 20 is a big time saver.</p>
 
-<h3>TL;DR</h3>
+<h2>TL;DR</h2>
 <ul>
   <li><strong>I18n</strong> provides a single location to update content. This reduces code debt.</li>
   <li>The code is slighly longer<code>:alert => "Access Denied"</code> vs. <code>:alert => t('users.alert.access_denied')</code></li>

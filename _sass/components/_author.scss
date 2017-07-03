@@ -1,3 +1,10 @@
+.Author-container {
+  @extend .flex-container;
+
+  &:hover * {
+    color: $darker-gray-hover;
+  }
+}
 .Author {
   @extend .flex-column;
   @extend .transition;
@@ -5,17 +12,23 @@
   color: transparent;
   font: 32px/1 $lato;
 
-  &--first-name {
+  &-avatar {
+    @extend .circular-image;
+
+    border: 3px solid $white;
+    box-shadow: 0 0 0 1px $lighter-gray;
+    align-self: center;
+  }
+  &-logo {
+    align-self: center;
+    margin-left: 15px;
+  }
+  &-first-name {
     color: $lighter-gray;
     font-weight: 300;
   }
-
-  &--last-name {
+  &-last-name {
     color: $darker-gray;
     font-weight: 700;
-  }
-
-  &:hover * {
-    color: $darker-gray-hover;
   }
 }

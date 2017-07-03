@@ -12,7 +12,7 @@ tags:
 <!--excerpt-->
 <p>In this article I'll go through the creation of a many-to-many relationship with the built-in <code>Ruby on Rails ActiveRecord</code> associations, <code>has_many :through</code> and <code>has_and_belongs_to_many:</code>. Additionally, the specific differences between the two will be examined, but before all that let's first get some background on what is a many-to-many relationship.</p>
 
-<h3>The Many-to-Many Relationship</h3>
+<h2>The Many-to-Many Relationship</h2>
 <p>In relational database schemas, a <code>many-to-many</code> association is when a database table is built in a way that relates it to another table through a joining table. There needs to be at least three table to accomplish this. This allows the developer to query the relationship between the two tables gather their respective collections.</p>
 <p>Diving into an example, let's say you have an application that requires data for programmers, clients, and their connected projects. You could start by saying that a <code>Programmer</code> is a member of a <code>Project</code> as well as a <code>Client</code>. This would lead you to design your database schema to resemble something like this:</p>
 <div class="thumbnail">
@@ -39,11 +39,11 @@ tags:
 <p>If we were to delete a <code>Project</code> we would lose the project's data as well as the two foreign key fields: <code>programmer_id</code> and <code>client_id</code>. However, we don't end up with any invalid records in our system. Additionally, both the <code>Programmer</code> and <code>Client</code> records are completely usable as stand-alone data.</p>
 <p>Good job! Looks like we successfully created a working database structure. Next I'm going to show off how to create these tables from the command line and the Rails association methods that make using them easier.</p>
 
-<h3>How to leverage ActiveRecord Associations</h3>
+<h2>How to leverage ActiveRecord Associations</h2>
 <p>There are a few different types of ActiveRecord associations. <code>has_one</code> signifies that a model has one record of another specific model. <code>has_many</code> is the same except there can be many records. <code>belongs_to</code> is used to show that the model on the other side of the association is part of or belongs to the associated model.</p>
 <p>These are some of the basic fundamentals of ActiveRecord Assocations, at least from a theorhetical standpoint. However, for the purposes of this article we will focus on many-to-many associations which are accomplished with two of the more challenging associations that can be implemented. The <code>has_many :through</code> and the <code>has_and_belongs_to_many:</code>.</p>
 
-<h3>has_many :through</h3>
+<h2>has_many :through</h2>
 <p class="well floated"><strong>Rails Tip</strong><br /> I am using the shortened version of the <code>rails generate</code> command which is simply <code>rails g</code>. Nifty!</p>
 <p>The first step to implementing a <code>has_many :through</code> association is to run the rails
 generator to create the model and the migration files. We will use the entity relationship diagram (pictured above) to
@@ -93,7 +93,7 @@ class Projects < ActiveRecord::Base
 end
 {% endhighlight %}
 <p>By utilizing these associations we now have access to a number of helper methods (16 to be exact). Here they are directly from the RailsGuides documentation.</p>
-<h4>Built-in Association Methods</h4>
+<h3>Built-in Association Methods</h3>
 <ul>
   <li>collection(force_reload = false)</li>
   <li>collection<<(object, ...)</li>
@@ -114,21 +114,21 @@ end
 </ul>
 <p>This is now a properly set up has_many :through association which can be utilized by the preceding methods. I've given examples of <code>collection.create(attributes = {})</code> and <code>collection</code> below.</p>
 <div class='well'>
-  <h4>Create Association</h4>
+  <h3>Create Association</h3>
 {% highlight ruby %}
 programmer = Programmer.create(name: 'Josh Frankel')
 client     = Client.create(name: 'Mr. Nic Cage')
 
 programmer.projects.create(client: client)
 {% endhighlight %}
-  <h4>List ActiveRecord Collection</h4>
+  <h3>List ActiveRecord Collection</h3>
 {% highlight ruby %}
 programmer.clients
  => #<ActiveRecord::Associations::CollectionProxy [#<Client id: 1, created_at: "2016-01-25 18:45:00", updated_at: "2016-01-25 18:45:00", name: "Mr. Nic Cage">]>
 {% endhighlight %}
 </div>
 
-<h3>has_and_belongs_to_many:</h3>
+<h2>has_and_belongs_to_many:</h2>
 <p>An alternative way for creating many-to-many associations in Rails, is to use the <code>has_and_belongs_to_many</code> association or <abbr title="has_and_belongs_to_many">HABTM</abbr> for short. The setup is very similiar to the <code>has_many :through</code> association. The migration is slightly different though for the <code>has_many :through</code> association so you'll need to make sure you are running these on a clean database (or you can rollback to previous migrations and create new ones).</p>
 {% highlight bash %}
 rails g model Programmer name:string
@@ -161,13 +161,13 @@ end
 {% endhighlight %}
 <p>Once again here is how you would utilize the associations in your code or console.</p>
 <div class='well'>
-  <h4>Create Association</h4>
+  <h3>Create Association</h3>
 {% highlight ruby %}
 programmer = Programmer.create(name: 'Josh Frankel')
 
 programmer.clients.create(name: 'Mr. Nic Cage')
 {% endhighlight %}
-  <h4>List ActiveRecord Collection</h4>
+  <h3>List ActiveRecord Collection</h3>
 {% highlight ruby %}
 programmer.clients
  => #<ActiveRecord::Associations::CollectionProxy [#<Client id: 1, created_at: "2016-01-25 18:45:00", updated_at: "2016-01-25 18:45:00", name: "37Signals">]>
@@ -175,10 +175,10 @@ programmer.clients
 </div>
 <p>Now, you might be asking yourself "Why would I ever use the has_many :through association when has_and_belongs_to_many: is much easier to setup". Well the next section will explain the downsides of it and why generally using <code>has_many :through</code> is the best practice.</p>
 
-<h3>When should I use them? has_many :through vs HABTM</h3>
+<h2>When should I use them? has_many :through vs HABTM</h2>
 <p>While it looks like less work to use a <code>has_and_belongs_to_many</code> association, it actually can end up
 costing you a lot of time down the road.</p>
-<h4>Validations</h4>
+<h3>Validations</h3>
 <p>Imagine you build a system with the aforementioned HABTM association. One day your client (your actual client not the database table in the article) requests that the <code>Project</code> table must always have data for a name and description field filled out or else it will be invalid. With a HABTM association there isn't a model in which to place the validation code. While with <code>has_many :through</code> you have a model immediately ready for usage which would allow you to do write something like this:</p>
 {% highlight ruby %}
 class Project < ActiveRecord::Base
@@ -186,7 +186,7 @@ class Project < ActiveRecord::Base
   validates :description, presence: true
 end
 {% endhighlight %}
-<h4>Shared Functionality</h4>
+<h3>Shared Functionality</h3>
 <p>Furthermore, suppose that this same client (again, the person paying you for the application) requested that anytime a project's deadline_date was less than the current date that the system would automatically set the project as closed. With a HABTM association you would need to create an additional class or potentially a concern to package this functionality. While with <code>has_many :through</code> having the model available gives you a logical place to bundle the shared methods.</p>
 <p>Here is an example of the shared methods while building upon the already existing model validations from above:</p>
 {% highlight ruby %}
@@ -208,7 +208,7 @@ class Project < ActiveRecord::Base
 end
 {% endhighlight %}
 <p>There isn't anywhere to place this without creating more files with a HABTM association. This is by far the largest downside. <code>has_many :through</code> on the other hand gives you a model for your join table, allowing you to validate fields and add shared functionality through methods.<p>
-<h4>Difference in creation</h4>
+<h3>Difference in creation</h3>
 <p>Here is an example of a difference in some of the built-in methods that are created when you use either one of these associations. For <code>has_many :through</code> you can create objects on the collection as seen above in the following format:</p>
 {% highlight ruby %}
 # First example
@@ -223,20 +223,20 @@ programmer.projects.create(client: Client.create(name: 'Keanu Reeves'))
 programmer.clients.create(name: 'Mr. Nic Cage')
 {% endhighlight %}
 <p>Notice how for HABTM, we use <code>programmer.clients.create(client_attribute: value)</code> to build the collection, unlike a <code>has_many :through</code> where we can use the join table model like so: <code>programmer.projects.create(client: client_object)</code>. Just another difference between the two association methods.</p>
-<h4>Existing database schemas</h4>
+<h3>Existing database schemas</h3>
 <p>The best use case for a HABTM association is when you are working with an already built database. For some reason maybe the <code>has_many :through</code> association just isn't going to work with the existing structure. Or maybe the system is already utilizing a custom HABTM association and removing it could irrevocably break parts of the system.</p>
 <p>A little dramatic I know.</p>
 <p>These sort of cases typically happen with legacy applications as HABTM is an older feature of Rails. With some good refactoring they could be removed from the system, given there is a good suite of tests configured.</p>
-<h4>Recommended usage</h4>
-<blockquote class="floating-quote floating-quote-right"><div class="page-header">RailsGuides</div> "The simplest rule of thumb is that you should set up a has_many :through relationship if you need to work with the relationship model as an independent entity. If you don't need to do anything with the relationship model, it may be simpler to set up a has_and_belongs_to_many relationship (though you'll need to remember to create the joining table in the database).<br /><br />
+<h3>Recommended usage</h3>
+<blockquote class="Info Info-right"><div class="page-header">RailsGuides</div> "The simplest rule of thumb is that you should set up a has_many :through relationship if you need to work with the relationship model as an independent entity. If you don't need to do anything with the relationship model, it may be simpler to set up a has_and_belongs_to_many relationship (though you'll need to remember to create the joining table in the database).<br /><br />
 You should use has_many :through if you need validations, callbacks, or extra attributes on the join model."</blockquote>
 <p>I would recommend that 99% of the time that you stick to creating <code>has_many :through</code> associations. They end up being much cleaner as well as saving you time down the road by giving you a model that is tied to your database's join table.</p>
 <p>The other 1% of the time, <code>has_and_belongs_to_many:</code> is very useful for legacy relational database schemas as well as older systems. Sometimes HABTM makes a lot of sense for these situations.</p>
-<h3>Conclusion</h3>
+<h2>Conclusion</h2>
 <p>While <code>has_and_belongs_to_many:</code> associations are quicker to setup they tend not to scale well as your applications requires more functionality. <code>has_many :through</code> on the other hand are very versatile and give the added benefit of having a model directly mapped to your join table.</p>
 <p>Both types of many-to-many associations require the creation of a migration for a join table, a table that sits between two other tables and helps to association them to each other. This table is directly mapped to a model when using a <code>has_many :through</code> association but not a HABTM.</p>
 
-<h4>TL;DR</h4>
+<h3>TL;DR</h3>
 <p><strong>has_many :through</strong></p>
 <ul>
   <li>Requires a join table in the database</li>

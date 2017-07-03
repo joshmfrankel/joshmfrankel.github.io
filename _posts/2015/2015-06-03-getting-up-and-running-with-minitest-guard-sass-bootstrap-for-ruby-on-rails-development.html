@@ -21,7 +21,7 @@ published: true
 
 <p>I'm going to assume that you already have the following items installed: <mark>Ruby on Rails</mark> and <mark>Git</mark>. You will need both of these before going further into this setup.</p>
 
-<h3>The Gemfile</h3>
+<h2>The Gemfile</h2>
 <p>The first thing we need to do is add all the necessary gems. The bootstrap-sass gem neatly encapsulates most of the configuration for us with a small config caveat that I will go into later. To get smooth automated testing up and running with Minitest we need a number of other gems.</p>
 
 <p>Add the following to your Gemfile. Once added we need to run <code>bundle install</code> to install the newly added gems.</p>
@@ -41,7 +41,7 @@ end
 
 <p>With the gems now installed it's time to start configuring them with our environment. Let's first deal with our Bootstrap-sass configuration.</p>
 
-<h3>Bootstrap-sass</h3>
+<h2>Bootstrap-sass</h2>
 <p>As I mentioned earlier, the gem will do most of the work for us. If you look at /app/assets/javascripts/application.js and /app/assets/stylesheets/application.css you should see some comments that say <code>//= require bootstrap-sprockets</code>. For our application.js file we can leave these alone as they will work as expected. However, with Sass files the problem with the comments is that not only does it include our new bootstrap-sass gem but they also load all .css or .scss files in the assets/stylesheets directory. This makes it problematic for spliting Sass files into partials as the order they are included isn't specific.</p>
 <p>To fix this we need to remove all the comments from application.css. Also make sure that you rename the file to application.css.scss to use the sass file ending (or .sass if you like the indent version). Once the comments are removed and the file renamed we can now use Sass's built in @import statement to structure our files however we want. While we do lose the ability to automatically load all the stylesheets at once we are now able to load them with their partials in the proper order. It should look like the following code.</p>
 
@@ -60,7 +60,7 @@ end
 
 <p>We now have a working system for including Sass files and partials in a specific order. Sass is excellent at compiling multiple @imports together so no need to worry about the site running slower. Additionally, since we used the gem it has the Bootstrap framework built-in which is awesome!</p>
 
-<h3>Minitest</h3>
+<h2>Minitest</h2>
 <p>There are a lot of different testing solutions for using Rails. You have Rspec, Cucumber, Test::Unit, and Minitest. <strong>Rspec</strong> is really powerful but can be quite tricky to get working right. <strong>Cucumber</strong> is great for its easy to read tests that could allow your clients to write the application specs as tests. For starting out though I would recommend <strong>Minitest</strong> because of how easy it is setup and also that it is the preferred unit testing framework packaged with Rails.</p>
 <p>There are two gems from the Gemfile section that are associated with getting minitest looking sweet: <strong>minitest-reporters</strong>, and <strong>mini_backtrace</strong>. Minitest reporters adds hooks for better display output from tests. Mini backtrace add supports for backtrace cleaner to prevent really long error messages while running your test suite.</p>
 
@@ -76,7 +76,7 @@ end
 
 <p>Awesome! You can now run tests on your app with clean output using <code>rake test</code>. Of course manually running tests is so un-hip so let's setup our automated testing suite with Guard.</p>
 
-<h3>Automated testing: Guard</h3>
+<h2>Automated testing: Guard</h2>
 <p>Guard is an awesome event handler for the command line. Built in native ruby it integrates well into the Rails workflow. Setting up Guard is pretty easy just run <code>guard init minitest</code> to create a basic Minitest Guardfile.</p>
 <p>The Guardfile is similiar to gulp or grunt in that it watches for particular events to occur and then performs an action. Your Guardfile should looking something like the following code</p>
 {% highlight ruby %}
@@ -101,16 +101,16 @@ guard :minitest,
 end
 {% endhighlight %}
 <p>Basically we have all the particular watched files within the guard block. These will essentially fire off your unit tests depending on which files are being modified. To start Guard just run <code>guard</code> in the terminal from your Rails project directory. It will take a few seconds and then should start polling for events. Super handy and cuts down on the time it takes to manually run unit tests. The only issue is that the test suite runs really, really slowly. This is where the Spring preloader gem comes in handy by reducing the execution time of your test suite.</p>
-<h3>Spring</h3>
+<h2>Spring</h2>
 <p>Spring is a preloader meaning that your application assets will become loaded before your tests so that Guard doesn't need to re-build them everytime you run your test suite. The reduction in run time can be quite impressive from 5 seconds to almost instantaneously. Spring with Guard makes Test-Driven Development a dream. To setup Spring you first need to add Spring to your app's executables by running <code>bundle exec spring binstub --all</code>. Next make sure the Spring attribute is marked as true in your Guardfile.</p>
 {% highlight ruby %}
     guard :minitest, spring: true, all_on_start: false, all_after_pass: true do
 {% endhighlight %}
 <p>We now have all the basics of a proper automated testing environment setup. System notifications in the next section add another layer of convenience with testing.</p>
-<h3>Notifications</h3>
+<h2>Notifications</h2>
 <p>Having notifications from your test suite is just another way to increase your productivity by not having to pull up terminal every 5 seconds. Since I am using Linux the gem I choose was <strong>Libnotify</strong> to add notifications. There are a number of different <strong>system notifiers</strong>. To find out which one is available for your OS check out the <a href="https://github.com/guard/guard/wiki/System-notifications" target="_blank">system notifications faq page</a>. This page also includes install instructions or further documentation pages.</p>
 
-<h3>Git</h3>
+<h2>Git</h2>
 <p>Lastly, is version control. It is recommended to follow the useful gitignore file located <a href="https://github.com/github/gitignore" target="_blank">here</a> for your programming language. Look at the ruby and rails sections for preferred ignored files. Additionally, since we are using Spring for preloading make sure to ignore spring files by adding <code>/spring/*.pid</code> to your .gitignore file. Here is a basic .gitignore file below</p>
 {% highlight ruby %}
 # See https://help.github.com/articles/ignoring-files for more about ignoring files.
