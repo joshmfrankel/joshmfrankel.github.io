@@ -1,5 +1,10 @@
 .Post {
   p code {
-    color: darken($accent-color, 10%);
+    background-color: lighten($accent-color, 22.5%);
+    border: 1px solid lighten($accent-color, 10%);
+    border-radius: 2px;
+    color: $accent-color;
+    padding: 3px 3px 0 3px;
+    margin: 0 2px;
   }
 }

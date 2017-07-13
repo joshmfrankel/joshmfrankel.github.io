@@ -24,10 +24,12 @@ a {
   @extend .transition;
 
   color: $primary-color;
+  border-bottom: 1px solid transparent;
   text-decoration: none;
 
   &:hover {
     color: $accent-color;
+    border-bottom: 1px solid $accent-color;
   }
 }
 p, blockquote, figure.highlight, li {
@@ -56,15 +58,14 @@ header {
 }
 footer {
   background: $lightest-gray;
-  padding-top: 20px;
-  padding-bottom: 50px;
+  padding: 50px 0;
   text-align: center;
-  margin: 30px auto 0;
+  margin: 80px auto 0;
 }
 
 // Classes
 .transition {
-  transition: all 150ms ease;
+  transition: all 250ms ease;
 }
 .flex-container {
   display: flex;

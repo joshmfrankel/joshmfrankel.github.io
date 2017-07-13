@@ -15,7 +15,7 @@ social:
     - https://twitter.com/Joshmfrankel
 
 # Structure Settings
-permalink: /:year/:title/
+permalink: /blog/:title/
 excerpt_separator: "--excerpt--"
 paginate: 10
 github: [metadata]

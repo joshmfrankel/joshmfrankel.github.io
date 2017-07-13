@@ -1,5 +1,14 @@
 .Author-container {
   @extend .flex-container;
+  border-bottom: none;
+
+  &:hover {
+    border-bottom:none;
+
+    .Author-avatar {
+      border: 3px solid $accent-color;
+    }
+  }
 
   &:hover * {
     color: $darker-gray-hover;
@@ -15,13 +24,14 @@
   &-avatar {
     @extend .circular-image;
 
+    transition: all 500ms ease;
     border: 3px solid $white;
     box-shadow: 0 0 0 1px $lighter-gray;
     align-self: center;
   }
   &-logo {
     align-self: center;
-    margin-left: 15px;
+    margin: 0 15px;
   }
   &-first-name {
     color: $lighter-gray;
