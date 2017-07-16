@@ -58,6 +58,7 @@ header {
 }
 footer {
   background: $lightest-gray;
+  border-top: 1px solid #e0e0e0;
   padding: 50px 0;
   text-align: center;
   margin: 80px auto 0;
@@ -81,6 +82,18 @@ footer {
 .flex-right {
   align-self: center;
   margin-left: auto;
+
+  @media screen and (max-width: 1125px) {
+    font-size: 1.9rem;
+    align-self: left;
+    margin-left: 0;
+    display: grid;
+    margin-top: 10px;
+
+    a {
+      padding: 7px 7px;
+    }
+  }
 }
 .circular-image {
   border-radius: 50%;

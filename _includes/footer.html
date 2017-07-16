@@ -5,6 +5,21 @@
       <i class="devicon-ruby-plain Gemstone Gemstone-gem Gemstone--side Gemstone--side--left"></i>
       <i class="devicon-ruby-plain Gemstone Gemstone-gem Gemstone--side Gemstone--side--right"></i>
     </div>
-    <span class="tagline">© 2017+ Josh Frankel. {{ site.title }}. All rights reserved</span>
+
+    <div class="flex-container">
+      <section class="Footer-links">
+        {% for nav in site.data.navigation %}
+          {% assign nav_page_url = nav.url | prepend: "/" | append: "/" %}
+          <a href="{{ site.github.url }}/{{ nav.url }}" {% if page.url == nav_page_url %} class="active" {% endif %}>{{ nav.name }}</a>
+        {% endfor %}
+      </section>
+      <section class="Footer-social">
+      </section>
+
+    </div>
+  </div>
+  <div class="Footer-copyright">
+    <p>© 2017+ Josh Frankel. {{ site.title }}. All rights reserved</p>
   </div>
 </footer>
+

@@ -1,0 +1,29 @@
+footer {
+  position: relative;
+  min-height: 100px;
+}
+.Footer {
+  &-links {
+    display: flex;
+    margin: -30px auto 0 auto;
+    font: 300 2.1rem/30px $railway, sans-serif;
+    position: relative;
+    left: -5%;
+
+    a {
+      padding: 7px 10px;
+    }
+  }
+  &-copyright {
+    background: $primary-color;
+    padding: 1px 0;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+
+    p {
+      color: #fff;
+      margin: 10px 0;
+    }
+  }
+}

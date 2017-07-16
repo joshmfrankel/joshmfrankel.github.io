@@ -15,9 +15,10 @@ social:
     - https://twitter.com/Joshmfrankel
 
 # Structure Settings
-permalink: /blog/:title/
 excerpt_separator: "--excerpt--"
+permalink: /blog/:title/
 paginate: 10
+paginate_path: /blog/page/:num
 github: [metadata]
 highlighter: rouge
 markdown: kramdown
@@ -35,6 +36,8 @@ gems:
   - jekyll-sitemap
   - jekyll-paginate
   - jekyll-seo-tag
+  - jekyll-compose
+  - jekyll-redirect-from
 exclude:
   - Gemfile
   - Gemfile.lock

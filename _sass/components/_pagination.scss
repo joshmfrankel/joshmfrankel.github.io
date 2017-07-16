@@ -1,9 +1,19 @@
-.pagination {
-  padding-top: 30px;
+.Pagination {
+  border-bottom: 1px solid $slightly-lighter-gray;
+  font-size: 1.6rem;
   text-align: center;
-  font-size: 1.5rem;
+  padding: 30px 0;
 
-  .page_number {
+  background: #ffffff;
+  background: -moz-linear-gradient(left, #ffffff 0%, #fafafa 50%, #ffffff 100%);
+  background: -webkit-linear-gradient(left, #ffffff 0%,#fafafa 50%,#ffffff 100%);
+  background: linear-gradient(to right, #ffffff 0%,#fafafa 50%,#ffffff 100%);
+
+  span {
+    color: #515151;
+  }
+
+  .page-number {
     padding: 0 7px;
   }
 }

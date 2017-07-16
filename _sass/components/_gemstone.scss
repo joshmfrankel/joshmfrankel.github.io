@@ -9,10 +9,16 @@
   }
   &--main {
     color: $primary-color;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 10px $primary-color;
   }
   &--side {
     color: $accent-color;
     font-size: 5.6rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 5px #fff, 0 0 5px $accent-color;
 
     &--left {
       margin-left: -100px;
