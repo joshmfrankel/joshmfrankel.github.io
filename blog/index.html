@@ -20,6 +20,11 @@ redirect_from:
       <div class="content">
         {{ post.excerpt }}
       </div>
+      <div class="Listing Listing-tags">
+        {% for tag in post.tags %}
+          <a href="#">#{{ tag }}</a>
+        {% endfor %}
+      </div>
     </article>
   {% endfor %}
 </section>

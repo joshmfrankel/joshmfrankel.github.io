@@ -2,12 +2,38 @@ nav {
   font: 300 2.1rem/30px $railway;
 
   a {
-    padding: 15px 7px;
-    border-bottom: 1px solid transparent;
+    @extend .expand-hover-border-from-center;
 
-    &:hover,
+    padding: 15px 7px;
+    display: inline-block;
+
+    &:last-of-type {
+      padding-right: 0;
+    }
+
     &.active {
-      border-bottom: 1px solid $accent-color;
+      color: $accent-color;
+    }
+  }
+
+  @media screen and (max-width: 1125px) {
+    font-size: 1.7rem;
+
+    a {
+      padding: 7px 7px;
+    }
+  }
+  @media screen and (max-width: 960px) {
+    text-align: right;
+    font-size: 1.9rem;
+
+    a {
+      padding: 5px;
+      display: block;
+
+      &:after {
+        top: 0px;
+      }
     }
   }
 }

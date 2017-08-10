@@ -16,15 +16,15 @@
 }
 .Author {
   @extend .flex-column;
-  @extend .transition;
+  @extend .default-transition;
 
   color: transparent;
   font: 32px/1 $lato;
 
   &-avatar {
     @extend .circular-image;
+    @include transition($long-transition);
 
-    transition: all 500ms ease;
     border: 3px solid $white;
     box-shadow: 0 0 0 1px $lighter-gray;
     align-self: center;

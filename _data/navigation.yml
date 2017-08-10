@@ -3,10 +3,10 @@
   url: blog
 
 - name: Today I Learned
-  url: today-I-learned
+  url: blog/today-I-learned
 
 - name: Series
-  url: series
+  url: blog/series
 
 - name: About
   url:

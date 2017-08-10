@@ -1,6 +1,8 @@
 .Banner {
   background-color: $primary-color;
   color: $primary-inverse-color;
+  display: flex;
+  flex: none;
 
   &-heading {
     font-weight: 700;

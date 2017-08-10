@@ -1,8 +1,11 @@
-footer {
-  position: relative;
-  min-height: 100px;
-}
 .Footer {
+  background: $lightest-gray;
+  border-top: 1px solid $lightest-gray-border;
+  height: 100px;
+  margin-top: 100px;
+  padding-top: 50px;
+  text-align: center;
+
   &-links {
     display: flex;
     margin: -30px auto 0 auto;
@@ -11,18 +14,19 @@ footer {
     left: -5%;
 
     a {
+      @extend .expand-hover-border-from-center;
+
       padding: 7px 10px;
     }
   }
   &-copyright {
+    margin-top: auto;
     background: $primary-color;
-    padding: 1px 0;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
 
     p {
       color: #fff;
+      font-size: 1.2rem;
+      font-weight: 600;
       margin: 10px 0;
     }
   }

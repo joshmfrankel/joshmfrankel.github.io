@@ -67,4 +67,4 @@
 .highlight .lineno { color: $white; border-right: 1px solid $light-gray; padding-right: 10px;}
 .highlight pre { padding: 10px; border-radius: 5px; margin: 30px 0; }
 .highlight .code { padding-left: 15px; }
-.highlight code { color: #fff; } // Fix bash coloring
+.highlight code { color: #fff; line-height: 2.6rem; } // Fix bash coloring and 30px line-height

@@ -2,6 +2,10 @@
   &-title {
     letter-spacing: -0.2rem;
     margin-bottom: 0;
+
+    a {
+      @extend .remove-default-hover;
+    }
   }
   &-subtitle {
     font: italic 300 1.9rem/30px $lato, sans-serif;
@@ -13,5 +17,17 @@
   &-article {
     border-bottom: 1px solid $slightly-lighter-gray;
     padding-bottom:20px;
+  }
+  &-tags {
+    a {
+      @extend .inline-code;
+
+      font: 300 1.7rem/30px "Raleway", sans-serif;
+
+      &:hover {
+        color: $accent-color;
+        border: 1px solid darken($accent-color, 4%);
+      }
+    }
   }
 }

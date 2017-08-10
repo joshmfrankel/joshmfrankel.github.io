@@ -1,0 +1,62 @@
+@mixin transition($duration: $default-transition) {
+  transition: all $duration ease-in-out;
+}
+.default-transition {
+  @include transition;
+}
+.flex-container {
+  display: flex;
+}
+.flex-column {
+  @extend .flex-container;
+  flex-direction: column;
+}
+.flex-left {
+  align-self: center;
+  margin-right: auto;
+}
+.flex-right {
+  align-self: center;
+  margin-left: auto;
+}
+.circular-image {
+  border-radius: 50%;
+}
+.remove-default-hover {
+  border: none;
+  &:hover {
+    border: none;
+  }
+}
+.expand-hover-border-from-center {
+  @extend .remove-default-hover;
+
+  &:after {
+    @include transition($fast-transition);
+
+    display: block;
+    content: "";
+    border-bottom: 1px solid $accent-color;
+    transform: scaleX(0);
+    position: relative;
+    top: 10px;
+  }
+  &:hover:after {
+    transform: scaleX(1);
+  }
+}
+.clearfix {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+.inline-code {
+  background-color: lighten($accent-color, 22.5%);
+  border: 1px solid lighten($accent-color, 10%);
+  border-radius: 2px;
+  color: $accent-color;
+  padding: 3px 3px 0 3px;
+  margin: 0 2px;
+}

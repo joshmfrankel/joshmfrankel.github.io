@@ -2,7 +2,7 @@
 title: Development Simplified
 email: joshmfrankel@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  A blog about ruby, sql, performance, and patterns.
+  A blog about ruby, sql, performance, and patterns. By Josh Frankel.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 

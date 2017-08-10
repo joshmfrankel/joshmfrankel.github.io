@@ -6,7 +6,8 @@ $blue: #7cb8cc;
 $glacier: #61b8d0;
 $purple: #B388EB;
 // #f6f6f6;
-$lightest-gray: #f6f6f6; // #ededed
+$lightest-gray-border: #f3f3f3;
+$lightest-gray: #f9f9f9;
 $slightly-lighter-gray: #eee;
 $lighter-gray: #a6a6a6;
 $light-gray: #565656;
@@ -19,5 +20,10 @@ $primary-inverse-color: $white;
 $accent-color: $purple;
 $header-color: $light-gray;
 $p-color: $darker-gray-hover;
+
+// Transitions
+$fast-transition: 150ms;
+$default-transition: 250ms;
+$long-transition: 350ms;
 
 // h1 rgba(0,0,0,0.77)
