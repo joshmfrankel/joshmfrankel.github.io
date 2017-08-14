@@ -16,20 +16,11 @@ nav {
     }
   }
 
-  @media screen and (max-width: 1125px) {
+  @media screen and (max-width: 800px) {
     font-size: 1.7rem;
 
     a {
-      padding: 7px 7px;
-    }
-  }
-  @media screen and (max-width: 960px) {
-    text-align: right;
-    font-size: 1.9rem;
-
-    a {
-      padding: 5px;
-      display: block;
+      padding: 3px;
 
       &:after {
         top: 0px;

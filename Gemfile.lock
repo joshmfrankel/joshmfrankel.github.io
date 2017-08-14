@@ -106,6 +106,8 @@ GEM
     jekyll-optional-front-matter (0.1.2)
       jekyll (~> 3.0)
     jekyll-paginate (1.1.0)
+    jekyll-paginate-v2 (1.8.1)
+      jekyll (~> 3.0)
     jekyll-readme-index (0.1.0)
       jekyll (~> 3.0)
     jekyll-redirect-from (0.12.1)
@@ -198,7 +200,7 @@ DEPENDENCIES
   github-pages
   jekyll-compose (~> 0.5)
   jekyll-feed
-  jekyll-paginate
+  jekyll-paginate-v2
   jekyll-redirect-from
   jekyll-seo-tag
 

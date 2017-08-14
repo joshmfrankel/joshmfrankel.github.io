@@ -2,6 +2,10 @@
   width: 60%;
   margin: 0 auto;
 
+  @media screen and (max-width: 1125px) {
+    width: 80%;
+  }
+
   &-flex {
     @extend .flex-container;
   }

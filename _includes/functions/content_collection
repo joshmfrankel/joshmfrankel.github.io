@@ -1,0 +1,11 @@
+{% for node in collection %}
+  {% if node.title != null %}
+    {% if group == null or group == node.group %}
+      {% if page.url == node.url %}
+        <li class="active"><a href="{{ site.url }}{{node.url}}" class="active">{{node.title}}</a></li>
+      {% else %}
+        <li><a href="{{ site.url }}{{node.url}}">{{node.title}}</a></li>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}

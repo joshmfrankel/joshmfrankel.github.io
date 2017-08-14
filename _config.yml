@@ -17,8 +17,15 @@ social:
 # Structure Settings
 excerpt_separator: "--excerpt--"
 permalink: /blog/:title/
-paginate: 10
-paginate_path: /blog/page/:num
+
+pagination:
+  enabled: true
+  sort_reverse: true
+  title: :title
+
+# paginate: 10
+# paginate_path: /blog/page/:num
+
 github: [metadata]
 highlighter: rouge
 markdown: kramdown
@@ -34,7 +41,7 @@ sass:
 gems:
   - jekyll-feed
   - jekyll-sitemap
-  - jekyll-paginate
+  - jekyll-paginate-v2
   - jekyll-seo-tag
   - jekyll-compose
   - jekyll-redirect-from

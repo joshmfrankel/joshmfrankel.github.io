@@ -1,7 +1,12 @@
 ---
 layout: page
+title: Tags
 ---
 
-# List all tags
-# Sort by most popular
-# Add ids to them for hotlinking
+{% for tag in site.tags %}
+  <h2 id="{{ tag[0] }}">{{ tag[0] | join: "/" | downcase }}</h2>
+  <ul>
+    {% assign collection = tag[1] %}
+    {% include functions/content_collection %}
+  </ul>
+{% endfor %}
