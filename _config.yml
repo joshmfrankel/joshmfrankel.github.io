@@ -42,6 +42,5 @@ gems:
   - jekyll-seo-tag
   - jekyll-compose
   - jekyll-redirect-from
-exclude:
-  - Gemfile
-  - Gemfile.lock
+
+exclude: [vendor]
