@@ -23,9 +23,6 @@ pagination:
   sort_reverse: true
   title: :title
 
-# paginate: 10
-# paginate_path: /blog/page/:num
-
 github: [metadata]
 highlighter: rouge
 markdown: kramdown
