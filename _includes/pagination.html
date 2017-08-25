@@ -9,7 +9,7 @@
       {% endif %}
 
       <p class="Listing Listing-date">
-        <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %-d, %Y" }}</time>
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %-d, %Y" }}</time>
       </p>
       <div class="content">
         {{ post.excerpt }}
@@ -25,17 +25,13 @@
 
 <!-- Pagination links -->
 <section class="Pagination">
-  {% if paginator.previous_page %}
-    <a href="{{ paginator.previous_page_path }}" class="previous">Previous</a>
-  {% else %}
-    <span class="previous">Previous</span>
-  {% endif %}
-
-  <span class="page-number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
-
-  {% if paginator.next_page %}
-    <a href="{{ paginator.next_page_path }}" class="next">Next</a>
-  {% else %}
-    <span class="next">Next</span>
+  {% if paginator.page_trail %}
+    {% for trail in paginator.page_trail %}
+      {% assign trail_path_url = trail.path | append: "index.html" %}
+      <li {% if page.url == trail_path_url %}class="selected"{% endif %}>
+          <a href="{{ trail.path | prepend: site.baseurl }}" title="{{trail.title}}">{{ trail.num }}</a>
+      </li>
+    {% endfor %}
   {% endif %}
 </section>
+

@@ -8,7 +8,7 @@
 
   &-links {
     display: flex;
-    margin: -30px auto 0 auto;
+    margin: -30px 0 0 0;
     font: 300 2.1rem/30px $railway, sans-serif;
     position: relative;
     left: -5%;
@@ -17,6 +17,17 @@
       @extend .expand-hover-border-from-center;
 
       padding: 7px 10px;
+    }
+  }
+  &-author {
+    background: #b388eb; /* Old browsers */
+    background: -moz-linear-gradient(-45deg, #b388eb 0%, #b388eb 31%, #6a6a6a 31%, #6a6a6a 31%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(-45deg, #b388eb 0%,#b388eb 31%,#6a6a6a 31%,#6a6a6a 31%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(155deg, #b388eb 0%,#b388eb 31%,#6a6a6a 31%,#6a6a6a 31%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+
+    h2,
+    p {
+      color: #fff;
     }
   }
   &-copyright {

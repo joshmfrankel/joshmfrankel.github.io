@@ -9,15 +9,29 @@
     <div class="flex-container">
       <section class="Footer-links">
         {% for nav in site.data.navigation %}
-          {% assign nav_page_url = nav.url | prepend: "/" | append: "/" %}
+          {% assign nav_page_url = nav.url | prepend: "/" | append: "/index.html" %}
           <a href="{{ site.github.url }}/{{ nav.url }}" {% if page.url == nav_page_url %} class="active" {% endif %}>{{ nav.name }}</a>
         {% endfor %}
       </section>
-      <section class="Footer-social">
-      </section>
-
     </div>
   </div>
+
+  <div class="Footer-author">
+    <div class="Container">
+      <h2>About the Author</h2>
+      <p>I am obsessed with mastering the newest programming techniques and skills. You can find me constantly pouring over the latest articles and tutorials. When I'm not reading up on web development, I usually am writing about it here, on my blog.</p>
+
+      <p>I love answering questions and explaining programming concepts, so feel free to leave a comment or contact me via social media.</p>
+      <ul>
+        <li><a href="https://github.com/joshmfrankel"><i class="fa fa-github-alt" aria-hidden="true"></i></a></li>
+        <li><a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/"><i class="fa fa-slack" aria-hidden="true"></i></a></li>
+        <li><a href="https://stackoverflow.com/users/906974/josh-frankel"><i class="fa fa-stack-overflow" aria-hidden="true"></i></a></li>
+        <li><a href="https://twitter.com/Joshmfrankel"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+        <li><a href="https://www.linkedin.com/in/joshmfrankel/"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+      </ul>
+    </div>
+  </div>
+
   <div class="Footer-copyright">
     <p>© 2017+ Josh Frankel. {{ site.title }}. All rights reserved</p>
   </div>
