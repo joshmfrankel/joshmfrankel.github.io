@@ -6,11 +6,6 @@ description: > # this means to ignore newlines until "baseurl:"
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
-# GitHub
-username: joshmfrankel
-repo: joshmfrankel.github.io
-branch: source
-
 # Author Settings
 twitter_username: joshmfrankel
 github_username:  joshmfrankel
