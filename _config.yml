@@ -34,11 +34,11 @@ kramdown:
 
 # Build Settings
 sass:
-  style: compact
+  style: compressed
   sass_dir: _sass
 
 # Gemfile
-gems:
+plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-paginate-v2
@@ -48,4 +48,8 @@ gems:
 
 exclude:
   - vendor
-  - .travis.yml
+  - Gemfile
+  - Gemfile.lock
+  - Rakefile
+  - LICENSE
+  - README.md

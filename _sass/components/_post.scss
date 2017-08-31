@@ -2,6 +2,6 @@
   width: 100%;
 
   p code {
-    @extend .inline-code;
+    @include inline-code($accent-color);
   }
 }

@@ -6,7 +6,7 @@
 
 # THANKS
 
-    Megan Oed
+    Megan Oed -- Editor
 
 # TECHNOLOGY COLOPHON
 

@@ -1,12 +1,12 @@
 
-- name: Articles
+- name: Blog
   url: blog
 
-- name: Today I Learned
-  url: blog/today-I-learned
+- name: Categories
+  url: blog/categories
 
-- name: Series
-  url: blog/series
+- name: Tags
+  url: blog/tags
 
 - name: About
   url:

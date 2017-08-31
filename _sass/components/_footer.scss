@@ -1,17 +1,18 @@
 .Footer {
   background: $lightest-gray;
   border-top: 1px solid $lightest-gray-border;
-  height: 100px;
   margin-top: 100px;
-  padding-top: 50px;
-  text-align: center;
+  // height: 100px;
+  // text-align: center;
+
+  .Container {
+    padding: 10px 0;
+  }
 
   &-links {
     display: flex;
-    margin: -30px 0 0 0;
+    flex: 1;
     font: 300 2.1rem/30px $railway, sans-serif;
-    position: relative;
-    left: -5%;
 
     a {
       @extend .expand-hover-border-from-center;
@@ -19,26 +20,51 @@
       padding: 7px 10px;
     }
   }
-  &-author {
-    background: #b388eb; /* Old browsers */
-    background: -moz-linear-gradient(-45deg, #b388eb 0%, #b388eb 31%, #6a6a6a 31%, #6a6a6a 31%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(-45deg, #b388eb 0%,#b388eb 31%,#6a6a6a 31%,#6a6a6a 31%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(155deg, #b388eb 0%,#b388eb 31%,#6a6a6a 31%,#6a6a6a 31%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  &-social {
+    a {
+      @extend .remove-default-hover;
 
-    h2,
-    p {
-      color: #fff;
+      font-size: 2.8rem;
+      padding: 0 5px;
     }
   }
-  &-copyright {
-    margin-top: auto;
-    background: $primary-color;
+  &-actions {
+    background: $accent-color;
+    text-align: left;
 
-    p {
-      color: #fff;
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin: 10px 0;
+    h3 {
+      color: $pale-slighty-lighter-gray;
+      border-bottom: 1px solid $pale-light-gray;
+      padding-bottom: 12px;
+      padding-right: 35px;
+      display: inline-block;
+    }
+    section {
+      nav {
+        a {
+          @extend .remove-default-hover;
+
+          font-size: 1.9rem;
+          padding: 5px 0;
+          display: block;
+
+          &:hover {
+            color: $pale-light-gray;
+          }
+        }
+      }
+    }
+    &-copyright {
+      border-top: 1px solid $pale-light-gray;
+      margin-top: 50px;
+
+      p {
+        color: $pale-slighty-lighter-gray;
+        font-size: 1.3rem;
+        font-weight: 600;
+        text-align: center;
+      }
     }
   }
+
 }

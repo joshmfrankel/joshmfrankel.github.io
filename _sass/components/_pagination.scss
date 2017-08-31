@@ -19,16 +19,7 @@
     }
 
     a {
-      color: $accent-color;
-      display: inline-block;
-      width: 30px;
-      height: 30px;
-
-      &:hover {
-        background: lighten($accent-color, 7%);
-        border-radius: 50px;
-        color: #fff;
-      }
+      @include link-with-circle;
     }
   }
 

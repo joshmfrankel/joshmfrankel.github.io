@@ -3,15 +3,12 @@
   {% for post in paginator.posts %}
     <article class="Listing Listing-article">
       <h1 class="Listing Listing-title"><a href="{{ post.url }}">{{ post.title }}</a></h1>
-
-      {% if post.subtitle %}
-        <h2 class="Listing Listing-subtitle">{{ post.subtitle }}</h2>
-      {% endif %}
+      <h2 class="Listing Listing-category">{{ post.category }}</h2>
 
       <p class="Listing Listing-date">
         <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %-d, %Y" }}</time>
       </p>
-      <div class="content">
+      <div class="Listing Listing-content">
         {{ post.excerpt }}
       </div>
       <div class="Listing Listing-tags">
