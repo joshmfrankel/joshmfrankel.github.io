@@ -1,0 +1,36 @@
+.Home {
+  &-what-i-do {
+    margin-top: 35px;
+    margin-bottom: 5px;
+  }
+  &-skillset {
+    background-color: $accent-color;
+    color: $pale-slighty-lighter-gray;
+    margin-top: 35px;
+    margin-bottom: 5px;
+    padding-bottom: 45px;
+    padding-top: 35px;
+
+    h2,
+    p {
+      color: $pale-slighty-lighter-gray;
+    }
+
+    h2 {
+      border-bottom: 1px solid $pale-light-gray;
+      padding-bottom: 12px;
+      padding-right: 35px;
+      display: inline-block;
+    }
+    i {
+      color: lighten($accent-color, 20%);
+      font-size: 8.8rem;
+      display: inline-block;
+      padding: 20px;
+
+      &:hover {
+        color: lighten($accent-color, 30%);
+      }
+    }
+  }
+}

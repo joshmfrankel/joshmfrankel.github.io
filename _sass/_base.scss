@@ -39,6 +39,13 @@ a {
     border-bottom: 1px solid $accent-color;
   }
 }
+mark {
+  background: none;
+  color: #61b8d0;
+  border-bottom: 1px dashed #61b8d0;
+  cursor: help;
+  font-style: italic;
+}
 p, blockquote, li {
   font: 300 1.9rem/30px $railway;
   // letter-spacing: 0.4px;

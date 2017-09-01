@@ -12,8 +12,8 @@
     word-break: break-word;
   }
   &-information {
+    color: $primary-inverse-color;
     font-size: 2.2rem;
-    font-style: italic;
     margin-top: -20px;
     margin-bottom:40px;
   }
