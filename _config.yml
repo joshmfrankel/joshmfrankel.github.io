@@ -50,6 +50,5 @@ exclude:
   - vendor
   - Gemfile
   - Gemfile.lock
-  - Rakefile
   - LICENSE
   - README.md
