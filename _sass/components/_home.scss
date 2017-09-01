@@ -7,7 +7,6 @@
     background-color: $accent-color;
     color: $pale-slighty-lighter-gray;
     margin-top: 35px;
-    margin-bottom: 5px;
     padding-bottom: 45px;
     padding-top: 35px;
 
@@ -30,6 +29,35 @@
 
       &:hover {
         color: lighten($accent-color, 30%);
+      }
+    }
+  }
+  &-about-me {
+    padding-top: 35px;
+    padding-bottom: 39px;
+  }
+  &-contact {
+    background-color: $primary-color;
+    color: $white;
+    padding-top: 35px;
+    padding-bottom: 36px;
+
+    h2,
+    p,
+    a {
+      color: $white;
+    }
+    h2 {
+      margin-bottom: 35px;
+    }
+    a {
+      border:none;
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 15px;
+
+      &:hover {
+        color: $accent-color;
       }
     }
   }

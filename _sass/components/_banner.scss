@@ -3,6 +3,8 @@
   color: $primary-inverse-color;
   display: flex;
   flex: none;
+  padding-top: 23px;
+  padding-bottom: 38px;
 
   &-heading {
     font-weight: 700;
@@ -10,11 +12,10 @@
     display: block;
     width: 100%;
     word-break: break-word;
+    margin-bottom: 0;
   }
   &-information {
     color: $primary-inverse-color;
     font-size: 2.2rem;
-    margin-top: -20px;
-    margin-bottom:40px;
   }
 }
