@@ -4,5 +4,6 @@
 
   p code {
     @include inline-code($accent-color);
+    color: #fefefe;
   }
 }
