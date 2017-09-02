@@ -2,43 +2,45 @@ header {
   @media screen and (max-width: 600px) {
     flex-direction: column;
   }
-}
-nav {
-  font: 300 2.1rem/30px $railway;
-  display: flex;
 
-  @media screen and (max-width: 600px) {
-    &.flex-right {
-      margin-left: 0;
-      margin-top: 15px;
-      align-self: initial;
+  nav {
+    font: 300 2.1rem/30px $railway;
+    display: flex;
+
+    @media screen and (max-width: 600px) {
+      &.flex-right {
+        margin-left: 0;
+        margin-top: 15px;
+        align-self: initial;
+      }
     }
-  }
-
-  a {
-    @extend .expand-hover-border-from-center;
-
-    padding: 15px 7px;
-    display: inline-block;
-
-    &:last-of-type {
-      padding-right: 0;
-    }
-
-    &.active {
-      color: $accent-color;
-    }
-  }
-
-  @media screen and (max-width: 800px) {
-    font-size: 1.7rem;
 
     a {
-      padding: 3px;
+      @extend .expand-hover-border-from-center;
 
-      &:after {
-        top: 0px;
+      padding: 15px 7px;
+      display: inline-block;
+
+      &:last-of-type {
+        padding-right: 0;
+      }
+
+      &.active {
+        color: $accent-color;
+      }
+    }
+
+    @media screen and (max-width: 800px) {
+      font-size: 1.7rem;
+
+      a {
+        padding: 3px;
+
+        &:after {
+          top: 0px;
+        }
       }
     }
   }
+
 }

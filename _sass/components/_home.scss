@@ -53,13 +53,13 @@
     }
     a {
       border: none;
-      color: lighten($accent-color, 30%);
+      color: $pale-night-text;
       font-size: 1.8rem;
       display: block;
       margin-bottom: 15px;
 
       &:hover {
-        color: lighten($accent-color, 40%);
+        color: lighten($pale-night-text, 10%);
       }
     }
   }

@@ -55,12 +55,13 @@
         a {
           @extend .remove-default-hover;
 
+          color: $pale-night-text;
           font-size: 1.9rem;
           padding: 5px 0;
           display: block;
 
           &:hover {
-            color: $pale-light-gray;
+            color: lighten($pale-night-text, 10%);
           }
         }
       }
