@@ -1,5 +1,19 @@
+header {
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+  }
+}
 nav {
   font: 300 2.1rem/30px $railway;
+  display: flex;
+
+  @media screen and (max-width: 600px) {
+    &.flex-right {
+      margin-left: 0;
+      margin-top: 15px;
+      align-self: initial;
+    }
+  }
 
   a {
     @extend .expand-hover-border-from-center;

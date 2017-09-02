@@ -5,6 +5,10 @@
 
   .Container {
     padding: 10px 0;
+
+    @media screen and (max-width: 697px) {
+      flex-direction: column;
+    }
   }
 
   &-links {
@@ -19,6 +23,15 @@
     }
   }
   &-social {
+    display: flex;
+
+    @media screen and (max-width: 697px) {
+      margin-left: 0;
+      align-self: initial;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+
     a {
       @extend .remove-default-hover;
 

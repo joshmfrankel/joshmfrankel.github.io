@@ -45,21 +45,21 @@
     padding-bottom: 36px;
 
     h2,
-    p,
-    a {
+    p {
       color: $pale-slighty-lighter-gray;
     }
     h2 {
       margin-bottom: 35px;
     }
     a {
-      border:none;
+      border: none;
+      color: lighten($accent-color, 30%);
       font-size: 1.8rem;
       display: block;
       margin-bottom: 15px;
 
       &:hover {
-        color: $accent-color;
+        color: lighten($accent-color, 40%);
       }
     }
   }

@@ -3,7 +3,10 @@
   width: 100%;
 
   p code {
-    @include inline-code($accent-color);
-    color: #fefefe;
+    background-color: $accent-color;
+    color: $pale-night-text;
+    border-radius: 2px;
+    padding: 3px 3px 0 3px;
+    margin: 0 2px;
   }
 }

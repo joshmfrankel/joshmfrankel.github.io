@@ -52,14 +52,6 @@
     clear: both;
   }
 }
-@mixin inline-code($color: $accent-color) {
-  background-color: lighten($color, 22.5%);
-  border: 1px solid lighten($color, 10%);
-  border-radius: 2px;
-  color: $color;
-  padding: 3px 3px 0 3px;
-  margin: 0 2px;
-}
 @mixin link-with-circle($size: 30px, $color: $accent-color) {
   border-radius: 50px;
   color: $color;
