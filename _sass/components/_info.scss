@@ -8,6 +8,8 @@ $margin-spacing: 20px;
   margin:0;
   padding:20px;
 
+
+
   &-accent {
     background-color: $accent-color;
     border-left: 5px solid darken($accent-color, 15%);
@@ -15,6 +17,13 @@ $margin-spacing: 20px;
   &-left,
   &-right {
     @extend .clearfix;
+
+    @media screen and (max-width: 697px) {
+      width: 100%;
+      float: none;
+      margin: 0;
+      box-sizing: border-box;
+    }
 
     width: 300px;
   }

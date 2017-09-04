@@ -9,6 +9,11 @@ body {
 h1 {
   font: normal 300 5.2rem/1.1 $lato;
 }
+h2,
+p,
+code {
+  word-wrap: break-word;
+}
 h2 {
   color: $darker-gray-hover;
   font: normal 700 3.2rem/1 $lato;
@@ -48,7 +53,6 @@ mark {
 }
 p, blockquote, li {
   font: 300 1.9rem/30px $railway;
-  // letter-spacing: 0.4px;
 }
 figure.highlight {
   font-size: 1.7rem
