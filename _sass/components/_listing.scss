@@ -8,11 +8,24 @@
     }
   }
   &-category {
-    font: italic 300 1.9rem/30px $lato, sans-serif;
-    margin-top:0;
+    font: 300 2rem/30px $lato, sans-serif;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    text-transform: none;
+
+    em {
+      text-transform: capitalize;
+    }
   }
   &-date {
     font-weight: 700;
+    font-size: 1.7rem;
+
+    i {
+      font-size: 1.4rem;
+      top: -1px;
+      position: relative;
+    }
   }
   &-content {
     p {
