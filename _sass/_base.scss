@@ -18,6 +18,7 @@ h2 {
   color: $darker-gray-hover;
   font: normal 700 3.2rem/1 $lato;
   text-transform: capitalize;
+  margin-top: 50px;
 
   // Legacy support for bootstrap styles
   small {
@@ -102,6 +103,7 @@ header {
 
   h2 {
     margin-bottom: 3.2rem;
+    margin-top: 3.2rem;
   }
 }
 .Page {

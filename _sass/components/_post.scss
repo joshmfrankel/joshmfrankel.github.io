@@ -4,9 +4,9 @@
 
   p code {
     background-color: $accent-color;
-    color: $pale-night-text;
+    color: lighten($pale-night-text, 10%);
     border-radius: 2px;
-    padding: 3px 3px 0 3px;
+    padding: 5px 5px 0 5px;
     margin: 0 2px;
   }
 }
