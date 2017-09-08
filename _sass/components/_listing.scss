@@ -2,6 +2,7 @@
   &-title {
     letter-spacing: -0.2rem;
     margin-bottom: 0;
+    margin-top: 60px;
 
     a {
       @extend .remove-default-hover;
@@ -9,7 +10,7 @@
   }
   &-category {
     font: 300 2rem/30px $lato, sans-serif;
-    margin-top: 10px;
+    margin-top: 0px;
     margin-bottom: 0px;
     text-transform: none;
 
@@ -20,6 +21,7 @@
   &-date {
     font-weight: 700;
     font-size: 1.7rem;
+    margin-top: 0;
 
     i {
       font-size: 1.4rem;
@@ -34,11 +36,11 @@
   }
   &-article {
     border-bottom: 1px solid $slightly-lighter-gray;
-    padding-bottom: 25px;
+    padding-bottom: 60px;
   }
   &-tags {
     a {
-      font: 300 1.7rem/30px "Raleway", sans-serif;
+      font: 300 1.8rem/30px "Raleway", sans-serif;
       border:none;
       padding:0 3px;
 
