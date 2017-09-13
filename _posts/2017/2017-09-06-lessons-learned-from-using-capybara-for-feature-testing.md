@@ -41,6 +41,21 @@ keyword.
 find(".AssignModal-recurringUnit select").first(:option, "Weeks").select_option
 {% endhighlight %}
 
+## Mimic user typing directly with send_keys
+While the previous example gives you a way to directly set what value is within
+an element, sometimes you want to actually mimic the user's interaction. This is 
+especially important with things like <strong>autocomplete</strong> or <strong>fuzzy searches</strong>.
+
+{% highlight ruby %}
+find(".someElement").native.send_keys("User typing each character")
+{% endhighlight %}
+
+<code>Native</code> returns the element directly from the driver allowing for more control of
+elements that is closer to the real implementation of the browser.
+
+<code>Send_keys</code> mimics a user typing each character one at a time into whatever element
+it is pointed at.
+
 ## Assert that the button is disabled
 This allows you to match only disabled buttons on the page. Without this line Capybara 
 defaults to marking elements that are disabled as not being part of the content.
