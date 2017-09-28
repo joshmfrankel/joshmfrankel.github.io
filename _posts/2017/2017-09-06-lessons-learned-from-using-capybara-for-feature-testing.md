@@ -14,7 +14,7 @@ For Rails, that means utilizing the Capybara gem for testing features from end-t
 While Capybara is a great gem for accomplishing this goal, it can be at time difficult, frustrating, and
 nuanced in its implementation. I've been keeping track of all the tricks I use reguarly and compiled a
 list of the best ones. Hopefully, this helps give some clarity to a few best practices I use on a daily basis.
-{::comment}--excerpt--{:/comment}
+<!--excerpt-->
 
 ## Find element attribute
 You can use the hash symbol syntax to return the full value of any attributes from a captured element.
@@ -26,6 +26,25 @@ have_css(".PathContentOptions .NewButton[disabled]")
 The additional syntax of <code>find(".PathContentOptions .NewButton")[:disabled]</code> is also available but
 not recommended due to its inability to wait for the element to load fully with the specific
 attribute.
+
+## Find the parent of an element
+Sometimes it might be nearly impossible to grab a specific container element. Whether that is due to multiple existing on the page or insufficient selector specificity, it can be difficult to grab ambigous elements.
+
+However, if you can find an element that is a child of the element you want to write expectations against you can use xpath to find its parent.
+
+{% highlight html %}
+<div>
+  <p class="target">
+</div>
+<div>
+  <p>Excluded</p>
+</div>
+{% endhighlight %}
+{% highlight ruby %}
+node = page.find(".target")
+parent = node.find(:xpath, "..")
+parent["innerHTML"] #=> <p>Excluded</p>
+{% endhighlight %}
 
 ## Set element value without an ID or name
 Using the keyword <code>set</code> you can mimic the fill_in shortcut for elements that are difficult to find by id or name.
