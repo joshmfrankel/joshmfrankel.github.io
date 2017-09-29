@@ -25,7 +25,8 @@ addon from Heroku you can do so in your terminal with:
 {% highlight ruby %}
 # Where BONSAI_IVORY_URL is an environment variable set on heroku that
 # points at your Elasticsearch url
-heroku config:get BONSAI_IVORY_URL -a lessonly-staging
+# Note: Your specific plan might be different than IVORY
+heroku config:get BONSAI_IVORY_URL -a your-staging-application
 {% endhighlight %}
 
 If you don't know what your environment variable is for BONSAI then you'll need
