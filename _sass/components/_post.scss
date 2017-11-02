@@ -9,4 +9,31 @@
     padding: 5px 5px 0 5px;
     margin: 0 2px;
   }
+
+  img {
+    max-width: 100%;
+    margin: 40px auto;
+    border-radius: 5px;
+    border: 1px solid $lightest-gray-border;
+    padding: 15px;
+    box-sizing: border-box;
+    display: block;
+  }
+}
+
+.Comments {
+  background: $lightest-gray;
+  padding: 5px 30px 30px 30px;
+  border-radius: 5px;
+  border: 1px solid $lightest-gray-border;
+  margin-top: 50px;
+
+  h2 {
+    margin-bottom: 3.2rem;
+    margin-top: 3.2rem;
+  }
+}
+.Page {
+  padding-top: 25px;
+  width: 100%;
 }

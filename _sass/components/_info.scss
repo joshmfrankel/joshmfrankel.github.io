@@ -8,7 +8,11 @@ $margin-spacing: 20px;
   margin:0;
   padding:20px;
 
-
+  &:before,
+  &:after {
+    content: "";
+    display: none;
+  }
 
   &-accent {
     background-color: $accent-color;

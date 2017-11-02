@@ -59,7 +59,30 @@ figure.highlight {
   font-size: 1.7rem
 }
 blockquote {
+  color: $white;
   @extend .Info;
+
+  p {
+    color: $white;
+    display: inline;
+
+    &:before,
+    &:after {
+      font-size: 4.5rem;
+      font-weight: 700;
+      position: relative;
+      top: 10px;
+    }
+
+    &:before {
+      content: "“";
+      margin-right: 3px;
+    }
+    &:after {
+      content: "”";
+      margin-left: 3px;
+    }
+  }
 }
 p {
   color: $p-color;
@@ -93,21 +116,3 @@ header {
   font-style: italic;
   font-size: 13px;
 }
-
-.Comments {
-  background: $lightest-gray;
-  padding: 5px 30px 30px 30px;
-  border-radius: 5px;
-  border: 1px solid $lightest-gray-border;
-  margin-top: 50px;
-
-  h2 {
-    margin-bottom: 3.2rem;
-    margin-top: 3.2rem;
-  }
-}
-.Page {
-  padding-top: 25px;
-  width: 100%;
-}
-
