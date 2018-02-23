@@ -214,7 +214,7 @@ Here's a screenshot of the generic settings that I recommend using for your buil
 
 ![General TravisCI settings](/img/2017/travis-ci-setting.png)
 
-Once, you've got everything set up try out pushing a new commit to your *source* branch. You should see the TravisCI build start, pass, and eventually if you navigate to [http://username.github.io](http://username.github.io) your site will be live! If for some reason your build fails look through the **job log** for any details on errors. I'd be happy to help troubleshoot them in the comments.
+Once, you've got everything set up try out pushing a new commit to your *source* branch. You should see the TravisCI build start, pass, and eventually if you navigate to <code>username.github.io</code> your site will be live! If for some reason your build fails look through the **job log** for any details on errors. I'd be happy to help troubleshoot them in the comments.
 
 ![A passing build](/img/2017/travis-ci-pass.png)
 

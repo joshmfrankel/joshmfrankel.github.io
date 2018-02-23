@@ -19,6 +19,26 @@
     box-sizing: border-box;
     display: block;
   }
+  &-series {
+    @extend blockquote;
+
+    h3,
+    a {
+      color: $white;
+    }
+    h3 {
+      margin-top: 7px;
+    }
+    a {
+      border: none;
+      display: block;
+
+      &:hover {
+        border-bottom: none;
+        color: $accent-color;
+      }
+    }
+  }
 }
 
 .Comments {
