@@ -260,6 +260,32 @@ window.onload = function() {
 };
 {% endhighlight %}
 
+## Disabling Capybara::Poltergeist::JavascriptError
+By default Capybara will fail any spec that produces a javascript error. These can be disabled (though not recommended) from where <code>Capybara::Poltergeist::Driver.new</code> is registered with the following:
+
+{% highlight ruby %}
+# specs/spec_helper.rb
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app, timeout: 2.minutes, js_errors: false)
+end
+{% endhighlight %}
+
+Using binding.pry as described above can help track down where errors are occuring in the execution flow and is generally the most useful approach.
+
+## Poltergeist Javascript Errors caused by your ISP
+
+If you are constantly receieving errors it is possible that there is a network issue preventing the test from passing. Yes, **a local network setting could prevent the test suite from passing in development**. Here's an example of an ISP blocking and redirecting a request being made to the jquery cdn from a feature spec.
+
+{% highlight terminal %}
+  Error: Bootstrap's JavaScript requires jQuery
+  Error: Bootstrap's JavaScript requires jQuery
+    at http://dnserrorassist.att.net/s/js/bootstrap.min.js:6 in global code
+{% endhighlight %} 
+
+The give away here is that jQuery is being required by Bootstrap but Bootstrap can't find it. At the end of the error in the console the url returned is suspicious http://**dnserrorassist.att.net**/s/js/bootstrap.min.js:6. Specifically the highlighted part indicates that the request is be re-routed by the network.
+
+In order to fix these type of issues you'll need to change your network settings on your router, adjust privacy settings with your ISP, or if you are on public WIFI move to a new location.
+
 Do you have an awesome Capybara trick I missed? Let me know with a comment below.
 
 Thanks for reading.
