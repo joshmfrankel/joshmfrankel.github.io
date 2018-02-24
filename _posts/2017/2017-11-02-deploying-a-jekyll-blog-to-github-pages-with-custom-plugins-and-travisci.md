@@ -172,7 +172,7 @@ All of this together basically says, "Using the source branch from this repo, pu
 {% highlight ruby %}
 # filename: Rakefile
 task :default do
-  puts "Building Jekyll site..."
+  puts "Running CI tasks..."
 
   # Runs the jekyll build command for production
   # TravisCI will now have a site directory with our
@@ -222,8 +222,8 @@ That's it! Start blogging.
 
 ## Optional: Custom Domains
 
-You can give your readers a more customized experience by giving them a customized
-domain to navigate to. This is accomplished by pointing your <code>username.github.io</code> site at a domain registrar where you have purchased a domain name. (e.g. [joshfrankel.me](http://joshfrankel.me/))
+You can give your readers a more specialized experience by enabling a custom
+domain for them to navigate to. This is accomplished by pointing your <code>username.github.io</code> site at a domain registrar where you have purchased a domain name. (e.g. [joshfrankel.me](http://joshfrankel.me/))
 
 Don't worry if this sounds scary. It is actually easy to setup. [Namecheap has an excellent article that guides you through the entire process](https://www.namecheap.com/support/knowledgebase/article.aspx/9645/2208/how-do-i-link-my-domain-to-github-pages).
 
@@ -239,6 +239,96 @@ This tells Github Pages where you site is being published at. Below I've listed 
 > - A record for @ pointing to 192.30.252.153
 > - A record for @ pointing to 192.30.252.154
 > - CNAME record for www pointing to your username.github.io (the username should be replaced with your actual GitHub account username):
+
+If you now navigate to your repository's settings page you should see something
+like this:
+
+![Github Pages custom domain settings](/img/2017/github-pages-custom-domain.png)
+
+**Note** The small print around enablement of https states that it is unavailable for custom domains at present. However, there are additional resources and guides out there for [setting up third-party services such as CloudFlare for enabling https for Github Pages](https://www.jonathan-petitcolas.com/2017/01/13/using-https-with-custom-domain-name-on-github-pages.html). This may also be possible through other DNS hosts such as Namecheap (which I'm using).
+
+## Optional: Enable html_proofer
+
+> ...you can add other checks to this process such as [html_proofer](https://github.com/gjtorikian/html-proofer). These will be required to pass without failure before TravisCI will deploy the build.
+
+Like I mentioned above, one of the benefits of having a <code>Rakefile</code> is that 
+custom checks need to pass before the build will be sent out for deployment. One
+of those is a really helpful gem called **html_proofer** which allows for testing
+of rendered HTML to ensure validity.
+
+We can set this up with a few easy steps. First we'll want to add **html_proofer**
+to our <code>Gemfile</code>.
+
+{% highlight ruby %}
+# Gemfile
+
+gem "rake", "~> 12"
+gem "jekyll"
+# Outside the jekyll plugin group
+gem "html-proofer"
+{% endhighlight %}
+
+Next we'll add a few lines and configuration to our existing <code>Rakefile</code>
+to start testing the built <code>_site</code> folder contents.
+
+{% highlight ruby %}
+require "html-proofer" # Require gem for using within tasks
+
+task :default do
+  puts "Running CI tasks..."
+  sh("JEKYLL_ENV=production bundle exec jekyll build")
+  # Add HTMLProofer.check_directory("./_site").run in order to start checking
+  # for invalid HTML
+  HTMLProofer.check_directory(
+    "./_site",
+    url_ignore: [/linkedin.com|php-fig.org|bower.io|bost.ocks.org|elementary.io/] 
+  ).run
+  puts "Jekyll successfully built"
+end
+{% endhighlight %}
+
+The call to **html_proofer** should occur after the jekyll site is built from the
+<code>JEKYLL_ENV=production bundle exec jekyll build</code> line. This ensures that
+there are newly built files to validate against the linter's settings. 
+
+The basic code to get this working is: <code>HTMLProofer.check_directory("./_site").run</code>. This tells **html_proofer** to 
+look through the <code>_site</code> directory and run all available linters.
+
+We can test all this out locally by running the following command <code>rake</code> in our development directory. The <code>rake</code> command runs the default task found in the <code>Rakefile</code>. 
+
+{% highlight terminal %}> rake
+Running CI tasks...
+JEKYLL_ENV=production bundle exec jekyll build
+Configuration file: /home/josh/Development/joshmfrankel.github.io/_config.yml
+            Source: /home/josh/Development/joshmfrankel.github.io
+       Destination: /home/josh/Development/joshmfrankel.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+         AutoPages: Disabled/Not configured in site.config.
+        Pagination: Complete, processed 1 pagination page(s)
+                    done in 0.819 seconds.
+ Auto-regeneration: disabled. Use --watch to enable.
+Running ["ImageCheck", "ScriptCheck", "LinkCheck"] on ["./_site"] on *.html... 
+
+Checking 65 external links...
+Ran on 53 files!
+
+HTML-Proofer finished successfully.
+Jekyll successfully built
+{% endhighlight %}
+
+At this point if
+you have existing content you're likely to see many errors that need fixing. Take
+some time and fix as many of these as you can. A well tested blog is an efficient blog.
+
+As you can see from my example above **html_proofer** has many additional configuration
+options. Once of which is <code>url_ignore</code>. This is especially helpful for ignoring
+linting errors related to SSL, required sign-ins, and paywalls. For example, I have a social icon on my site that links to [https://www.linkedin.com/in/joshmfrankel](https://www.linkedin.com/in/joshmfrankel). LinkedIn requires a user
+to be logged in in order to view active profiles. Because of this the **html_proofer**
+check will fail. Therefore I added it to a blacklist of urls to ignore while 
+linting.
+
+## Closing thoughts
 
 Is there something I could explain more? Were the steps above easy to follow? Got a Jekyll plugin you are digging? I'd love to hear about it in the comments below.
 

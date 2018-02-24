@@ -83,6 +83,9 @@ blockquote {
       margin-left: 3px;
     }
   }
+  a {
+    color: lighten($accent_color, 10%);
+  }
 }
 p {
   color: $p-color;
