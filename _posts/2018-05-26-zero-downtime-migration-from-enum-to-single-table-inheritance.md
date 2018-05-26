@@ -459,7 +459,7 @@ The assumption at this point is that all code will be writing to only the new <c
 
 ### Share common behavior through Composition instead of Inheritance
 
-![Zero Downtime class diagram with modules](/img/2018/zero-downtime-with-module.png)
+{% include rich-snippets/article-image src="2018/zero-downtime-with-module.png" caption="Zero downtime class diagram with modules" width="424" height="329" %}
 
 Something else we could start doing here is abstracting out common logic into modules. For instance both the Porter and the Stout are served at the same temperature. They also both happen to be dark beers. From this we can create a <code>DarkBeer</code> module that is includable in any future dark beer models.
 

@@ -15,7 +15,7 @@ social:
     - https://twitter.com/Joshmfrankel
 
 # Structure Settings
-excerpt_separator: "--excerpt--"
+excerpt_separator: "<!--excerpt--"
 permalink: /blog/:title/
 
 pagination:
