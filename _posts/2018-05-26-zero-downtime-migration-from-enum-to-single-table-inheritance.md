@@ -16,9 +16,10 @@ For the purposes of our case, let's assume we're dealing with the following goal
 
 <strong>Situation</strong><br>
 An enum column on our table has gotten out of control and we need to move to a more
-organized architecture. We've decided upon Single Table Inheritance now let's figure out how we get there.
+organized architecture. We've decided something needs to chnage now let's figure out what we
+want the new application to look like.
 
-For a little bit of background here's what some of the current application looks like:
+Here's a little bit of background visualization on our application:
 
 ![Zero Downtime enum diagram](/img/2018/zero-downtime-enum.png)
 
@@ -38,6 +39,8 @@ As time goes on, the pattern above perpetuates itself and developers keep adding
 
 {% highlight ruby %}
 class Beer
+  belongs_to :restaurant
+
   enum beer_types: %i(porter stout hefeweizen)
 
   # Only certain beers are on-tap
@@ -134,6 +137,8 @@ end
 class Beer
   include SyncBeerType
 
+  belongs_to :restaurant
+
   # ... other methods ...
 end
 {% endhighlight %}
@@ -142,7 +147,7 @@ With this in place, all future Beers also set a proper <code>type</code> value.
 
 ### Laying some ground-work for our STI implementation
 
-![Zero Downtime STI class diagram ](/img/2018/zero-downtime-sti.png)
+![Zero Downtime STI class diagram](/img/2018/zero-downtime-sti.png)
 
 Next, we can start creating the type specific models for each Beer type. This is good prepartion work for when we have confidence that our database's type column is always filled out (phase 3). We don't actually need any logic in these yet but they are necessary for STI to function properly.
 
@@ -158,6 +163,22 @@ end
 {% endhighlight %}
 
 You may have noticed above that each of these inherit from the original Beer class. This makes each of them behave the same way the old code does while preparing us to start abstracting type specific logic into the individual Beer type models in the next phase. Additionally, single table inheritance requires a each child class to inherit from the parent base class.
+
+### Adding new STI scopes to the Restaurant model
+
+Remember our dinky little <code>Restaurant</code> model? All it does is say a Restaurant has many Beers. Now with STI setup we can add some additional helper associations to improve chaining and querying in ActiveRecord.
+
+{% highlight ruby %}
+class Restaurant
+  has_many :beers
+  has_many :porters, class_name: Porter
+  has_many :stouts, class_name: Stout
+  has_many :hefeweizens, class_name: Hefeweizen
+end
+{% endhighlight %}
+
+We can now chain queries like <code>Restaurant.first.porters</code> to see all of
+a given <code>Restaurant's</code> Porter beers.
 
 ### Backfill all existing Beer database records
 
@@ -331,6 +352,8 @@ class Hefeweizen < Beer
 end
 
 class Beer
+  belongs_to :restaurant
+
   enum beer_types: %i(porter stout hefeweizen)
 
   # Inheritors of Beer can override this method
@@ -419,6 +442,19 @@ module SyncBeerType
 end
 {% endhighlight %}
 
+Additionally, at this point we can remove the bit of code within the old <code>Beer</code> model that specified the enums:
+
+{% highlight ruby %}
+class Beer
+  belongs_to :restaurant
+
+  # Remove the line of code below as it is no longer necessary
+  enum beer_types: %i(porter stout hefeweizen)
+
+  # ... additional logic ...
+end 
+{% endhighlight %}
+
 The assumption at this point is that all code will be writing to only the new <code>type</code> column and that any old logic will no longer work with the old <code>beer_type</code> column. Also by using the same concern we don't need to update any of the Beer subclasses include statements.
 
 ### Share common behavior through Composition instead of Inheritance
@@ -430,7 +466,7 @@ Something else we could start doing here is abstracting out common logic into mo
 <blockquote class="Info Info-right"><strong>Inheritance vs. Composition</strong><br>
   Use Inheritance for <em>is-a</em> relationships. A Stout is-a Beer.
   Use Composition for <em>has-a</em> relationships. A Stout has-a DarkBeer color.<br>
-  <cite>- Sandi Metz, Practical Object-Oriented Design in Ruby: An Agile Primer, A paraphasing</cite>
+  <cite>- Sandi Metz, Practical Object-Oriented Design in Ruby: An Agile Primer, Paraphrase</cite>
 </blockquote>
 
 {% highlight ruby %}
