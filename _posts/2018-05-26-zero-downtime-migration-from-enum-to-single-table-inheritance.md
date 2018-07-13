@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Zero downtime migration from Enum to Single Table Inheritance
-category: today-i-learned
+category: tutorials
 ---
 
 I've been refactoring quite a bit of legacy code recently. I love this kind
