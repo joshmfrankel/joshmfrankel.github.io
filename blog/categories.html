@@ -4,7 +4,7 @@ title: Categories
 ---
 
 {% for category in site.categories %}
-  <h2 id="{{ category[0] }}">{{ category[0] | join: "/" | downcase }}</h2>
+  <h2 id="{{ category[0] }}">{{ category[0] | join: "/" | replace: "-", " " | downcase }}</h2>
   <ul>
     {% assign collection = category[1] %}
     {% include functions/content_collection %}
