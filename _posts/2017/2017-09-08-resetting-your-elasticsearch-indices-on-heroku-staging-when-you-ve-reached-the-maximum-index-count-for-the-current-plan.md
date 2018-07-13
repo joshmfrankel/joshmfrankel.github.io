@@ -16,7 +16,7 @@ ran into the following error: <code>reached maximum index count for current plan
 Since in most cases your staging indices aren't as critical as say production (don't use
 the fix below in production, please!), you can safely follow the procedure below for
 removing and reindexing your search enabled models.
-{::comment}--excerpt--{:/comment}
+<!--excerpt-->
 
 ## Find your Elasticsearch URL
 First you'll need to find your Elasticsearch url. If you are using the Bonsai
