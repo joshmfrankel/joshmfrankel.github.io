@@ -5,7 +5,7 @@ category: today-i-learned
 ---
 
 I've been refactoring quite a bit of legacy code recently. I love this kind
-of work because you get to setup new patterns and code pathways for future developers to use. Right past mistakes and make the future of the application just a bit brighter. My most recent refactoring involved converting an Enum based architecture to utilize Rail's Single Table Inheritance setup. So what does it take to move from one architecture to another? Keep reading to find out strategies that I use to help keep bugs to a minimum while ensuring that end-users experience zero downtime.
+of work because you get to architect new patterns and code pathways for future developers to use. Right past mistakes and make the future of the application just a bit brighter. My most recent refactoring involved converting an Enum based architecture to utilize Rail's Single Table Inheritance setup. So what does it take to move from one architecture to another? Keep reading to find out strategies that I use to help keep bugs to a minimum while ensuring that end-users experience zero downtime.
 <!--excerpt-->
 
 For major architecture refactors, there are a few steps I take to determine what the desirable end result is. Do you want to modify an existing feature? Convert an existing feature into another? Is this a brand new feature? These high-level questions about the purpose behind the refactor help guide you in making decisions that lead to a successful delivery.
@@ -16,7 +16,7 @@ For the purposes of our case, let's assume we're dealing with the following goal
 
 <strong>Situation</strong><br>
 An enum column on our table has gotten out of control and we need to move to a more
-organized architecture. We've decided something needs to chnage now let's figure out what we
+organized architecture. We've decided something needs to change now let's figure out what we
 want the new application to look like.
 
 Here's a little bit of background visualization on our application:
@@ -35,7 +35,7 @@ class Beer
 end 
 {% endhighlight %}
 
-As time goes on, the pattern above perpetuates itself and developers keep adding more and more beer_types. This isn't necessarily a bad thing except each of these types has special processing logic. This means everytime we add a new beer type at the very least the <code>#is_on_tap?</code>, <code>#preferred_glass</code>, and <code>#serving_temperature</code> methods below become just a little bit more complicated.
+As time goes on, the pattern above perpetuates itself and developers keep adding more and more beer_types. This isn't necessarily a bad thing except each of these types has special processing logic. This means every time we add a new beer type at the very least the <code>#is_on_tap?</code>, <code>#preferred_glass</code>, and <code>#serving_temperature</code> methods below become just a little bit more complicated.
 
 {% highlight ruby %}
 class Beer
@@ -49,7 +49,7 @@ class Beer
     false
   end
 
-  # New shippments of beer aren't cold initially
+  # New shipments of beer aren't cold initially
   def preferred_glass
     case beer_type
     when porter? then glass_1
@@ -149,7 +149,7 @@ With this in place, all future Beers also set a proper <code>type</code> value.
 
 ![Zero Downtime STI class diagram](/img/2018/zero-downtime-sti.png)
 
-Next, we can start creating the type specific models for each Beer type. This is good prepartion work for when we have confidence that our database's type column is always filled out (phase 3). We don't actually need any logic in these yet but they are necessary for STI to function properly.
+Next, we can start creating the type specific models for each Beer type. This is good preparation work for when we have confidence that our database's type column is always filled out (phase 3). We don't actually need any logic in these yet but they are necessary for STI to function properly.
 
 {% highlight ruby %}
 class Porter < Beer
@@ -428,7 +428,7 @@ beer.pour #=> Pours a Stout
 
 ### Reject the old column
 
-Rails 5 has a built-in way of manually disabling columns in ActiveRecord. This is a great trick for simulating in advance what the application will function like once phase 4's dropping of the <code>beer_type</code> column occurs. Not only does this allow you to modify your test suite to accomodate the removal of the column but it also prevents the application from holding onto the rejected column in memory. For example, having this step occur one deployment before pharse 4 prevents the application from using the column in any manner.
+Rails 5 has a built-in way of manually disabling columns in ActiveRecord. This is a great trick for simulating in advance what the application will function like once phase 4's dropping of the <code>beer_type</code> column occurs. Not only does this allow you to modify your test suite to accommodate the removal of the column but it also prevents the application from holding onto the rejected column in memory. For example, having this step occur one deployment before phase 4 prevents the application from using the column in any manner.
 
 What I like to do here is modify the module used for syncing to instead ignore the column to be dropped in the upcoming deployment.
 
@@ -461,7 +461,7 @@ The assumption at this point is that all code will be writing to only the new <c
 
 {% include rich-snippets/article-image src="2018/zero-downtime-with-module.png" caption="Zero downtime class diagram with modules" width="424" height="329" %}
 
-Something else we could start doing here is abstracting out common logic into modules. For instance both the Porter and the Stout are served at the same temperature. They also both happen to be dark beers. From this we can create a <code>DarkBeer</code> module that is includable in any future dark beer models.
+Something else we could start doing here is abstracting out common logic into modules. For instance both the Porter and the Stout are served at the same temperature. They also both happen to be dark beers. From this we can create a <code>DarkBeer</code> module that is includeable in any future dark beer models.
 
 <blockquote class="Info Info-right"><strong>Inheritance vs. Composition</strong><br>
   Use Inheritance for <em>is-a</em> relationships. A Stout is-a Beer.
@@ -503,7 +503,7 @@ class Stout < Beer
 end
 {% endhighlight %}
 
-You may at first be tempted to create another layer of inheritance with something like <code>Beer > DarkBeer > Porter</code>. While this technically would work, it also ties us to the strict hierachy which may or may not be the right abstraction at this point. This increases upkeep costs of maintaining the codebase. Using composition with modules allows us to reuse behaviors, like <code>DarkBeer</code>, without ties specific types to a strict interface that inheritance implements. Sandi Metz explains the pitfalls of inheritance best in the below quote.
+You may at first be tempted to create another layer of inheritance with something like <code>Beer > DarkBeer > Porter</code>. While this technically would work, it also ties us to the strict hierarchy which may or may not be the right abstraction at this point. This increases upkeep costs of maintaining the codebase. Using composition with modules allows us to reuse behaviors, like <code>DarkBeer</code>, without ties specific types to a strict interface that inheritance implements. Sandi Metz explains the pitfalls of inheritance best in the below quote.
 
 <blockquote>"Shallow, narrow hierarchies are easy to understand. Shallow, wide hierarchies are
 slightly more complicated. Deep, narrow hierarchies are a bit more challenging and
