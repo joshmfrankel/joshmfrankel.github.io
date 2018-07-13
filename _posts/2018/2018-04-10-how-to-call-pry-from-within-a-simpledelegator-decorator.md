@@ -3,6 +3,9 @@ layout: post
 title: How to call Pry from within a SimpleDelegator Decorator
 category:
 - fixes
+tags:
+- ruby
+- gems
 ---
 
 I'm by nature a kinesthetic learning or someone that learns by doing. One of the 

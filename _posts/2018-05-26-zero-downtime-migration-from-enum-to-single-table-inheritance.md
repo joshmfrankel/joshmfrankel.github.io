@@ -2,6 +2,11 @@
 layout: post
 title: Zero downtime migration from Enum to Single Table Inheritance
 category: tutorials
+tags: 
+- ruby on rails
+- composition
+- single table inheritance
+- databases
 ---
 
 I've been refactoring quite a bit of legacy code recently. I love this kind

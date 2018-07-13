@@ -3,6 +3,8 @@ layout: post
 title: Using attr_accesor for Class level methods
 category:
 - tutorials
+tags:
+- ruby
 ---
 
 The beginning steps to writing a new class usually involve writing a quick

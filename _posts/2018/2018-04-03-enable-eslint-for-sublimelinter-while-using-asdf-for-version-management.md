@@ -3,6 +3,10 @@ layout: post
 title: Enable ESLint for SublimeLinter while using asdf for version management
 category:
 - fixes
+tags:
+- sublime text
+- eslint
+- asdf
 ---
 
 SublimeLinter is an excellent tool for linting new code quickly and efficiently. Version managers like rvm, nvm, and [asdf](https://github.com/asdf-vm/asdf) are also great tools for smoothly switching between projects with different version requirements. Getting both SublimeLinter and version manager to play nice can sometimes be challenging. I'm going to quickly talk about the simple steps I took to getting ESLint and [asdf](https://github.com/asdf-vm/asdf) to work with SublimeLinter below.

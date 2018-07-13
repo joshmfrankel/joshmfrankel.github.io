@@ -3,6 +3,10 @@ layout: post
 title: Ensure dropping a database table is reversible
 category: 
 - today-i-learned
+tags:
+- ruby on rails
+- databases
+- migration
 ---
 
 When dropping a database table in a migration all data contained within the dropped table will be lost as well. This is to be expected since the table schema no longer exists. However, it is possible to make such a migration reversible so that at least the database structure is preserved.
