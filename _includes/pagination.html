@@ -3,7 +3,7 @@
   {% for post in paginator.posts %}
     <article class="Listing Listing-article">
       <h1 class="Listing Listing-title"><a href="{{ post.url }}">{{ post.title }}</a></h1>
-      <h2 class="Listing Listing-category"><em>posted in <a href="{{ site.baseurl | append: "categories#" | append: post.categories.first }}">{{ post.categories.first | replace: '-', ' ' }}</a></em></h2>
+      <h2 class="Listing Listing-category"><em>posted in <a href="{{ site.url | append: "categories#" | append: post.categories.first }}">{{ post.categories.first | replace: '-', ' ' }}</a></em></h2>
 
       <p class="Listing Listing-date">
         <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %-d, %Y" }}</time>
