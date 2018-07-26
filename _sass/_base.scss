@@ -104,6 +104,30 @@ header {
   flex: none;
   padding: 15px;
 }
+table {
+  background: $lightest-gray;
+  border: 1px solid $lightest-gray-border;
+  border-radius: 5px;
+  display: inline-block;
+  font: 300 1.6rem/32px $railway;
+
+  thead {
+    border-bottom: 1px solid $lightest-gray-border;
+
+    th {
+      color: $darker-gray-hover;
+    }
+  }
+  th, td {
+    padding: 15px;
+  }
+  tbody tr:nth-child(even) {
+    background: darken($slightly-lighter-gray, 3%);
+  }
+  tbody tr:hover {
+    background: $white;
+  }
+}
 .Content {
   flex: 1;
 }
