@@ -234,11 +234,23 @@ What you need to do is first create a CNAME file in your Github repository. The 
 joshfrankel.me
 {% endhighlight %}
 
-This tells Github Pages where you site is being published at. Below I've listed the basic setup for what you'll need to do for other domain registrars. (From the Namecheap documentation)
+This tells Github Pages where you site is being published at. 
 
-> - A record for @ pointing to 192.30.252.153
-> - A record for @ pointing to 192.30.252.154
+~~Below I've listed the basic setup for what you'll need to do for other domain registrars. (From the Namecheap documentation)~~
+
+> - ~~A record for @ pointing to 192.30.252.153~~
+> - ~~A record for @ pointing to 192.30.252.154~~
 > - CNAME record for www pointing to your username.github.io (the username should be replaced with your actual GitHub account username):
+
+### Update (July 27th, 2018) 
+Github has updated their servers and as such you'll need to point your DNS at the following ip addresses. Similar to the above, you'll want to create A records pointing at @ for each of the below ip addresses. [Here's the related documentation](https://help.github.com/articles/troubleshooting-custom-domains/#dns-configuration-errors).
+
+> If you configured A records through your DNS provider, your A records must point your custom domain to the following IP addresses:
+>
+> - 185.199.108.153
+> - 185.199.109.153
+> - 185.199.110.153
+> - 185.199.111.153
 
 If you now navigate to your repository's settings page you should see something
 like this:
