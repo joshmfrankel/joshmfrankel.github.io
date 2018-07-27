@@ -4,12 +4,12 @@ title: Constructing a select * from subquery using ActiveRecord
 category: articles
 tags:
 - ruby on rails
-- postgres
+- PostgreSQL
 - ActiveRecord
 - SQL
 ---
 
-ActiveRecord is a great tool for making SQL a bit more readable. However, there
+ActiveRecord is a great tool for making SQL a more readable. However, there
 are some things that are really difficult to do in pure ActiveRecord. One of those is 
 a <code>SELECT * FROM (subquery)</code> style of query. Before writing it in a raw
 SQL query, check out the following tip for preserving some ActiveRecord goodness.
@@ -60,7 +60,8 @@ Now that we've defined a simple database structure and model code, let's say our
 3. (Here's the tricky part) The user's latest attendance if they have seen an artist more than once.
 4. We want Attendances sorted by newest first in the results
 <div class="clearfix"></div>
-Here's an example output:
+
+Here's an example of desired output:
 
 | Artist        | Attendee         | Latest Attendance |
 |---------------|------------------|-------------------|
@@ -103,6 +104,8 @@ User
 
 We're done! Right? Well not quite. As with any real world project, there's a new client request.
 
+## There's always another requirement
+
 The client now wants to display the Concert's location along with latest attendance for each User / Artist combination. That seems like it would be as easy as adding location into the select clause and grouping by it with <code>.group(:id, "artist, latest_attendance")</code> but unfortunately that would only give you <code>latest_attendance</code> specified by unique <code>locations</code> as you can see below.
 
 | Artist        | Attendee         | Latest Attendance | Location |
@@ -113,7 +116,7 @@ The client now wants to display the Concert's location along with latest attenda
 | Bassnectar    | Emilia Clarke    | Wed, 06 Jun 2018 15:42:02 EDT -04:00 | Houston, TX |
 | Kodomo        | Kit Harington    | Fri, 27 Apr 2018 15:42:17 EDT -04:00 | Miami, FL |
 
-This is great information but isn't quite accurate to the client's requirements. (Also, Sean Bean apparently has been flying all over the country)
+This is great information but isn't quite accurate to the client's requirements. (Also, apparently Sean Bean has been flying all over the country and is a huge Pretty Lights fan. Who knew?)
 
 <blockquote class="Info Info-right"><strong>PostgreSQL DISTINCT ON</strong><br />
   SELECT DISTINCT ON ( expression [, ...] ) keeps only the first row of each set of rows where the given expressions evaluate to equal. 
@@ -140,7 +143,9 @@ SELECT * FROM (
 ORDER BY inner_query.latest_attendance DESC
 {% endhighlight %}
 
-This could also be written as a [Common Table Expression](https://www.postgresql.org/docs/9.1/static/queries-with.html) using the <code>WITH</code> keyword in PostgreSQL. It could be considered a more readable query.
+The above works by ensuring that all the results are distinct by the <code>artists.id</code>. We then order the subquery by latest_attendance descending in order to grab the latest start time. However, because we're using the <code>DISTINCT ON</code> clause for filtering the order by clause has to contain the same constraint of <code>art.id</code> as the first argument like so: <code>ORDER BY art.id, latest_attendance DESC</code>. This means that the records aren't quite in the right order because the Artist's id takes precedence over the latest_attendance in the sort order. The magic happens when we also order the subquery in the outer query by its latest_attendance descending <code>ORDER BY inner_query.latest_attendance DESC</code>. This ensures that we only are looking at the latest result for a given Artist.
+
+An alternative syntax for the above query could be to use a [Common Table Expression](https://www.postgresql.org/docs/9.1/static/queries-with.html) via the <code>WITH</code> keyword in PostgreSQL. It could be considered a more readable query.
 
 {% highlight sql %}
 WITH inner_query AS (
@@ -160,7 +165,17 @@ FROM inner_query
 ORDER BY inner_query.latest_attendance DESC
 {% endhighlight %}
 
-At this point you could just run the above raw SQL directly using <code>ActiveRecord::Base.connection.execute(raw_sql)</code> and that would be perfectly reasonable way of accomplishing our goal. However, by doing this we lose <code>ActiveRecord's</code> built in helpers and chainability as we are instead return a <code>PG::Result object</code>.
+At this point you could just run the above raw SQL directly using <code>ActiveRecord::Base.connection.execute(raw_sql)</code> and that would be a perfectly reasonable way of accomplishing our goal. 
+
+Here we have the final dataset. Note that while Sean Bean attended 3 Pretty Lights Concerts we only wanted the information regarding his latest attendance with a matching Concert location.
+
+| Artist        | Attendee         | Latest Attendance | Location |
+|---------------|------------------|-------------------|----------|
+| Pretty Lights | Sean Bean        | Mon, 16 Jul 2018 15:39:36 EDT -04:00 | Los Angeles, CA |
+| Bassnectar    | Emilia Clarke    | Wed, 06 Jun 2018 15:42:02 EDT -04:00 | Houston, TX |
+| Kodomo        | Kit Harington    | Fri, 27 Apr 2018 15:42:17 EDT -04:00 | Miami, FL |
+
+However, by doing this in raw SQL we lose <code>ActiveRecord's</code> built in helpers and chainability as we are instead returning a <code>PG::Result object</code>.
 
 {% highlight ruby %}
 raw_sql = <<~SQL
@@ -181,12 +196,12 @@ result = ActiveRecord::Base.connection.execute(raw_sql)
 result #=> #<PG::Result:0x000000000db346a8 status=PGRES_TUPLES_OK ntuples=5 nfields=29 cmd_tuples=5>
 {% endhighlight %}
 
-PG::Result object's are still pretty useful giving you access to a implementation of <code>#each</code>, <code>#values</code>, and <code>#to_a</code>. However, we lost scopes and a whole slew of ActiveRecord collection methods in the process. Let's fix that!
+PG::Result object's are still pretty useful giving you access to a implementation of <code>#each</code>, <code>#values</code>, and <code>#to_a</code>. However, we'd like the  whole slew of ActiveRecord collection methods and helper available. Let's fix that!
 
 ## Converting this back into ActiveRecord
 
 Making this work in ActiveRecord is hard. There isn't a lot of clear guidance of how
-to accomplish this. I was able to dig through enough forums and documentation until I happened upon the following entry: https://apidock.com/rails/v4.0.2/ActiveRecord/QueryMethods/from. 
+to accomplish this. I was able to dig through enough forums and documentation until I happened upon the following entry on [ActiveRecord from](https://apidock.com/rails/v4.0.2/ActiveRecord/QueryMethods/from). 
 
 The <code>ActiveRecord</code> from method generally just specifies the table you
 are querying against. However, it also allows you to pass in built ActiveRecord collections and query from those. This is accomplishes by building the subquery and passing it into the <code>from</code> method on a valid ActiveRecord scope. 
@@ -225,6 +240,9 @@ because we're only querying from the data within the subquery and not the actual
 ## Conclusion
 
 And there you have it. We've fully moved our subquery into ActiveRecord and can now enjoy all the conveniences that it provides. It took a little tweaking to the built
-in ActiveRecord from clause by passing in a subquery but it works like a charm.
+in ActiveRecord from clause by passing in a subquery but it works like a charm. Rock on!
+
+![Rock on!](/img/2018/subquery_concert.jpeg)
+<!-- Concert Image provided by Pexels.com https://www.pexels.com/photo/crowd-watching-show-inside-the-dark-stadium-761543/ -->
 
 What did you think about this technique? Let me know by leaving a comment below and thanks for reading.
