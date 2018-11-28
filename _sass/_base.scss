@@ -87,11 +87,18 @@ blockquote {
     color: lighten($accent_color, 10%);
   }
 }
-p {
+ul {
+  padding-left: 25px;
+}
+p, li {
   color: $p-color;
 }
 figure.highlight {
   margin: 0;
+}
+abbr {
+  text-decoration: none;
+  cursor: help;
 }
 
 // Layout
