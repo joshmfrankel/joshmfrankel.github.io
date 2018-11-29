@@ -86,6 +86,19 @@ blockquote {
   a {
     color: lighten($accent_color, 10%);
   }
+  cite {
+    word-break: break-all;
+
+    a {
+      color: $white;
+      font-weight: 600;
+
+      &:hover {
+        color: $white;
+        border-bottom: 1px solid $white;
+      }
+    }
+  }
 }
 ul {
   padding-left: 25px;
