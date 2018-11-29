@@ -62,8 +62,10 @@ blockquote {
   color: $white;
   @extend .Info;
 
-  p {
+  li, p {
     color: $white;
+  }
+  p {
     display: inline;
 
     &:before,

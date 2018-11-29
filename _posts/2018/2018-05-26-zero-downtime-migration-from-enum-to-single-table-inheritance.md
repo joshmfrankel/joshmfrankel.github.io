@@ -418,7 +418,7 @@ beer = params[:type]
 beer.pour
 {% endhighlight %}
 
-<blockquote class="Info Info-right"><strong>Drunk ducks</strong><br> Because all future types of Beers inherit from the base class of beer, they all respond to the same interface of methods. This enables us to duck type or allow any type of Beer object to stand-in for another while avoiding type-checks. Quack, quack.</blockquote>
+<blockquote class="Info Info-right"><strong>Drunk ducks</strong><br> Because all future types of Beers inherit from the base class of beer, they all respond to the same interface of methods. This enables us to write duck types or have any type of Beer object stand-in for another. This avoids the necessity of type-checks. Quack, quack.</blockquote>
 
 Additionally, single table inheritance allows us to call the model directly and ActiveRecord knows to properly build sql to query the specific type (see the raw sql below).
 
@@ -443,6 +443,55 @@ module SyncBeerType
 
   included do
     self.ignored_columns = %w(beer_type)
+  end
+end
+{% endhighlight %}
+
+<blockquote class="Info Info-right"><strong>Duck Typing</strong><br>
+  "Whenever possible, you should treat objects according to the methods they define rather than the classes from which they inherit or the modules they include."<br>
+  <cite>- <a href="http://rubylearning.com/satishtalim/duck_typing.html">http://rubylearning.com/satishtalim/duck_typing.html</a></cite>
+</blockquote>
+
+While ignoring the beer_type column in ActiveRecord prevents it from being visible, there are still several enum predicate methods that can be used. The methods I'm referring to are `porter?`, `stout?`, `hefeweizen?`. These essentially perform type checks, which for our purposes, we want to instead favor duck typing.
+
+Between Phase 3 and Phase 4, other developers may continue to use these predicate methods. One way to avoid this is to override the predicate methods to signal to developers that they are no longer supported. Similar to ignoring the ActiveRecord column above, this allows us to prepare for the next phase without having to update other developer code in the interim. We can also leave a helpful message to encourage the use of duck typing.
+
+{% highlight ruby %}
+module SyncBeerType
+  extend ActiveSupport::Concern
+
+  included do
+    self.ignored_columns = %w(beer_type)
+
+    # New Error type
+    UnsupportedMethodError = Class.new(StandardError)
+
+    # All predicate methods follow the same pattern. We could probably
+    # use something like method_missing here but for the sake of explictness
+    # I've written each of them out.
+    #
+    # __method__ is just a magic variable that contains the name of the current
+    # method. (e.g. porter?, stout?, hefeweizen?)
+    def porter?
+      unsupported_method(__method__)
+    end
+
+    def stout?
+      unsupported_method(__method__)
+    end
+
+    def hefeweizen?
+      unsupported_method(__method__)
+    end
+
+    # This looks complicated but actually just raises the new Error type
+    # and prints a message that includes the calling method's signature.
+    def unsupported_method(method)
+      raise UnsupportedMethodError, <<~EXCEPTION
+        #{method} is no longer supported. If you need to know a Beer's type please use `object.is_a?(some-type)`
+        A more ideal approach is to have a Beer object respond to a message via duck typing.
+      EXCEPTION
+    end
   end
 end
 {% endhighlight %}
