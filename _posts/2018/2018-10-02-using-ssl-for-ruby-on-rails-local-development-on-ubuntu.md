@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Setting up SSL for local development with Puma on Ubuntu
+title: Configure Puma SSL for local development on Ubuntu
 category: tutorials
 tags:
 - ruby on rails
