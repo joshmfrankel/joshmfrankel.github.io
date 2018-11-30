@@ -106,7 +106,7 @@ en:
       access_denied: "I'm sorry dave, but I'm afraid I can't do that"
 {% endhighlight %}
 <p>Viola, you just changed 20 different instances of the exact same content from a single location. Bravo!</p>
-<img src="{{ site.url }}/img/2015/I18n-doge.png" alt="Generated from dogr.io" />
+<img src="{{ site.baseurl }}/img/2015/I18n-doge.png" alt="Generated from dogr.io" />
 <p>The only downside to this method is that you need to type a little more code to display the content. However, even though <code>"Access Denied"</code> is less typing than <code>t('user.alert.access_denied')</code> by using <strong>I18n</strong> to <strong>dry</strong> out your code, it will allow you to have a singularly defined location for content. I don't know about you but changing code in one place vs 20 is a big time saver.</p>
 
 <h2>TL;DR</h2>

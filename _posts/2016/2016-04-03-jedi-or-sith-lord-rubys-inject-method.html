@@ -15,7 +15,7 @@ published: true
 <h2>Inject <small>a.k.a. Reduce</small></h2>
 
 <p>The inject method in ruby is a powerful method for reducing (or folding) all the elements of a collection, into a single value. It is commonly known as the reduce or fold method in other programming languages. Ruby provides an alias to reduce via inject.</p>
-<p>Let's walk through a typical use case for the inject method in ruby. I originally thought of this idea after reading <a href="http://www.globalnerdy.com/2008/09/03/enumerating-enumerable-a-cute-trick-for-explaining-inject-reduce-fold/" target="_blank">this awesome post</a>, by Joey Devilla. He uses folding paper to demostrate how inject works. Rather than recreate his post, I've decided to use playing cards to demonstrate another type of explanation.</p>
+<p>Let's walk through a typical use case for the inject method in ruby. I originally thought of this idea after reading <a href="http://www.globalnerdy.com/2008/09/03/enumerating-enumerable-a-cute-trick-for-explaining-inject-reduce-fold/" target="_blank">this awesome post</a>, by Joey Devilla. He uses folding paper to demonstrate how inject works. Rather than recreate his post, I've decided to use playing cards to demonstrate another type of explanation.</p>
 
 {% include rich-snippets/article-image src="2016/inject/post-intro-1.jpg" caption="The darkside collection" width="700" height="560" %}
 
@@ -30,12 +30,12 @@ published: true
 <div class="card-container">
   <div class="card-drawn">
     <h3>Drawn</h3>
-    <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
+    <img src="{{ site.baseurl }}/img/2016/inject/Card-2.jpg" alt="2">
   </div>
   <div class="card-collection">
     <h3>In Hand</h3>
     <div class="card-collection-in-hand">
-      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-A.jpg" alt="Ace">
     </div>
   </div>
 </div>
@@ -49,13 +49,13 @@ published: true
 <div class="card-container">
   <div class="card-drawn">
     <h3>Drawn</h3>
-    <img src="{{ site.url }}/img/2016/inject/Card-3.jpg" alt="2">
+    <img src="{{ site.baseurl }}/img/2016/inject/Card-3.jpg" alt="2">
   </div>
   <div class="card-collection">
     <h3>In Hand</h3>
     <div class="card-collection-in-hand">
-      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
-      <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-2.jpg" alt="2">
     </div>
   </div>
 </div>
@@ -69,14 +69,14 @@ published: true
 <div class="card-container">
   <div class="card-drawn">
     <h3>Drawn</h3>
-    <img src="{{ site.url }}/img/2016/inject/Card-4.jpg" alt="4">
+    <img src="{{ site.baseurl }}/img/2016/inject/Card-4.jpg" alt="4">
   </div>
   <div class="card-collection">
     <h3>In Hand</h3>
     <div class="card-collection-in-hand">
-      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
-      <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
-      <img src="{{ site.url }}/img/2016/inject/Card-3.jpg" alt="3">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-3.jpg" alt="3">
     </div>
   </div>
 </div>
@@ -90,15 +90,15 @@ published: true
 <div class="card-container">
   <div class="card-drawn fix-md">
     <h3>Drawn</h3>
-    <img src="{{ site.url }}/img/2016/inject/Card-5.jpg" alt="5">
+    <img src="{{ site.baseurl }}/img/2016/inject/Card-5.jpg" alt="5">
   </div>
   <div class="card-collection">
     <h3>In Hand</h3>
     <div class="card-collection-in-hand">
-      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
-      <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
-      <img src="{{ site.url }}/img/2016/inject/Card-3.jpg" alt="3">
-      <img src="{{ site.url }}/img/2016/inject/Card-4.jpg" alt="4">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-3.jpg" alt="3">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-4.jpg" alt="4">
     </div>
   </div>
 </div>
@@ -111,11 +111,11 @@ published: true
   <div class="card-collection">
     <h3>In Hand</h3>
     <div class="card-collection-in-hand">
-      <img src="{{ site.url }}/img/2016/inject/Card-A.jpg" alt="Ace">
-      <img src="{{ site.url }}/img/2016/inject/Card-2.jpg" alt="2">
-      <img src="{{ site.url }}/img/2016/inject/Card-3.jpg" alt="3">
-      <img src="{{ site.url }}/img/2016/inject/Card-4.jpg" alt="4">
-      <img src="{{ site.url }}/img/2016/inject/Card-5.jpg" alt="5">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-3.jpg" alt="3">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-4.jpg" alt="4">
+      <img src="{{ site.baseurl }}/img/2016/inject/Card-5.jpg" alt="5">
     </div>
   </div>
 </div>
@@ -129,7 +129,7 @@ published: true
 {% endhighlight %}
 
 <h2>If you only knew the power of Ruby's inject method!</h2>
-<img src="{{ site.url }}/img/2016/inject/power-of-darkside.gif" alt="You dont know the power of the darkside - From http://heavy-metal-aesthetic.tumblr.com/">
+<img src="{{ site.baseurl }}/img/2016/inject/power-of-darkside.gif" alt="You dont know the power of the darkside - From http://heavy-metal-aesthetic.tumblr.com/">
 <p>The inject method has a couple of tricks up its sleeve (card pun). Here are several of the formats that you can utilize. These are taken straight from the ruby docs.</p>
 {% highlight ruby %}
 inject(initial, sym) → obj
@@ -146,7 +146,7 @@ inject { |memo, obj| block } → obj
 <p>Now our first iteration of the loop yields <code>{ |5, 1| 5 + 1 }</code> and increases the ending sum by 5 making it 20. This can come in handy if you have an existing collection and need to use a different starting point.</p>
 
 <h3>Staying on target in the real world <small>with an example</small></h3>
-<img src="{{ site.url }}/img/2016/inject/stay-on-target.gif" alt="From giphy.com" />
+<img src="{{ site.baseurl }}/img/2016/inject/stay-on-target.gif" alt="From giphy.com" />
 <p>Let's take a look at a real world example. Say we had a forum for asking questions on our website between buyers and sellers. The buyer creates questions that can be shared between multiple projects. On these projects, the seller answers the required questions.</p>
 <p>Now the project requirement is to lock the buyer out of editing a question, if that particular question is used on more than one project or location in the app. We need to make sure that we have a starting value of 0 in this example which is where our initial value comes into play.</p>
 {% highlight ruby %}
@@ -166,7 +166,7 @@ end
 
 
 <h2>It’s true. All of it. Enumerables, Symbol#to_proc. They’re real.</h2>
-<img src="{{ site.url }}/img/2016/inject/Its_true_all_of_it.gif" alt="From polygon.com" />
+<img src="{{ site.baseurl }}/img/2016/inject/Its_true_all_of_it.gif" alt="From polygon.com" />
 
 <p>Do you remember seeing this example above? <code>(0..5).inject(:+) #=> 15</code>. This format is known as Symbol#to_proc or <code>inject(sym) → obj</code>. This is also known as using some of Ruby's built-in syntactical sugar.</p>
 <h3>inject(sym) → obj</h3>
@@ -179,7 +179,7 @@ Some addtional examples of valid symbols include: <code>:+</code>, <code>:-</cod
 (0..5).reduce(:+) => 15, this is the same thing again just different format
 {% endhighlight %}
 <p>This can be quite handy for quickly implementing basic logic against a collection. Additionally, just like above the <code>inject(sym) → obj</code> format can also accept an initial value in the following format <code>inject(initial, sym) → obj</code>
-<img src="{{ site.url }}/img/2016/inject/yoda-strength.jpg" alt="Yoda inspirational quote">
+<img src="{{ site.baseurl }}/img/2016/inject/yoda-strength.jpg" alt="Yoda inspirational quote">
 <p>Pretty awesome, no?</p>
 <div class="well floated"><p><strong>Symbol confusion</strong></p><p>There two different symbol formats you may encounter online. Up until Ruby 1.8.7, the inject method required that you prepend symbols with an ampersand (<code>&:+</code>) to convert them to a Proc so that inject could understand them. With 1.8.7 the inject method will accept both <code>:+</code> and <code>&:+</code> as valid symbols.</p></div>
 <p>Now before you go applying <code>:+</code> and <code>:*</code> to other enumerable methods such as <code>(0..5).map</code>, keep in mind that these require the usage of the ampersand to convert them to proc. Only inject and reduce have this functionality of current.</p>

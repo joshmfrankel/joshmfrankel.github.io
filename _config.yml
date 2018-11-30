@@ -4,7 +4,7 @@ email: joshmfrankel@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   A blog about ruby, sql, performance, and patterns. By Josh Frankel.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "http://joshfrankel.me" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Author Settings
 twitter_username: joshmfrankel
@@ -13,6 +13,8 @@ social:
   name: Josh Frankel
   links:
     - https://twitter.com/Joshmfrankel
+author:
+  twitter: joshmfrankel
 
 # Structure Settings
 excerpt_separator: "<!--excerpt--"

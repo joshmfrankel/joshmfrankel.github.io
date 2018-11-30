@@ -16,7 +16,7 @@ tags:
 <p>In relational database schemas, a <code>many-to-many</code> association is when a database table is built in a way that relates it to another table through a joining table. There needs to be at least three table to accomplish this. This allows the developer to query the relationship between the two tables gather their respective collections.</p>
 <p>Diving into an example, let's say you have an application that requires data for programmers, clients, and their connected projects. You could start by saying that a <code>Programmer</code> is a member of a <code>Project</code> as well as a <code>Client</code>. This would lead you to design your database schema to resemble something like this:</p>
 <div class="thumbnail">
-  <img src="{{ site.url }}/img/2016/many-to-many-bad-erd.png" alt="An ERD example of what not to do" />
+  <img src="{{ site.baseurl }}/img/2016/many-to-many-bad-erd.png" alt="An ERD example of what not to do" />
   <div class="caption">An ERD example of what not to do</div>
 </div>
 <p>Unfortunately, you now have set yourself up for a headache later on. To use this database you'll have to contend with having to create a <code>project_id</code> foreign key in each subsequent table that needs an association with the <code>Project</code> table. This can get hairy pretty quick.</p>
@@ -27,8 +27,8 @@ tags:
 <p>If every <code>Project</code> has a <code>Programmer</code> and <code>Client</code> attached to it, then we could say that a <code>Project</code> belongs to a <code>Programmer</code> and a <code>Project</code> also belongs to a <code>Client</code>. Here it is organized into a new entity relationship diagram.</p>
 
 <div class="thumbnail" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
-  <img src="{{ site.url }}/img/2016/many-to-many-good.png" alt="An ERD example of a Many-to-many association" />
-  <meta itemprop="url" content="{{ site.url }}/img/2016/many-to-many-good.png" />
+  <img src="{{ site.baseurl }}/img/2016/many-to-many-good.png" alt="An ERD example of a Many-to-many association" />
+  <meta itemprop="url" content="{{ site.baseurl }}/img/2016/many-to-many-good.png" />
   <meta itemprop="width" content="780" />
   <meta itemprop="height" content="398" />
   <div class="caption" itemprop="caption">

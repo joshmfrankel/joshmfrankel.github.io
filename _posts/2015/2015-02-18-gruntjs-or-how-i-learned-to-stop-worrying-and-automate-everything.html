@@ -13,20 +13,24 @@ published: true
 <!--excerpt-->
 
 <div class="center-block image-holder-300">
-    <img src="{{ site.url }}/img/2015/grunt-logo.png" alt="Grunt.js Logo all rights reserved to http://gruntjs.com/" />
+    <img src="{{ site.baseurl }}/img/2015/grunt-logo.png" alt="Grunt.js Logo all rights reserved to http://gruntjs.com/" />
     <p><small>Logo property of http://gruntjs.com/</small></p>
 </div>
 <h2>Build Tools</h2>
 <p>While I can't speak on behalf of Gulp, I have used both Guard and Grunt.js in my projects. In one of my earlier posts (<a href="http://joshfrankel.me/blog/leveling-up-css-with-sass-basics-setup-part-1/">Leveling up CSS with Sass</a>) I mentioned the usage of Guard for compiling Sass files. For this purpose it is really useful but I have found that Grunt.js is just a little easier for me. I still use Guard for Rails based projects though as it integrates well.</p>
 
 <p>Now before I begin to explain how to setup Grunt.js lets conceptualize what we wish to accomplish from the final configuration. We want a Grunt.js build system that has automatically loaded plugins, an easy way of maintaining tasks, and external plugin configurations. Over the next couple sections I will detail how we can get such a grunt setup working. Additionally, for developers new to Grunt this article will serve as a crash course into the world of task runners.</p>
-<nav class='well'>
-<strong>Sections</strong>
-<a href="#setup-node">Step 1: Setup Node.js</a>
-<a href="#basic-gruntjs">Step 2: Basic Grunt.js Setup</a>
-<a href="#gruntfile">Step 3: Configure the Gruntfile.js</a>
-<a href="#optimize-structure">Step 4: Optimize Gruntfile.js with load-grunt-config</a>
-</nav>
+
+<div class="Post Post-series">
+  <h3>Sections</h3>
+  <nav>
+    <a href="#setup-node">Step 1: Setup Node.js</a>
+    <a href="#basic-gruntjs">Step 2: Basic Grunt.js Setup</a>
+    <a href="#gruntfile">Step 3: Configure the Gruntfile.js</a>
+    <a href="#optimize-structure">Step 4: Optimize Gruntfile.js with load-grunt-config</a>
+  </nav>
+</div>
+
 <h2 id="setup-node">Setup Node.js</h2>
 <p>Before we can begin using grunt you need to first make sure you have node installed so we can use <acronym title="Node Package Manager">npm</acronym>. NPM is like <a href="https://rubygems.org/" target="_blank">Ruby Gems</a>, <a href="https://getcomposer.org/" target="_blank">Composer</a>, or <a href="http://bower.io/" target="_blank">Bower</a>, in that it manages specific packages for your project.</p>
 <p>To install node, download the proper version based on your OS from <a href="http://nodejs.org/download/" title="Node Download Page" target="_blank">here</a>. Once installed run the following initialize command in the project directory from your terminal. <code>npm init</code></p>
@@ -113,7 +117,7 @@ grunt.loadNpmTasks('grunt-notify');
 {% endhighlight %}
 <p>Configurations are setup by listing the task name, which is generally the plugin name like notify or watch, followed by the target and then the options. In the case of the grunt-notify plugin, notify is the task name (not to be confused with tasks coming up later), welcome is the target, and options are specific to the plugin and grunt. The task and target can actually be named whatever you want as long as the they are called correctly in the task definition.</p>
 <p>We can actually bring up terminal and run <code>grunt notify:welcome</code> and it will start grunt looking for a task name of notify with a target of welcome. Assuming grunt-notify is setup correctly (outside scope of this article) you should get something like this.</p>
-<img src="{{ site.url }}/img/2015/grunt-notify.png" alt="Grunt notify display" />
+<img src="{{ site.baseurl }}/img/2015/grunt-notify.png" alt="Grunt notify display" />
 <p>Congratulations, you have just run your very first grunt task, albeit somewhat lengthly and not really automated yet. Don't worry we will fix that soon.</p>
 <p class="well"><strong>Cool Trick:</strong><br /> Try running just <code>grunt notify</code> without the target. It will run both notify:welcome and notify:another. Essentially running any target under the notify task.</p>
 

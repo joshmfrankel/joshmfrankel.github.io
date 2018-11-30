@@ -1,8 +1,8 @@
 require "html-proofer"
 
 task :default do
-  puts "Running CI tasks..."
   sh("JEKYLL_ENV=production bundle exec jekyll build")
+  puts "Jekyll successfully built"
 
   options = {
       # @todo Should try to enable this one
@@ -21,5 +21,4 @@ task :default do
     "./_site",
     options
   ).run
-  puts "Jekyll successfully built"
 end

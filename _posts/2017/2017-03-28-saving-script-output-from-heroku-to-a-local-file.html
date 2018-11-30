@@ -16,7 +16,7 @@ tags:
 heroku run rails runner 'Your full script pasted here' -a my-app-name > data.txt # Stores the return data into a file called data.txt
 {% endhighlight %}
 <p>If you are exporting to a CSV you'll need to make sure that the script uses <code>puts</code> before the generated data. This will properly print out the CSV string and save it to the data.txt file listed in the above snippet.</p>
-<p>In one of my previous posts, <a href="{{ site.url }}/blog/fast-reports-exporting-to-csv-in-rails/">Exporting to a CSV</a>, I mentioned how to go about exporting data into CSV format. Building upon that lesson let's see what the the new command would look like.</p>
+<p>In one of my previous posts, <a href="{{ site.baseurl }}/blog/fast-reports-exporting-to-csv-in-rails/">Exporting to a CSV</a>, I mentioned how to go about exporting data into CSV format. Building upon that lesson let's see what the the new command would look like.</p>
 {% highlight ruby %}
 # Multi-line scripts are not a problem
 # Try classes as well
