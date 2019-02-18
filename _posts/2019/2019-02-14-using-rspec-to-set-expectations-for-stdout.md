@@ -25,7 +25,7 @@ end
 # spec/lib/formatter_spec.rb
 it "displays the coverage" do
   expect {
-    formatter.format(simple_cov_result_stub)
+    formatter.print_coverage(90, 127)
   }.to output(/90% coverage, 127 total lines/).to_stdout
 end
 {% endhighlight %}
