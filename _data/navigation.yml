@@ -8,5 +8,8 @@
 - name: Tags
   url: blog/tags
 
+- name: Archives
+  url: blog/archives
+
 - name: About
   url:
