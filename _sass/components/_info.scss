@@ -8,8 +8,8 @@ $margin-spacing: 20px;
   margin:0;
   padding:20px;
 
-  &:before,
-  &:after {
+  &::before,
+  &::after {
     content: "";
     display: none;
   }

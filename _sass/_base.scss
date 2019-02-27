@@ -89,6 +89,8 @@ blockquote {
     color: lighten($accent_color, 10%);
   }
   cite {
+    display: block;
+    margin-top: 20px;
     word-break: break-all;
 
     a {
