@@ -59,31 +59,12 @@ figure.highlight {
   font-size: 1.7rem
 }
 blockquote {
-  color: $white;
-  @extend .Info;
+  border-left: 5px solid $primary-color;
+  margin: 0;
+  padding: 20px;
 
-  li, p {
-    color: $white;
-  }
-  p {
-    display: inline;
-
-    &:before,
-    &:after {
-      font-size: 4.5rem;
-      font-weight: 700;
-      position: relative;
-      top: 10px;
-    }
-
-    &:before {
-      content: "“";
-      margin-right: 3px;
-    }
-    &:after {
-      content: "”";
-      margin-left: 3px;
-    }
+  p, li {
+    line-height: 40px;
   }
   a {
     color: lighten($accent_color, 10%);
@@ -131,7 +112,6 @@ header {
 table {
   background: $lightest-gray;
   border: 1px solid $lightest-gray-border;
-  border-radius: 5px;
   display: inline-block;
   font: 300 1.6rem/32px $railway;
 

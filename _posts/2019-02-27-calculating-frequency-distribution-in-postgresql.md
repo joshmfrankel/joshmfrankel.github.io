@@ -8,82 +8,129 @@ tags:
 ---
 
 I've always loved statistics. Being a software engineer has allowed me a lot of opportunities
-to solve complex statistical problems in SQL. There are lots of tools optimized for running statistical analysis such as [SPSS](https://www.ibm.com/analytics/spss-statistics-software) or [R](https://www.r-project.org/about.html), but these are generally used as retrospective tools to look back at a 
-dataset. With programming, we want to consider the current state of our data which
+to solve complex statistical problems in SQL. With programming, we want to consider the current state of data which
 means running calculations on demand. Recently, I had the opportunity to calculate
-frequency distribution in SQL.
+frequency distribution in SQL and wanted to share what I've learned with you.
 <!--excerpt-->
+
+## An example
+
+Alright so before we just dive in, first we need an example. A good example...
+
+While walking down a dirt path, a gentle breeze brushes against your neck. Suddenly,
+out of nowhere a grizzled old bridgekeeper blocks your way. "Stop!" he exclaims. 
+
+His breath reeks of elderberry and he smells faintly of hamster. As he stares
+at you with milky white eyes he states the following:
+
+"Who would cross the Bridge of Death must answer me these questions three, ere the other side he see."
+
+To which you of course respond, "Ask me the questions, bridgekeeper. I'm not afraid.". So ask away
+he does:
+
+<blockquote>
+  <ul>
+    <li>What is your favorite color?</li>
+    <li>What is your quest?</li>
+    <li>What is the airspeed velocity of an unladen swallow?</li>
+  </ul>
+</blockquote>
+
+As you stare at him puzzled, he (helpfully) gives you multiple choices for each question.
+Each question now has a set of options: a, b, c, and d. Considering your options you answer
+that your favorite color is indeed B) fuschia, your quest is A) not being hassled by creepy
+bridgekeepers, and you answer for the airspeed velocity of an unladen swallow with A) An 
+African or European swallow?
+
+While certainly an unsettling experience, you're now really curious as to how other 
+travelers before you answered the questions. So curious in fact that you're thinking 
+about finding out what the frequency distribution for each question's choice was.
+
+Ok, ok, ok. So this wasn't an actual situation I ran into at work but work with me here.
 
 ## Basic Frequency Distribution
 
-<blockquote class="Info Info-right"><strong>Frequency Distribution</strong><br />
-  "A frequency (distribution) table shows the different measurement categories and the number of observations in each category."
-<cite><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3117575/">- PubMed Central</a></cite>
+<blockquote class="Info Info-right"><strong>What is Frequency Distribution?</strong><br />
+  Frequency distribution is calculating the frequency (also known as rate or occurence) of 
+  which question choice was selected 
 </blockquote>
 
-Think about a professor giving a multiple choice exam. There are a set number of options: a, b, c, and d
-listed for each question and a set number of students taking the exam. **Frequency
-distribution is calculating how many students selected a, b, c, or d as their answer.**
+Think back on the Bridgekeeper's questions, there are a set number of options: a, b, c, and d
+for each question and a set number of travelers whom answered. **Frequency
+distribution is measuring the total times that each multiple choice option was selected.** You can think of each option (a, b, c, d) as a different category that we'd like
+to group travelers into based on their answer.
 
-You can think of each option (a, b, c, d) as a different category we'd like
-to group students into based on their answer. For the following example, we'll
-assume that we're talking about a single exam:
+Now that we're interested in analyzed previous traveler's responses we'll want
+to know how well they answered. From looking at the frequency distribution, we
+could also hypothesize if a question was too hard or too easy.
+
+First let's write some SQL to gather traveler responses across all three
+questions.
 
 {% highlight sql %}
 SELECT 
-  student_answers.choice, 
-  COUNT(student_answers.choice) as total_answers
-FROM student_answers
-GROUP BY student_answers.choice
-ORDER BY student_answers.choice -- To ensure the order is a, b, c, d
+  traveler_answers.choice, 
+  COUNT(traveler_answers.choice) as total_answers
+FROM traveler_answers
+GROUP BY traveler_answers.choice
+ORDER BY traveler_answers.choice -- To ensure the order is a, b, c, d
 {% endhighlight %}
 
-The exam might have a distribution that looks like:
+The above query returns the choice (a, b, c, or d) along with a count of
+how many times a traveler selected it. We group the above by `traveler_answers.choice` 
+as this ensures that the aggregate function `COUNT()` returns a result for each type 
+of choice. The query above nets us a basic frequency distribution
+which you can see below:
 
 | choice        | total_answers    |
 |---------------|------------------|
 | a             |   25            |
 | b             |   50            |
-| c             |   30            |
-| d             |   70            |
+| c             |   25            |
+| d             |   75            |
 
-This is the most basic example of a frequency distribution table. Pretty straight forward right? However, the above table only illustrates what the
-selected answers were for **all questions** on the exam. Ready for your next
-requirement?
+Since this is frequency distribution at its most basic, it is pretty straight forward
+to write the supporting SQL. However, it isn't really useful in its current form. What
+does 25 total answers for choice A really tell us? Well, across the five questions... I mean
+three questions, 25 travelers select choice A. Not real compelling stuff. 
+
+"Well, lets get going! Come along, Patsy"
 
 ## Frequency Distribution for two categories
 
-Now the professor would like to know frequency distribution on a more
-granular level. Specifically, given an ExamQuestion how many students answered
-a, b, c, or d? We now have two categories (or groups): **selected answer** and **exam question**.
+What might be more useful than frequency distribution across all questions? How
+about frequency distribution based on a single question? Specifically let's calculate how many travelers
+selected a **given choice** for a **given question**. You could also think about this
+as comparing two categories within frequency distribution.
+
+To accomplish this we follow along with our above example by adding a new `GROUP BY`
+clause to ensure that we are grouping categories into traveler's answered choice
+(`traveler_answers.choice`)
+and the Bridgekeeper's question (`bridgekeeper_questions.question_text`).
 
 {% highlight sql %}
 SELECT 
-  exam_questions.question_text,
-  student_answers.choice, 
-  COUNT(student_answers.choice) as total_answers
-FROM student_answers
-INNER JOIN exam_questions ON exam_questions.id = student_answers.exam_question_id
+  bridgekeeper_questions.question_text,
+  traveler_answers.choice, 
+  COUNT(traveler_answers.choice) as total_answers
+FROM traveler_answers
+INNER JOIN bridgekeeper_questions ON bridgekeeper_questions.id = traveler_answers.exam_question_id
 GROUP BY 
-  student_answers.choice, 
-  exam_questions.question_text
-ORDER BY student_answers.choice
+  traveler_answers.choice, 
+  bridgekeeper_questions.question_text
+ORDER BY traveler_answers.choice
 {% endhighlight %}
 
-For example purposes, let's assume that the Exam only has three questions: 
-1. *What is your name?*
-2. *What is your quest?*
-3. *What is the airspeed velocity of an unladen swallow?*
-
-Since we're grouping the results by `student_answers.choice` and `exam_questions.question_text`, we end
-up with multiple results per question text (1 per choice / question pair)
+Since we're grouping the results by `traveler_answers.choice` and `bridgekeeper_questions.question_text`, we end
+up with multiple results per question text (1 per choice / question pair). You can see
+what the resulting query would return below.
 
 | Question text | choice        | total_answers    |
 |--------------------------------|---------------|------------------|
-| "What is your name?" | a             |   12            |
-| "What is your name?" | b             |   20            |
-| "What is your name?" | c             |   10            |
-| "What is your name?" | d             |   5            |
+| "What is your favorite color?" | a             |   12            |
+| "What is your favorite color?" | b             |   20            |
+| "What is your favorite color?" | c             |   10            |
+| "What is your favorite color?" | d             |   5            |
 | "What is your quest?" | a             |   12            |
 | "What is your quest?" | b             |   5            |
 | "What is your quest?" | c             |   15            |
@@ -93,49 +140,51 @@ up with multiple results per question text (1 per choice / question pair)
 | "What is the airspeed velocity of an unladen swallow?" | c             |   5            |
 | "What is the airspeed velocity of an unladen swallow?" | d             |   25            |
 
-This is starting to look like useful data.
+Now we have frequency distribution for each question. This is starting to look like useful data.
 
 ## Frequency Distribution with Descriptive Statistics
 
-<blockquote class="Info Info-right clearfix"><strong>What is Descriptive Statistics</strong><br />
-  "Descriptive statistics allow you to characterize your data based on its properties. 
-  There are four major types of descriptive statistics: Measures of Frequency, 
-  Measures of Central Tendency, Measures of Dispersion or Variation, Measure of Position"
-<cite><a href="https://baselinesupport.campuslabs.com/hc/en-us/articles/204305665-Types-of-Descriptive-Statistics">- Campuslabs.com</a></cite>
+<blockquote class="Info Info-right clearfix"><strong>What is Descriptive Statistics?</strong><br />
+  "A descriptive statistic (in the count noun sense) is a summary statistic that quantitatively describes or summarizes features of a collection of information"
+<cite><a href="https://en.wikipedia.org/wiki/Descriptive_statistics">- Wikipedia</a></cite>
 </blockquote>
 
-The professor says this looks great but she'd love to know more about
-the data involving whether or not the student selected the **correct answer**. Here's the
-new requirements:
+At this point we've forgotten something. Who cares about a previous traveler's answer
+unless we know if their selection was correct or not. "Who are
+ you, who are so wise in the ways of science?". Totally normally if you're thinking that. 
+ Well... probably not, but don't ruin my delusions.
+
+Here's our new analysis goals:
 
 1. What is the total number of correct answers per question?
-2. What is the average number of correct answers per question?
+2. What is the percentage of correct answers per question?
 
-Questions like that are what is referred to as **Descriptive Statistics**. Gathering 
-a count of the total number of correct answers is a *Measure or Frequency* while 
-average (also known as the mean) number of correct answers is a *Measure of 
-Central Tendency*.
+Now these won't make a lot of sense if for each row in the above table we return
+total number and percentage of total correct. Really we want these in the format of:
 
-Now for a curve ball, she'd like to have only 1 row per question text so that 
-the data is easier to read. 
+`Question text | choice | total answers | total correct answers | percentage correct answers`
+
+So you might say that the sh**rub**bery here is that we need to condense the multi-row format above
+into a single line per question.
 
 {% highlight sql %}
 SELECT 
   inner_query.question_text, 
+  SUM(inner_query.total_answers) as total_answers,
   SUM(inner_query.total_correct_answers) as total_correct_answers, 
-  (SUM(inner_query.total_correct_answers) / SUM(inner_query.total_answers)) * 100 as average_correct_answer
+  (SUM(inner_query.total_correct_answers) / SUM(inner_query.total_answers)) * 100 as percentage_correct_answer
 FROM (
   SELECT 
-    exam_questions.question_text,
-    student_answers.choice, 
-    COUNT(student_answers.choice) as total_answers
-    COUNT(student_answers.choice) FILTER (WHERE exam_questions.correct_choice = student_answers.choice) as total_correct_answers
-  FROM student_answers
-  INNER JOIN exam_questions ON exam_questions.id = student_answers.exam_question_id
+    bridgekeeper_questions.question_text,
+    traveler_answers.choice, 
+    COUNT(traveler_answers.choice) as total_answers
+    COUNT(traveler_answers.choice) FILTER (WHERE bridgekeeper_questions.correct_choice = traveler_answers.choice) as total_correct_answers
+  FROM traveler_answers
+  INNER JOIN bridgekeeper_questions ON bridgekeeper_questions.id = traveler_answers.exam_question_id
   GROUP BY 
-    student_answers.choice, 
-    exam_questions.question_text
-  ORDER BY student_answers.choice
+    traveler_answers.choice, 
+    bridgekeeper_questions.question_text
+  ORDER BY traveler_answers.choice
 ) inner_query
 GROUP BY inner_query.question_text
 {% endhighlight %}
@@ -148,44 +197,79 @@ GROUP BY inner_query.question_text
 You'll notice that from the above query we used the syntax
 `SELECT columns FROM (inner_query)` in order to select and aggregate already existing
 aggregate values. Think of this like querying a query. This is necessary for us
-to calculate an aggregate based on a group of multiple aggregates. 
+to calculate an aggregate based on a group of multiple aggregates. It also allows
+us to return a single row again per question.
 
-More specifically, calculations are accomplished by first counting the results within 
-the inner query giving us the total answers for each category (as seen in the previous table).
-Then `SUM ()` is used to calculate the running total for all categories. If we were
-to calculate this manually for the question, "What is your name?" it would look like this 
-for the inner query:
+To understand how we're back to returning a single row, let's look at what is happening behind the scenes by calculating the percentage
+of correct answers. The formula for calculating percentage of correct answers is:
+
+<blockquote>
+  ( total_correct_answers / total_answers ) * 100
+</blockquote>
+ 
+First the inner query calculates the individual number of answers
+per question. `COUNT(traveler_answers.choice)` returns:
 
 | Question text | choice        | total_answers    |
 |--------------------------------|---------------|------------------|
-| "What is your name?" | a             |   12            |
-| "What is your name?" | b             |   20            |
-| "What is your name?" | c             |   10            |
-| "What is your name?" | d             |   5            |
+| "What is your favorite color?" | a             |   12            |
+| "What is your favorite color?" | b             |   20            |
+| "What is your favorite color?" | c             |   10            |
+| "What is your favorite color?" | d             |   5            |
 
-Then the outer query aggregates each column into a SUM of all the existing
-aggregates given a single question.
+Additionally, we're counting correct answers by choice using a FILTER clause: 
+`COUNT(traveler_answers.choice) FILTER (WHERE bridgekeeper_questions.correct_choice = traveler_answers.choice)`. The
+results within the inner query here are a bit strange but will become useful once we aggregate its
+results in the outer query.
 
-`12 + 20 + 10 + 5 = 20`
+| Question text | choice        | total_answers    | total_correct_answers |
+|--------------------------------|---------------|------------------|------------------|
+| "What is your favorite color?" | a             |   12            | 0 |
+| "What is your favorite color?" | b             |   20            | 20 |
+| "What is your favorite color?" | c             |   10            | 0 |
+| "What is your favorite color?" | d             |   5            | 0 |
 
-| Question text | total_correct_answers   |
-|---------------|-------------------------|
-| "What is your name?" | 20             |
+Think about the above as building out raw data that we want to perform calculations on in
+the outer query. This is exactly what we'll do by leaning on the `SUM()` function 
+with the following: `(SUM(inner_query.total_correct_answers) / SUM(inner_query.total_answers)) * 100`.
 
-For calculating average, the SUM of the total correct answers is divided by the SUM of the total answers. 
-We multiply by 100 to convert it to a percentage.
+<blockquote class="Info Info-right"><strong>PostgreSQL FILTER clause</strong><br /><br />
+  Something else you may have noticed is the `FILTER` syntax. This is an excellent way
+  of extending an aggregate function with an additional `WHERE` clause. 
+  <cite><a href="https://modern-sql.com/feature/filter">- Modern-sql.com</a></cite>
+</blockquote>
 
-Below is the end result given the newest SQL changes above.
+We use `SUM()` instead of `COUNT()` because `COUNT()` would only give us how many rows were returned 
+while we want to know what the running total is based on a column's value. 
 
-| Question text | total_correct_answers   | average_correct_answer    |
+Looking back we can 
+see that we're right at the step for using our formula for calculating the
+percentage.
+
+Here's it written out in full:
+
+{% highlight text %}
+total_correct_answers: 0 + 20 + 0 + 0 = 20
+total_answers: 12 + 20 + 10 + 5 = 47
+(total_correct_answers / total_answers): (20 / 47) = 0.425532
+(0.425532) * 100 = 42.5532%
+{% endhighlight %}
+
+Given our newest SQL changes above, here's the end result:
+
+| Question text | total_correct_answers   | percentage_correct_answer    |
 |---------------|-------------------------|---------------------------|
-| "What is your name?" | 20             |   42.5532            |
+| "What is your favorite color?" | 20             |   42.5532            |
 | "What is your quest?" | 40             |   55.5555            |
 | "What is the airspeed velocity of an unladen swallow?" | 1             |   1.78571            |
 
-This is looking really good. Unfortunately, by running the aggregate for
-total correct and average correct, we lost the frequency distribution for 
-each question. It's a bit tricky to get this back but possible.
+Unfortunately, by running the aggregate for
+total correct and percentage correct, we lost the frequency distribution for 
+each question. It's a bit tricky to get this back but where there's a way... 
+
+"The Black Knights always triumph!"
+
+Ahem, excuse me. Sorry about that.
 
 ## Frequency Distribution as a single row
 
@@ -200,41 +284,53 @@ the distribution into a single value. JSONB is a perfect solution for this probl
 as it allows us to use key-value pairs to describe the value in a single column. 
 We'll be using `jsonb_agg()` and `jsonb_build_object()` PostgreSQL methods to accomplish this. 
 
-Just like we did above while calculating **total_correct_answers** and **average_correct_answer**, 
+Just like we did above while calculating **total_correct_answers** and **percentage_correct_answer**, 
 the aggregate of the inner query is utilized as an aggregate of the outer query.
 
 {% highlight sql %}
 SELECT 
-  inner_query.question_text, 
+  inner_query.question_text,
+  SUM(inner_query.total_answers) as total_answers, 
   SUM(inner_query.total_correct_answers) as total_correct_answers, 
-  (SUM(inner_query.total_correct_answers) / SUM(inner_query.total_answers)) * 100 as average_correct_answer,
+  (SUM(inner_query.total_correct_answers) / SUM(inner_query.total_answers)) * 100 as percentage_correct_answer,
   jsonb_agg(inner_query.frequency_distribution) as frequency_distribution_json
 FROM (
   SELECT 
-    exam_questions.question_text,
-    student_answers.choice, 
-    COUNT(student_answers.choice) as total_answers
-    COUNT(student_answers.choice) FILTER (WHERE exam_questions.correct_choice = student_answers.choice) as total_correct_answers,
-    jsonb_build_object('choice', student_answers.choice, 'frequency', COUNT(student_answers.choice)) as frequency_distribution
-  FROM student_answers
-  INNER JOIN exam_questions ON exam_questions.id = student_answers.exam_question_id
+    bridgekeeper_questions.question_text,
+    traveler_answers.choice, 
+    COUNT(traveler_answers.choice) as total_answers,
+    COUNT(traveler_answers.choice) FILTER (WHERE bridgekeeper_questions.correct_choice = traveler_answers.choice) as total_correct_answers,
+    jsonb_build_object('choice', traveler_answers.choice, 'frequency', COUNT(traveler_answers.choice)) as frequency_distribution
+  FROM traveler_answers
+  INNER JOIN bridgekeeper_questions ON bridgekeeper_questions.id = traveler_answers.exam_question_id
   GROUP BY 
-    student_answers.choice, 
-    exam_questions.question_text
-  ORDER BY student_answers.choice
+    traveler_answers.choice, 
+    bridgekeeper_questions.question_text
+  ORDER BY traveler_answers.choice
 ) inner_query
 GROUP BY inner_query.question_text
 {% endhighlight %}
 
-| Question text | total_correct_answers   | average_correct_answer    | frequency_distribution_json |
+"Oh,look. There's some lovely filth over here." 
+
+The resulting dataset below is pretty ugly but gathers the proper key-value pairs
+we need in order to show frequency distribution.
+
+| Question text | total_correct_answers   | percentage_correct_answer    | frequency_distribution_json |
 |---------------|-------------------------|---------------------------|-----------------------------|
-| "What is your name?" | 20             |   42.5532            | `[{ "choice": "a", "frequency": 12 }, { "choice": "b", "frequency": 20 }, { "choice": "c", "frequency": 10 }, { "choice": "d", "frequency": 5 }]` |
+| "What is your favorite color?" | 20             |   42.5532            | `[{ "choice": "a", "frequency": 12 }, { "choice": "b", "frequency": 20 }, { "choice": "c", "frequency": 10 }, { "choice": "d", "frequency": 5 }]` |
 | "What is your quest?" | 40             |   55.5555            | `[{ "choice": "a", "frequency": 12 }, { "choice": "b", "frequency": 5 }, { "choice": "c", "frequency": 15 }, { "choice": "d", "frequency": 40 }]` |
 | "What is the airspeed velocity of an unladen swallow?" | 1             |   1.78571            | `[{ "choice": "a", "frequency": 1 }, { "choice": "b", "frequency": 25 }, { "choice": "c", "frequency": 5 }, { "choice": "d", "frequency": 25 }]` |
 
-Success! With that being our final modification to the query, we now have a table that contains:
+With that being our final modification to the query, we now have a table that contains:
+
+<blockquote class="Info Info-right"><strong>PostgreSQL alternative method</strong><br /><br />
+  `width_bucket()` allows you to specify a column that has a minimum and maximum range and then split it into
+  buckets (categories). <a href="https://www.postgresql.org/docs/9.1/functions-math.html">Check out the following documentation</a>
+</blockquote>
+
 1. The total correct answers per question
-2. The average correct answer per question
+2. The percentage of correct answers per question
 3. A frequency distribution per question
 
 So what does the inner query look like with the new `jsonb_build_object()` method?
@@ -243,15 +339,15 @@ If we were to back track to the table that contained a result per question per
 choice and look at what the following SQL returns it would look like this:
 
 {% highlight sql %}
-  jsonb_build_object('choice', student_answers.choice, 'frequency', COUNT(student_answers.choice)) as frequency_distribution
+  jsonb_build_object('choice', traveler_answers.choice, 'frequency', COUNT(traveler_answers.choice)) as frequency_distribution
 {% endhighlight %}
 
 | Question text | choice        | total_answers    | frequency_distribution |
 |--------------------------------|---------------|------------------|------------------|
-| "What is your name?" | a             |   12            | `{ "choice": "a", "frequency": 12 }` |
-| "What is your name?" | b             |   20            | `{ "choice": "b", "frequency": 20 }` |
-| "What is your name?" | c             |   10            | `{ "choice": "c", "frequency": 10 }` |
-| "What is your name?" | d             |   5            | `{ "choice": "d", "frequency": 5 }` |
+| "What is your favorite color?" | a             |   12            | `{ "choice": "a", "frequency": 12 }` |
+| "What is your favorite color?" | b             |   20            | `{ "choice": "b", "frequency": 20 }` |
+| "What is your favorite color?" | c             |   10            | `{ "choice": "c", "frequency": 10 }` |
+| "What is your favorite color?" | d             |   5            | `{ "choice": "d", "frequency": 5 }` |
 | "What is your quest?" | a             |   12            | `{ "choice": "a", "frequency": 12 }` |
 | "What is your quest?" | b             |   5            | `{ "choice": "b", "frequency": 5 }` |
 | "What is your quest?" | c             |   15            | `{ "choice": "c", "frequency": 15 }` |
@@ -261,17 +357,18 @@ choice and look at what the following SQL returns it would look like this:
 | "What is the airspeed velocity of an unladen swallow?" | c             |   5            | `{ "choice": "c", "frequency": 5 }` |
 | "What is the airspeed velocity of an unladen swallow?" | d             |   25            | `{ "choice": "d", "frequency": 25 }` |
 
-The magic of this happens in the outer query with `jsonb_agg()` which
+The magic... "I'm not a witch, I'm not a witch"... of this happens in the outer query with `jsonb_agg()` which
 aggregates all the inner frequency distribution columns into an array
 of jsonb key-value pairs like we see in the above final query. This allows
 for both Descriptive Statistics on the entire dataset while providing Frequency Distribution
 for a single question.
 
-## Potential alternative
+<blockquote>
+  "What if you get a question wrong?"<br>
+  "Then you are cast into the Gorge of Eternal Peril."
+</blockquote>
 
-An alternative that I didn't dig into is called `width_bucket()`. These allow you
-to specify a column that has a minimum and maximum range and then split it into
-buckets (again this is the same as groups or categories). For more information on
-`width_bucket()` [check out the following documentation](https://www.postgresql.org/docs/9.1/functions-math.html).
+![Monty Python Bridgekeeper](/img/2019/monty-python-bridge.gif)
 
-Got a different SQL statistics trick? How about an improved approach to the above? I'd love to hear about it in the comments.
+Got a different SQL statistics trick? How about an improved approach to the above? 
+Just love Monty Python? I'd love to hear about it in the comments.
