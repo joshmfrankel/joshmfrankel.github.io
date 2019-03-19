@@ -67,7 +67,7 @@ blockquote {
     line-height: 40px;
   }
   a {
-    color: lighten($accent_color, 10%);
+    color: $primary-color;
   }
   cite {
     display: block;
