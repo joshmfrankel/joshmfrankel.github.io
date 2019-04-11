@@ -1,5 +1,5 @@
 <footer class="Footer">
-  <div class="Container Container-flex">
+  <div class="Container Container-flex Container--smallMargin">
     <section class="Footer-links">
       {% for nav in site.data.navigation %}
         {% assign nav_page_url = nav.url | prepend: "/" | append: "/index.html" %}
@@ -8,16 +8,16 @@
     </section>
 
     <section class="Footer-social flex-right">
-      <a href="https://github.com/joshmfrankel"><i class="fa fa-github-alt" aria-hidden="true"></i></a>
-      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/"><i class="fa fa-slack" aria-hidden="true"></i></a>
-      <a href="https://stackoverflow.com/users/906974/josh-frankel"><i class="fa fa-stack-overflow" aria-hidden="true"></i></a>
-      <a href="https://twitter.com/Joshmfrankel"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-      <a href="https://www.linkedin.com/in/joshmfrankel/"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
     </section>
   </div>
 
   <div class="Footer-actions">
-    <div class="Container">
+    <div class="Container Container--smallMargin">
       <section>
         <h3>Latest Posts</h3>
         <nav>
@@ -28,7 +28,7 @@
       </section>
 
       <section class="Footer-actions-copyright">
-        <p>© 2011-2017+ Josh Frankel. {{ site.title }}. All rights reserved</p>
+        <p>© 2011-2019+ Josh Frankel. {{ site.title }}. All rights reserved</p>
       </section>
     </div>
   </div>

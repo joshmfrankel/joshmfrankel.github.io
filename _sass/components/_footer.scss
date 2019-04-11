@@ -1,11 +1,8 @@
 .Footer {
   background: $lightest-gray;
   border-top: 1px solid $lightest-gray-border;
-  margin-top: 100px;
 
   .Container {
-    padding: 10px 0;
-
     @media screen and (max-width: 697px) {
       flex-direction: column;
     }
@@ -68,7 +65,7 @@
     }
     &-copyright {
       border-top: 1px solid $pale-light-gray;
-      margin-top: 50px;
+      margin-top: 25px;
 
       p {
         color: $pale-slighty-lighter-gray;

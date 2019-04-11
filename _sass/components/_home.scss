@@ -1,14 +1,12 @@
 .Home {
+  h2 {
+    margin-top: 0;
+  }
   &-what-i-do {
-    margin-top: 35px;
-    margin-bottom: 5px;
   }
   &-skillset {
     background-color: $accent-color;
     color: $pale-slighty-lighter-gray;
-    margin-top: 35px;
-    padding-bottom: 45px;
-    padding-top: 35px;
 
     h2,
     p {
@@ -34,15 +32,40 @@
       }
     }
   }
-  &-about-me {
-    padding-top: 35px;
-    padding-bottom: 39px;
+  &-open-source {
+    background-color: $primary-color;
+    color: $primary-inverse-color;
+
+    h2,
+    p {
+      color: $primary-inverse-color;
+    }
+    ul {
+      padding: 0;
+
+      li {
+        list-style: none;
+      }
+    }
+    a {
+      border-bottom: none;
+      color: $primary-inverse-color;
+      font-size: 1.8rem;
+      vertical-align: bottom;
+
+      &:hover {
+        color: $pale-night;
+        border-bottom: none;
+      }
+      i,
+      svg {
+        margin-right: 7px;
+      }
+    }
   }
   &-contact {
     background-color: $accent-color;
     color: $pale-slighty-lighter-gray;
-    padding-top: 35px;
-    padding-bottom: 36px;
 
     h2,
     p {

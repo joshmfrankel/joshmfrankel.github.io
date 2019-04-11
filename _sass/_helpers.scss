@@ -1,5 +1,5 @@
-@mixin transition($duration: $default-transition) {
-  transition: all $duration ease-in-out;
+@mixin transition($duration: $default-transition, $type: all) {
+  transition: $type $duration ease-in-out;
 }
 .default-transition {
   @include transition;
@@ -32,7 +32,7 @@
   @extend .remove-default-hover;
 
   &:after {
-    @include transition($fast-transition);
+    @include transition($fast-transition, transform);
 
     display: block;
     content: "";
@@ -51,6 +51,18 @@
     display: table;
     clear: both;
   }
+}
+.preload-transitions * {
+  $null-transition: none !important;
+
+  -webkit-transition: $null-transition;
+  -moz-transition: $null-transition;
+  -ms-transition: $null-transition;
+  -o-transition: $null-transition;
+  transition: $null-transition;
+}
+.w-100 {
+  width: 100%;
 }
 @mixin link-with-circle($size: 30px, $color: $accent-color) {
   border-radius: 50px;

@@ -16,14 +16,14 @@
 }
 .Logo {
   @extend .flex-column;
-  @extend .default-transition;
+  @include transition($default-transition, color);
 
   color: transparent;
   font: 32px/1 $lato;
 
   &-avatar {
+    @include transition($default-transition, border-color);
     @extend .circular-image;
-    @include transition($long-transition);
 
     border: 3px solid $white;
     box-shadow: 0 0 0 1px $lighter-gray;

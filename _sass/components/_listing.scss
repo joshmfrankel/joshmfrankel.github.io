@@ -1,8 +1,7 @@
 .Listing {
   &-title {
     letter-spacing: -0.2rem;
-    margin-bottom: 0;
-    margin-top: 60px;
+    margin: 0;
 
     a {
       @extend .remove-default-hover;
@@ -24,10 +23,11 @@
     font-size: 1.7rem;
     margin-top: 0;
 
-    i {
+    i,
+    svg {
       font-size: 1.4rem;
-      top: -1px;
       position: relative;
+      vertical-align: baseline;
     }
   }
   &-content {
@@ -38,6 +38,7 @@
   &-article {
     border-bottom: 1px solid $slightly-lighter-gray;
     padding-bottom: 60px;
+    margin-bottom: 60px;
   }
   &-tags {
     a {

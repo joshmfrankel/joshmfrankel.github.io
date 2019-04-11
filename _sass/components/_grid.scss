@@ -1,0 +1,11 @@
+.Grid {
+  display: grid;
+
+  &-two-columns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &-item {
+    justify-self: left;
+  }
+}

@@ -1,6 +1,6 @@
 .Container {
   width: 60%;
-  margin: 0 auto;
+  margin: 60px auto;
 
   @media screen and (max-width: 1125px) {
     width: 80%;
@@ -12,5 +12,10 @@
   &--wrap {
     flex-wrap: wrap;
   }
+  &--smallMargin {
+    margin: 5px auto;
+  }
+  &--noMargin {
+    margin: 0 auto;
+  }
 }
-

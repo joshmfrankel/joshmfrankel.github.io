@@ -1,0 +1,8 @@
+.Page {
+  width: 100%;
+
+  h2 {
+    @extend h1;
+    color: $accent-color;
+  }
+}
