@@ -2,7 +2,7 @@ source "https://rubygems.org"
 ruby RUBY_VERSION
 
 gem "rake", "~> 12"
-gem "jekyll"
+gem "jekyll", "3.6.3"
 gem "html-proofer", "3.9.0"
 
 group :jekyll_plugins do
