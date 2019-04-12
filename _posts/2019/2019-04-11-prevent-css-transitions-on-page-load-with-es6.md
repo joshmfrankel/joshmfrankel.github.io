@@ -31,7 +31,7 @@ The fix discussed in the above article goes like this. First we add a new class 
 </html>
 {% endhighlight %}
 
-Next we write a **SCSS** rule that ensures that all elements beneath the class above have their transitions disabled. And for extra assurance drop an `!important` on them. `!important` just means that we really, really want this value to be used over other inherited rules.
+Next we write a **SCSS** rule (you could also just use CSS here but I preferred SCSS for cleaning the rule up a bit) that ensures that all elements beneath the class above have their transitions disabled. And for extra assurance drop an `!important` on them. `!important` just means that we really, really want this value to be used over other inherited rules.
 
 {% highlight scss %}
 // Note the * after the class name. This just selects everything after the initial
