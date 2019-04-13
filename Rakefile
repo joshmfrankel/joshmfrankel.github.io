@@ -9,7 +9,7 @@ task :default do
       # https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
       check_sri: false,
       check_opengraph: true,
-      check_favicon: false, # @todo I should add a favicon
+      check_favicon: true,
       http_status_ignore: [999],
       url_ignore: [/globalnerdy.com.*/],
       cache: {
