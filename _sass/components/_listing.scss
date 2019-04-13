@@ -2,6 +2,7 @@
   &-title {
     letter-spacing: -0.2rem;
     margin: 0;
+    word-break: break-word;
 
     a {
       @extend .remove-default-hover;

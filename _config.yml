@@ -13,8 +13,10 @@ social:
   name: Josh Frankel
   links:
     - https://twitter.com/Joshmfrankel
+
 author:
-  twitter: joshmfrankel
+  name: Josh Frankel (@joshmfrankel)
+  uri: http://joshfrankel.me/
 
 # Structure Settings
 excerpt_separator: "<!--excerpt--"
