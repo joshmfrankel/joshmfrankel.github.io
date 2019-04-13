@@ -11,7 +11,7 @@
 # TECHNOLOGY COLOPHON
 
   Libraries: Jekyll, Normalize, Disqus
-  Languages: Ruby, CSS3, SASS, HTML5
+  Languages: Ruby, CSS3, SASS, HTML5, JS
   Icons: Devicons, FontAwesome
 
 # RESOURCES USED
@@ -20,3 +20,4 @@
   - https://stackoverflow.com/questions/28623446/expand-bottom-border-on-hover
   - https://stackoverflow.com/questions/31000885/align-an-element-to-bottom-with-flexbox
   - https://stackoverflow.com/questions/28623446/expand-bottom-border-on-hover
+  - https://favicon.io/favicon-generator/
