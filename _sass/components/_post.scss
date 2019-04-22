@@ -1,12 +1,14 @@
 .Post {
   width: 100%;
 
-  p code {
-    background-color: $accent-color;
-    color: $glacier;
-    border-radius: 2px;
-    padding: 1px 5px 0 5px;
-    margin: 0 2px;
+  p, li {
+    code {
+      background-color: $accent-color;
+      color: $glacier;
+      border-radius: 2px;
+      padding: 1px 5px 0 5px;
+      margin: 0 2px;
+    }
   }
 
   img {

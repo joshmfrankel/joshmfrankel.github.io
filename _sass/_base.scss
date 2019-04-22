@@ -93,6 +93,7 @@ p, li {
 }
 figure.highlight {
   margin: 0;
+  clear: both; // Prevent .Info from compacting code
 }
 abbr {
   text-decoration: none;
