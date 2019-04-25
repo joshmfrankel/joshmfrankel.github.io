@@ -100,6 +100,76 @@ Rails.application.routes.draw do
 end
 {% endhighlight %}
 
+So, now you're thinking, "This is great and all, but I have 200 other json only endpoints. Am I going to need to repeat this pattern for each of them?". Of course not! Rails doesn't leave you hanging on this.
+
+## Advanced Constraints
+
+For cases when we want to apply the same constraint setup to several routes we can use a dedicated class. This class then must respond to the <code>#matches?</code> message and we have ourselves a highly reusable format constraint. 
+
+For the below example I've added a couple extra routes for demonstration purposes.
+
+{% highlight ruby %}
+# config/initializers/routes/format_constraints.rb
+module Routes
+  class FormatConstraints
+    attr_reader :formats
+
+    def initialize(formats)
+      @formats = Array(formats) # This coerces formats into an array
+    end
+
+    def matches?(request)
+      # This checks to see the request format matches the array
+      # Useful for multi formats like Routes::FormatConstraints.new([:html, :json])
+      formats.include?(request.format.symbol)
+    end
+  end
+end
+
+# config/routes.rb
+Rails.application.routes.draw do
+  resources :users, only: :index, constraints: Routes::FormatConstraints.new(:json)
+  resources :posts, constraints: Routes::FormatConstraints.new(:json)
+  resources :comments, constraints: Routes::FormatConstraints.new(:json)
+end
+{% endhighlight %}
+
+We're still repeating ourselves a bit with the above example. Luckily, the <code>constraints</code> syntax also has a block form which makes
+it even easier to group your routes by JSON only endpoints.
+
+{% highlight ruby %}
+# config/routes.rb
+Rails.application.routes.draw do
+  constraints Routes::FormatConstraints.new(:json) do
+    resources :users, only: :index
+    resources :posts
+    resources :comments
+  end
+end
+{% endhighlight %}
+
+I've also built the above to allow for arrays of formats to match against. This is
+useful for grouping routes that have multiple formats.
+
+{% highlight ruby %}
+# config/routes.rb
+Rails.application.routes.draw do
+  constraints Routes::FormatConstraints.new(:json) do
+    resources :users, only: :index
+    resources :posts
+    resources :comments
+  end
+
+  # This allows requests from html, json, and csv to the 
+  # tags resource below
+  constraints Routes::FormatConstraints.new([:html, :json, :csv]) do
+    resources :tags
+  end
+end
+{% endhighlight %}
+
+Now we're grouping all of our JSON routes behind a formatting constraint. Nice! Thanks goes to Steve Grossi for the excellent idea regarding a dedicated constraint class in the comment below.
+
 This is just one type of routing constraint that Rails allows for. If you'd like to
 learn more about request-based constraints [here's the documentation on the subject](https://guides.rubyonrails.org/routing.html#request-based-constraints).
 
