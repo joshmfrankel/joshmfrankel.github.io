@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Using request-based constraints to only allow JSON requests in routes.rb
+title: Using request-based constraints to only accept JSON formats for endpoints
 date: 2019-04-22 13:50 -0400
 categories:
 - today-i-learned
@@ -104,7 +104,7 @@ So, now you're thinking, "This is great and all, but I have 200 other json only 
 
 ## Advanced Constraints
 
-For cases when we want to apply the same constraint setup to several routes we can use a dedicated class. This class then must respond to the <code>#matches?</code> message and we have ourselves a highly reusable format constraint. 
+For cases where we want to apply the same constraint to several routes, we can use a dedicated class. This class must respond to the <code>#matches?</code> message. With this we have ourselves a highly reusable format constraint. 
 
 For the below example I've added a couple extra routes for demonstration purposes.
 
@@ -115,7 +115,8 @@ module Routes
     attr_reader :formats
 
     def initialize(formats)
-      @formats = Array(formats) # This coerces formats into an array
+      # This coerces formats into an array
+      @formats = Array(formats)
     end
 
     def matches?(request)
@@ -168,7 +169,15 @@ Rails.application.routes.draw do
 end
 {% endhighlight %}
 
-Now we're grouping all of our JSON routes behind a formatting constraint. Nice! Thanks goes to Steve Grossi for the excellent idea regarding a dedicated constraint class in the comment below.
+Now we're grouping all of our JSON routes behind a formatting constraint. Nice!
+
+<blockquote class="Info"><strong>Acknowledgments</strong><br><br>
+  <a href="https://twitter.com/stevegrossi" title="@SteveGrossi">Steve Grossi</a> for the idea of using a dedicated constraint class<br>
+  <a href="https://twitter.com/unixmonkey" title="@unixmonkey">Dave Jones</a> for pointing me at the concept wrapping routes within a constraint
+  block.
+</blockquote>
+
+## Wrapping Up
 
 This is just one type of routing constraint that Rails allows for. If you'd like to
 learn more about request-based constraints [here's the documentation on the subject](https://guides.rubyonrails.org/routing.html#request-based-constraints).
