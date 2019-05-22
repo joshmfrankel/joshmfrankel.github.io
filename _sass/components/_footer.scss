@@ -18,6 +18,10 @@
 
       padding: 7px 10px;
     }
+
+    @media screen and (max-width: 600px) {
+      font-size: 1.7rem;
+    }
   }
   &-social {
     display: flex;

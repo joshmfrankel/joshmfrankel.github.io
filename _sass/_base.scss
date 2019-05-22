@@ -55,9 +55,6 @@ mark {
 p, blockquote, li {
   font: 300 2rem/32px $railway;
 }
-figure.highlight {
-  font-size: 1.7rem
-}
 blockquote {
   border-left: 5px solid $primary-color;
   margin: 0;
@@ -91,8 +88,9 @@ ul {
 p, li {
   color: $p-color;
 }
-figure.highlight {
+.highlight {
   margin: 0;
+  font-size: 1.7rem;
   clear: both; // Prevent .Info from compacting code
 }
 abbr {
