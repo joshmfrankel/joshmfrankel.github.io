@@ -321,7 +321,7 @@ patch user_path(existing_user), params: {
 }
 ```
 
-<blockquote class="Info Info-right"><strong>match_json_expression</strong>:<br> I'm using the <a href="'https://github.com/chancancode/json_expressions">json_expressions gem</a> for the `match_json_expression` matcher. It is super handy
+<blockquote class="Info Info-right"><strong>match_json_expression</strong>:<br> I'm using the <a href="https://github.com/chancancode/json_expressions">json_expressions gem</a> for the `match_json_expression` matcher. It is super handy
   when dealing with JSON payloads.
 </blockquote>
 
