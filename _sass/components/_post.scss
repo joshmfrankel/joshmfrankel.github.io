@@ -40,6 +40,18 @@
       }
     }
   }
+  &-actions {
+    border-top: 1px solid $lightest-gray-border;
+    margin-top: 30px;
+    padding-top: 30px;
+
+    a {
+      font-size: 2.0rem;
+    }
+    &--next {
+      float: right;
+    }
+  }
 }
 
 .Comments {
@@ -47,9 +59,10 @@
   padding: 5px 30px 30px 30px;
   border-radius: 5px;
   border: 1px solid $lightest-gray-border;
-  margin-top: 50px;
+  margin-top: 30px;
 
   h2 {
+    color: #656c7a; // Disqus color branding
     margin-bottom: 3.2rem;
     margin-top: 3.2rem;
   }

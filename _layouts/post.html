@@ -4,6 +4,16 @@ layout: default
 <article class="Post">
   {{ content }}
 
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    {% if page.previous.url %}
+      <a class="Post-actions--prev" href="{{ page.previous.url }}" title="{{ page.previous.title }}">&#171; Previous Post</a>
+    {% endif %}
+    {% if page.next.url %}
+      <a class="Post-actions--next" href="{{ page.next.url }}" title="{{ page.next.title }}">Next Post &#187;</a>
+    {% endif %}
+  </div>
+
   <!-- Comments System -->
   <div class="Comments">
     <h2>Join the conversation</h2>
