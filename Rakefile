@@ -13,6 +13,7 @@ task :default do
       http_status_ignore: [999],
       url_ignore: [/globalnerdy.com.*/],
       cache: {
+        # Cache external url checking for 6 weeks
         timeframe: '6w'
       }
     }

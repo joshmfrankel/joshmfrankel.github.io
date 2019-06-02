@@ -2,7 +2,7 @@
 layout: post
 title: Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures
 categories:
-- today-i-learned
+- articles
 tags:
 - ruby on rails
 - RSpec
