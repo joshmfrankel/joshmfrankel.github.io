@@ -11,7 +11,11 @@ task :default do
       check_opengraph: true,
       check_favicon: true,
       http_status_ignore: [999],
-      url_ignore: [/globalnerdy.com.*/],
+      # Regex for my site fixes the issue where a post hasn't been
+      # published yet but the seo metadata is pointing at the live url.
+      # This causes a 404 until the post is published. Regex below is
+      # constrained tighly to this scenario.
+      url_ignore: [/globalnerdy.com.*|http:\/\/joshfrankel.me\/blog\/.*\/$/],
       cache: {
         # Cache external url checking for 6 weeks
         timeframe: '6w'
