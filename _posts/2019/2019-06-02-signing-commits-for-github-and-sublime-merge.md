@@ -281,7 +281,7 @@ of generating a GPG key. If you have an existing key you'll need to enter your
 created passphrase here as well. 
 
 Can't remember it? You can always create a new
-one to use by following the [Generating a new GPG key](generating-a-new-gpg-key) section of 
+one to use by following the [Generating a new GPG key](#generating-a-new-gpg-key) section of 
 this tutorial.
 
 My prompt allowed me to remember my passphrase which means I no longer need to enter it.
