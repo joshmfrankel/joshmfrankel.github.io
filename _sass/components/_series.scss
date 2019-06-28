@@ -1,5 +1,11 @@
 .Series {
 
+  &-section {
+    background: $lightest-gray;
+    border: 1px solid $darker-gray;
+    padding: 20px;
+  }
+
   ul {
     padding-left: 0;
 
@@ -9,7 +15,8 @@
   }
 
   h2 {
-    margin-top: 20px;
+    font-weight: 300;
+    margin-top: 10px;
     text-transform: none;
   }
 }

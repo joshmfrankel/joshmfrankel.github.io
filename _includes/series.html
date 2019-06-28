@@ -1,0 +1,36 @@
+{% assign total_posts = 0 %}
+{% assign current_index = 0 %}
+
+{% if page.series %}
+  {% for post in site.posts reversed %}
+    {% if post.series == page.series %}
+      {% capture total_posts %}{{ total_posts | plus: 1 }}{% endcapture %}
+
+      {% if post.url == page.url %}
+        {% capture current_index %}{{ total_posts }}{% endcapture %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {% if total_posts != "1" %}
+    <section class="Series Series-section">
+      <h2>This post is part of a series ({{ current_index }} of {{ total_posts }})</h2>
+
+      <ul class="Series-listing">
+        {% assign index = 0 %}
+        {% for post in site.posts reversed %}
+          {% if post.series == page.series %}
+            {% capture index %}{{ index | plus: 1 }}{% endcapture %}
+            <li>(Part {{ index }})
+              {% if post.url == page.url %}
+                This article
+              {% else %}
+                <a href="{{ post.url }}">{{ post.title }}</a>
+              {% endif %}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+{% endif %}
