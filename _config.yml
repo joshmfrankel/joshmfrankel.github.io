@@ -24,6 +24,7 @@ permalink: /blog/:title/
 
 pagination:
   enabled: true
+  per_page: 10
   sort_reverse: true
   title: :title
   trail:
