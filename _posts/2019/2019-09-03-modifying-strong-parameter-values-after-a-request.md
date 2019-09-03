@@ -13,7 +13,6 @@ intermediary step during a refactor). However, strong parameter values can't be 
 makes this a bit more complex.
 <!--excerpt-->
 
-
 ## Strong Parameters are Immutable
 
 You may have heard the term immutable before in functional programming languages. This is essentially a fancy
@@ -234,7 +233,10 @@ altogether and instead just use the specific value you expect. (i.e. `User.new(p
 
 ## Wrapping up
 
-With that we've discussed five different approaches to dealing with modifying Strong Parameter
-values. I'd love to hear about any additional ones you know about in the comments.
+With that we've discussed several different approaches to dealing with modifying Strong Parameter
+values. I was reading up a lot about this the other day and stumbled across a [StackOverflow posting](https://stackoverflow.com/questions/18369592/modify-ruby-hash-in-place-rails-strong-params){:target="_blank"}
+that contained many of the methods I had tried out in the past which directly inspired this article.
+
+Got any additional tricks with Strong parameters? I'd love to hear about them in the comments.
 
 Thanks for reading.
