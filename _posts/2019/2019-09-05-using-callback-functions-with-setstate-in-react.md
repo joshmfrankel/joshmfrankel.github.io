@@ -3,6 +3,8 @@ layout: post
 title: Using callback functions with setState in React
 category:
 - today-i-learned
+tags:
+- React
 ---
 
 When working with asynchronous requests and setting state in React, you can
