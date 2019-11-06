@@ -8,6 +8,7 @@ series:
 tags:
 - Rack
 - Ruby
+- RSpec
 ---
 
 Previously, I described a process of using Rack to validate request objects
@@ -458,5 +459,14 @@ an Array or Hash is encountered as those indicate that we need to traverse insid
 of them. Strings on the other hand are the ending state we wish to have values
 be formatted in.
 
+## Wrap up
+
 So with all of that we now have a way to determine malicious values within a request
 object regardless of it being a String, Array, or Hash. Avoiding the sting of null bytes one request at a time.
+
+But wait! What about if a user's session contains null bytes in it? Have no fear as the [next post in this series
+covers how to handle it](http://joshfrankel.me/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/).
+
+What's a fun way you've used recursion to solve a complex programming problem? I'd love to discuss what the outcome was below in the comments.
+
+Thanks for reading.

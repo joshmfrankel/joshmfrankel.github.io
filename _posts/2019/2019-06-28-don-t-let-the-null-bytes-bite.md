@@ -8,12 +8,13 @@ series:
 tags:
 - Rack
 - Ruby
+- RSpec
 ---
 
 Have you ever encountered `Argument error "string contains null byte"`? What
 this means is that a null byte character `\u0000` was sent as a part of the request
 body. This can indicate a malicious request from someone trying to probe your
-application for vulnerabilities. So how can you avoid the stinging byte of 
+application for vulnerabilities. So how can you avoid the stinging byte of
 invalid characters? Rack to the rescue!
 <!--excerpt-->
 
@@ -282,7 +283,7 @@ With that our tests pass and we call it a day...
 
 Alright, so strings are only ONE type of object that can be passed as a user supplied
 param. Technically, arrays and JSON could also be encountered in a request object.
-In a follow-up post, I'll cover how to handle these efficiently using recursion.
+In the next post in the series, [I'll cover how to handle these efficiently using recursion](http://joshfrankel.me/blog/recursively-validate-application-requests-with-rack/).
 
 How has using Rack helped solve your problem? Found a particularly useful
 Rack pattern? I'd love to discuss it in the comments below.
