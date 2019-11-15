@@ -29,22 +29,35 @@ association:</p>
   <li>A User has_many Journals</li>
   <li>A Journal belongs_to a User</li>
 </ul>
-<p>Given this information you might come up with something like</p>
+<p>Your models currently look like the following:</p>
 {% highlight ruby %}
-rails generate AddUserToJournal user:references
-
+# cmd: rails generate model Journal
 # app/models/journal.rb
 class Journal < ActiveRecord::Base
   belongs_to :user
 end
 
+# cmd: rails generate model User
 # app/models/user.rb
 class User < ActiveRecord::Base
   has_many :journals
 end
+{% endhighlight %}
+<p>Assuming the above already exists, now we want to ensure a reference between
+  the two models with a <strong>user_id</strong> column on the Journal. At this point you could use
+the following command to build that migration</p>
+{% highlight bash %}
+rails generate migration AddUserToJournal user:references
+rails db:migrate
+{% endhighlight %}
 
+<p>Test driving this in a console should work with the above associations</p>
+{% highlight ruby %}
+# Inside Rails console
 user = User.new(...)
-Journal.create(user: user)
+journal = Journal.create(user: user)
+
+journal.user #=> #<User id: 3, created_at: "2019-11-15 14:50:51", updated_at: "2019-11-15 14:50:51">
 {% endhighlight %}
 
 <h2>Who is the creator of the Journal?</h2>
@@ -57,7 +70,7 @@ This would allow for more readable association language for future developers.</
 within the belongs_to method. Note: this requires no changes to the User model.</p>
 {% highlight ruby %}
 # ~Can't use references since we are now aliasing to creator~
-rails generate AddCreatorToJournal creator_id:integer
+rails generate migration AddCreatorToJournal creator_id:integer
 
 # (2019-03-07) Actually, the above isn't true. You can instead use `creator:references`
 # and then fill in the proper configuration within the migration. See the follow-up post
