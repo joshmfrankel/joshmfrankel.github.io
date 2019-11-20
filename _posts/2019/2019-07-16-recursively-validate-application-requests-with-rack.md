@@ -157,6 +157,8 @@ class ValidateRequestParams
 
   def string_contains_invalid_character?(string)
     invalid_characters_regex = Regexp.union(INVALID_CHARACTERS)
+
+    string.match?(invalid_characters_regex)
   end
 end
 ```
@@ -315,6 +317,8 @@ Converting our current implementation to recursion looks like the following:
 
   def string_contains_invalid_character?(string)
     invalid_characters_regex = Regexp.union(INVALID_CHARACTERS)
+
+    string.match?(invalid_characters_regex)
   end
 ```
 
