@@ -17,7 +17,6 @@ code {
 h2 {
   color: $darker-gray-hover;
   font: normal 300 3.2rem/1 $lato;
-  text-transform: capitalize;
   margin-top: 50px;
 
   // Legacy support for bootstrap styles
@@ -29,9 +28,9 @@ h2 {
 }
 h3 {
   color: $darker-gray-hover;
-  font: normal 700 1.8rem/1 $lato;
+  font: normal 300 2.8rem/1 $lato;
   margin-top: 32px;
-  text-transform:uppercase;
+  margin-bottom: 0;
 }
 a {
   @extend .default-transition;
@@ -64,7 +63,7 @@ blockquote {
     line-height: 40px;
   }
   a {
-    color: $primary-color;
+    // color: $primary-color;
   }
   cite {
     display: block;
@@ -72,11 +71,11 @@ blockquote {
     word-break: break-all;
 
     a {
-      color: $white;
+      // color: $white;
       font-weight: 600;
 
       &:hover {
-        color: $white;
+        // color: $white;
         border-bottom: 1px solid $white;
       }
     }
