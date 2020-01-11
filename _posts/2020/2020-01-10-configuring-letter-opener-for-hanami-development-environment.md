@@ -69,10 +69,13 @@ If you look inside the `environment :production do` block you'll see that it con
 Here's the working setup code:
 
 ``` ruby
-  mailer do
-    root 'lib/project_name/mailers'
+  environment :development do
+    # See: https://guides.hanamirb.org/projects/logging
+    logger level: :debug
 
-    delivery LetterOpener::DeliveryMethod, location: File.expand_path('../tmp/letter_opener', __FILE__)
+    mailer do
+      delivery LetterOpener::DeliveryMethod, location: File.expand_path('../tmp/letter_opener', __FILE__)
+    end
   end
 ```
 
