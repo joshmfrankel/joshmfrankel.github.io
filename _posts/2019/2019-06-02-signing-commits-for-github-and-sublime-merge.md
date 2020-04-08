@@ -168,6 +168,13 @@ not really clear, you can add the **pinentry-mac** program.
 brew install pinentry-mac
 ```
 
+Next you'll need to inform gpg-agent of pinentry-mac with the following append
+command:
+
+```
+echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+```
+
 After which if you're still not able to sign commits you may need to restart
 your gpg-agent.
 
@@ -229,7 +236,7 @@ ssb   4096R/42B317FD4BA89E7A 2019-06-01
   When sending something that will be viewed as text (i.e. an email), you should use ASCII mode. On the other hand, when sending a file, you can (and should, it will make the encrypted file smaller) use the default non-ASCII mode.<br><br>
 
   To operate in ASCII mode, use the --armor (or -a) switch."
-  <cite><a href="https://theprivacyguide.org/tutorials/gpg.html">The Privacy Guide</a></cite>
+  <cite>The Privacy Guide https://theprivacyguide.org/tutorials/gpg.html</cite>
 </blockquote>
 
 Now, we need to export our GPG key to be used on Github via the command: `gpg --armor --export <key-id>`
