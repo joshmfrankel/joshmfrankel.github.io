@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Signing commits for Github and Sublime Merge
-categories: 
+categories:
 - tutorials
 tags:
 - Git
@@ -11,7 +11,7 @@ tags:
 - Linux
 ---
 
-Signing commits is a great way to add additional level of confidence to your code. 
+Signing commits is a great way to add additional level of confidence to your code.
 This is especially important if you are an open source contributor. By
 signing your commit you're saying that it originated from a verified author.
 This is accomplished by using GPG which is a free encryption and signing tool.
@@ -22,13 +22,14 @@ from a trusted source, but the verified badge looks slick.
 <!--excerpt-->
 
 For the remainder of this tutorial, I'm assuming you don't have a generated GPG key. If
-you do (or aren't sure) you can run the command: 
+you do (or aren't sure) you can run the command:
 `gpg --list-secret-keys --keyid-format LONG`. This will list out all available
-GPG keys with public and private keys. If you'd like to use an existing 
+GPG keys with public and private keys. If you'd like to use an existing
 private/public key pair, go ahead and skip down to the step, <a href="#finding-your-generated-gpg-key">Finding your GPG key"</a>.
 
-I'm also writing this tutorial from the perspective of a Linux distribution but
-it should work relatively the same for MacOS (not sure about Windows).
+<del>I'm also writing this tutorial from the perspective of a Linux distribution but
+it should work relatively the same for MacOS (not sure about Windows).</del> I've now
+updated this tutorial for both Linux Debian and MacOSX.
 
 ## Making sure GPG is installed
 
@@ -37,21 +38,24 @@ it should work relatively the same for MacOS (not sure about Windows).
   <cite>https://gnupg.org/</cite>
 </blockquote>
 
-Most variants of Debian should have <acronym title="GNU Privacy Guard">GPG</acronym> 
+Most variants of Debian should have <acronym title="GNU Privacy Guard">GPG</acronym>
 installed by default. You can check this by running `which gpg` which should return
-the installation location. 
+the installation location.
 
 If it doesn't then you need to install it with `sudo apt-get install gpg` for linux or `brew install gnupg` for homebrew on MacOS.
 
 ## Generating a new GPG key
 
 Github has some great [documentation on generating gpg keys](https://help.github.com/en/articles/generating-a-new-gpg-key).
-Unfortunately, the command it recommends for gpg as well as gpg2 doesn't actually work. What I found works
-is the following:
+<del>Unfortunately, the command it recommends for gpg as well as gpg2 doesn't actually work. What I found works
+is the following</del>:
 
 ``` terminal
 gpg --gen-key
 ```
+
+**UPDATE 2020**: Upon running through this process on MacOS, I've found that `gpg --full-generate-key` works appropriately. For Linux
+based distributions you may still need to use the old --gen-key method above.
 
 We're going to run through what the process will look like step-by-step.
 
@@ -74,7 +78,7 @@ What keysize do you want? (2048) 4096
 Requested keysize is 4096 bits
 ```
 
-Next it will ask you if you want the key to expire. We don't, so **use the 
+Next it will ask you if you want the key to expire. We don't, so **use the
 default by pressing enter**.
 
 ``` shell
@@ -97,8 +101,10 @@ Now we need to identify ourselves. It wouldn't make sense for a signed commit
 to be without identity verification would it?
 
 First step is to **enter your full name** as you'd like it to appear in the signature.
-I've listed my name out but please use your own (we don't need any more Josh Frankel's 
+I've listed my name out but please use your own (we don't need any more Josh Frankel's
 running amok).
+
+**NOTE**: This name should match the one stored in your `~/.gitconfig` user name key.
 
 ``` shell
 You need a user ID to identify your key; the software constructs the user ID
@@ -109,8 +115,8 @@ Real name: Josh Frankel
 ```
 
 <blockquote class="Info Info-right">
-  "When asked to enter your email address, ensure that you enter the verified email 
-address for your GitHub account. To keep your email address private, use your 
+  "When asked to enter your email address, ensure that you enter the verified email
+address for your GitHub account. To keep your email address private, use your
 GitHub-provided no-reply email address."
 <cite><a href="https://help.github.com/en/articles/generating-a-new-gpg-key">Github</a></cite>
 </blockquote>
@@ -127,7 +133,7 @@ Email address: josh@tutorial.com
 You can leave Comment blank by **pressing enter**.
 
 ``` shell
-Comment: 
+Comment:
 ```
 
 Next you'll get an identity confirmation. If all the below is correct then
@@ -137,19 +143,46 @@ Next you'll get an identity confirmation. If all the below is correct then
 You selected this USER-ID:
     "Josh Frankel <josh@tutorial.com>"
 
-Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? 
+Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit?
 ```
+
+The next two sections deal with passphrase prompting at the command line for Debian
+and MacOSX respectively.
+
+### Debian GPG passphrase
 
 Now it will prompt you to **enter a passphrase** which for me looked like this (it may
 be a command line prompt for other distributions and operating systems):
 
 ![Access prompt](/img/2019/access-prompt.png "Access Prompt")
 
-You'll be prompted to re-enter this to confirm. Don't forget this password as it 
-is necessary for signing commits. Think of it as logging into the GPG identity. 
+You'll be prompted to re-enter this to confirm. Don't forget this password as it
+is necessary for signing commits. Think of it as logging into the GPG identity.
 I saved mine in a password manager.
 
-The last step is to just do random work on your computer until the GPG key is
+### MacOSX GPG Passphrase
+Ideally, you should receive a passphrase prompt at this point. If not then you most likely don't have one configured. While
+not really clear, you can add the **pinentry-mac** program.
+
+```
+brew install pinentry-mac
+```
+
+After which if you're still not able to sign commits you may need to restart
+your gpg-agent.
+
+```
+pkill gpg-agent
+gpg-agent --daemon
+```
+
+I believe that this is due to gpg-agent running as a daemon which means that it can't
+prompt you to enter a passphrase. Instead it has to rely on pinentry-mac to send
+the passphrase prompt.
+
+### Finish key generation
+
+After the identity confirmation, the last step is to just do random work on your computer until the GPG key is
 marked as trusted
 
 ``` shell
@@ -278,15 +311,15 @@ entry:
 Now the first time you go to sign a commit it will prompt you with entering a
 passphrase for the GPG key. We did this above after the identity verification step
 of generating a GPG key. If you have an existing key you'll need to enter your
-created passphrase here as well. 
+created passphrase here as well.
 
 Can't remember it? You can always create a new
-one to use by following the [Generating a new GPG key](#generating-a-new-gpg-key) section of 
+one to use by following the [Generating a new GPG key](#generating-a-new-gpg-key) section of
 this tutorial.
 
 My prompt allowed me to remember my passphrase which means I no longer need to enter it.
-I really like how simple this makes the signing process. Let me know if this isn't the 
-case for operating system or if you have a different solution. 
+I really like how simple this makes the signing process. Let me know if this isn't the
+case for operating system or if you have a different solution.
 
 On the flip-side, there's something to be said about always entering the passphrase for every commit.
 This is a bit more secure if you consider the scenario of someone having access to your physical computer
@@ -327,7 +360,7 @@ what about external Git tools?
 
 I prefer to use Git with a dedicated client. Having a
 Git client makes things like adding hunks or fixing conflicts a breeze. There
-are a ton of different ones out there but I've found that **Sublime Merge** is fast, 
+are a ton of different ones out there but I've found that **Sublime Merge** is fast,
 simple, and integrates well into my existing Sublime Text workflow. (I'm a Sublime fan
 if you couldn't tell.) [It's also free to try out just like Sublime](https://www.sublimemerge.com/)
 
@@ -344,13 +377,13 @@ The tip off point for me was the first line of the error message that mentioned
 gpg: cannot open tty `/dev/tty': No such device or address
 ```
 
-So what can we do here? 
+So what can we do here?
 
 Well we can specify that we want to run GPG in **no-tty** mode.
 This means that the terminal won't be used for output or prompting. This is perfect
 for external applications.
 
-To accomplish this we'll need to add **no-tty** to our **gpg.conf** configuration. 
+To accomplish this we'll need to add **no-tty** to our **gpg.conf** configuration.
 By doing so we can keep our process automated and ensure freedom of committing in our
 favorite external tools.
 
@@ -373,10 +406,10 @@ Now go back to Sublime Merge and try committing again. Viola, it works!
 
 One downside of adding no-tty to our **gpg.conf** is that trying to run gpg on the
 command line stops working because we just disabled tty (duh). If for some reason
-you need to use gpg you can always go back in and comment out the `no-tty` line 
+you need to use gpg you can always go back in and comment out the `no-tty` line
 on your **gpg.conf** file. I
 haven't been able to find another way sign commits in a Git tool
-while not disabling gpg for the command line. 
+while not disabling gpg for the command line.
 
 ![Sublime Merge signing success](/img/2019/sublime-merge-success.png "Sublime Merge signing success")
 
