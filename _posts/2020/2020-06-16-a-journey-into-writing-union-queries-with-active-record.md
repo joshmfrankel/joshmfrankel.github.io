@@ -10,7 +10,7 @@ tags:
 
 Active record has a multitude of features and niceties. From merging scopes to performing complex joins. However, sometimes it falls short. One shortcoming is a Union query.
 
-When I've got a roadblock with active record, I reach for either raw SQL or Arel Tables. Both of these work well but tend to produce verbose code. That's why it's nice to stay in Active record for readability. Ok, so let's actually look at how to accomplish this.
+When I've got a roadblock with active record, I reach for either raw SQL or Arel Tables. Both of these work well but tend to produce verbose code. That's why it's nice to stœay in Active record for readability. Ok, so let's actually look at how to accomplish this.
 <!--excerpt-->
 
 ## Potential solutions
@@ -456,10 +456,25 @@ Unfortunately, our code current produces the following SQL exception.
 
 ```
 PG::DuplicateAlias: ERROR:  table name "posts" specified more than once
- : SELECT "users".* FROM ((SELECT "posts".* FROM "posts" WHERE "posts"."name" = 'keyword') UNION (SELECT "posts".* FROM "posts" WHERE "posts"."name" = 'matched')) posts INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
+ : 
+ SELECT "users".*
+FROM (
+  (
+    SELECT "posts".*
+    FROM "posts"
+    WHERE "posts"."name" = 'keyword'
+  )
+  UNION
+  (
+    SELECT "posts".*
+    FROM "posts"
+    WHERE "posts"."name" = 'matched'
+  )
+) posts
+INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
 ```
 
-Notably the resultting SQL is a bit non-sensical. Look at the following: `SELECT "users".* FROM ((SELECT "posts".* FROM ...)) posts`. This is problematic because
+Notably the resulting SQL is nonsensical. Look at the following: `SELECT "users".* FROM ((SELECT "posts".* FROM ...)) posts`. This is problematic because
 we being selecting from the `users.*` alias on a FROM clause that is aliased as
 `posts`. Additionally, `posts` is seen as specified more than once in the query
 because it is the alias used for the from clause as well as an inner join onto
@@ -482,7 +497,7 @@ be seen above:
 ```
 
 We can leverage this fact with our implementation's output. Above we noticed that
-the from clause was non-sensical. Combining both of these facts we can still
+the from clause was nonsensical. Combining both of these facts we can still
 gather unioned relations albeit in a slightly different format.
 
 Previously I stated, "we can substitute the table to query from to instead be the result of our union sql". Taking this to the next logical step from what we've learned, we can transition to using the better supported `.where(id: ...)` syntax
@@ -504,7 +519,7 @@ where(id: unionized_sql)
 
 Now instead of the from clause specifying where we're querying data from, we instead use a subquery for selecting out the available ids of the table. The resulting
 SQL works and better supports the `.merge(scope)` syntax due to its reliance on
-the where id subquery approach.
+the where id subquery approach. I'd like to mention that the subquery approach may be less performance than the from approach but it is more versatile so I went with it.
 
 ### Full Solution
 
