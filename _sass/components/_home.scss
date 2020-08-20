@@ -36,8 +36,7 @@
     background-color: $primary-color;
     color: $primary-inverse-color;
 
-    h2,
-    p {
+    h2 {
       color: $primary-inverse-color;
     }
     ul {
@@ -47,10 +46,15 @@
         list-style: none;
       }
     }
-    a {
-      border-bottom: none;
+    p {
+      margin: 10px 0;
+    }
+    p, a {
       color: $primary-inverse-color;
       font-size: 1.8rem;
+    }
+    a {
+      border-bottom: none;
       vertical-align: bottom;
 
       &:hover {
