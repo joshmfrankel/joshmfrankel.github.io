@@ -42,5 +42,3 @@ format_date(date: "2020-12-16 12:49 -0400") #=> Monday, Dec 14th
 ```
 
 Got any DateTime tricks up your sleeve? I'd love to hear about them in the comments.
-
-41 45 62
