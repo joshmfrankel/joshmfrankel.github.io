@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>5 Useful CSS shorthand properties that every Web Developer should know | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="5 Useful CSS shorthand properties that every Web Developer should know" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I believe Jeffrey Way has a quote somewhere that goes like, &quot;think about the developer who can save a couple seconds on a task. At the end of the year he will have accomplished that much more than the developer who didn&#39;t&quot;. If you have begun to streamline your process learning shorthand css is one method for increasing efficiency." />
+<meta property="og:description" content="I believe Jeffrey Way has a quote somewhere that goes like, &quot;think about the developer who can save a couple seconds on a task. At the end of the year he will have accomplished that much more than the developer who didn&#39;t&quot;. If you have begun to streamline your process learning shorthand css is one method for increasing efficiency." />
+<link rel="canonical" href="http://joshfrankel.me/blog/5-useful-css-shorthand-properties-that-every-web-developer-should-know/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/5-useful-css-shorthand-properties-that-every-web-developer-should-know/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2013-02-22T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"I believe Jeffrey Way has a quote somewhere that goes like, &quot;think about the developer who can save a couple seconds on a task. At the end of the year he will have accomplished that much more than the developer who didn&#39;t&quot;. If you have begun to streamline your process learning shorthand css is one method for increasing efficiency.","headline":"5 Useful CSS shorthand properties that every Web Developer should know","dateModified":"2013-02-22T00:00:00+00:00","datePublished":"2013-02-22T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/5-useful-css-shorthand-properties-that-every-web-developer-should-know/"},"url":"http://joshfrankel.me/blog/5-useful-css-shorthand-properties-that-every-web-developer-should-know/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">5 Useful CSS shorthand properties that every Web Developer should know</h1>
+
+    
+      <p class="Banner-information">
+        <time>February 22, 2013</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>I believe Jeffrey Way has a quote somewhere that goes like, <mark>"think about the developer who can save a couple seconds on a task. At the end of the year he will have accomplished that much more than the developer who didn't".</mark> If you have begun to streamline your process learning shorthand css is one method for increasing efficiency.</p><!--excerpt-->
+<h2>1. Background</h2>
+<p>A staple of every web developer's css tool kit. 99% of websites will require the use of this property, making it an excellent way to reduce time on task. I seem to use this type of shorthand whenever I am using a sprites image file.</p>
+<blockquote><strong>background:</strong> [background-color] [background-image] [background-repeat] [background-attachment] [background-position];</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nc">.bg</span> <span class="p">{</span>
+     <span class="nl">background</span><span class="p">:</span> <span class="m">#323232</span> <span class="sx">url(../images/layout/sprites.png)</span> <span class="nb">no-repeat</span> <span class="nb">scroll</span> <span class="m">10px</span> <span class="m">20px</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<h2>2. Font</h2>
+<p>Probably my favorite css shorthand property. Combines everything you need to style a font. Super quick and concise format. The only thing it doesn't include is letter-spacing.</p>
+<blockquote><strong>font:</strong> [font-style] [font-variant] [font-weight] [font-size]/[line-height] [font-family];</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">p</span> <span class="p">{</span>
+     <span class="nl">font</span><span class="p">:</span> <span class="nb">italic</span> <span class="nb">small-caps</span> <span class="m">600</span> <span class="m">12px</span><span class="p">/</span><span class="m">23px</span> <span class="s1">"SophiaProLight"</span><span class="p">,</span> <span class="n">Verdana</span><span class="p">,</span> <span class="nb">sans-serif</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<h2>3. Margin / Padding</h2>
+<p>A truly tricky shorthand property. This is one I still get mixed up.</p>
+
+<p>The format goes as such: margin-top margin-right margin-bottom margin-left. If you think about the short hand like the face of a clock and imagine the clock starting at 12 this becomes a whole lot easier.</p>
+
+<p>However, there are three additional short hand properties. For all sides at once you just specify one measurement (margin: 15px). For the same measurement on top / bottom and right / left you specify just two measurements starting with the top / bottom (padding: 7px 5px).</p>
+
+<p>And now for the tricky one. If your left / right sides are the same measurement but the top / bottom are different you specify top measurment, followed by the joint left / right measurement, and finish with the bottom measurement (margin: 10px 20px 13px). Check the example below as I have shown with code all methods.</p>
+<blockquote><strong>margin:</strong> [margin-top] [margin-right] [margin-bottom] [margin-left];</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">p</span> <span class="p">{</span>
+    <span class="c">/* Top Right Bottom Left */</span>
+    <span class="nl">margin</span><span class="p">:</span> <span class="m">7px</span> <span class="m">10px</span> <span class="m">13px</span> <span class="m">5px</span><span class="p">;</span>
+
+    <span class="c">/* Top &amp; Bottom  Left &amp; Right */</span>
+    <span class="nl">padding</span><span class="p">:</span> <span class="m">7px</span> <span class="m">5px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">em</span> <span class="p">{</span>
+     <span class="c">/* Top Right &amp; Left Bottom */</span>
+     <span class="nl">margin</span><span class="p">:</span> <span class="m">10px</span> <span class="m">20px</span> <span class="m">13px</span><span class="p">;</span>
+
+     <span class="c">/* All four sides */</span>
+     <span class="nl">padding</span><span class="p">:</span> <span class="m">15px</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<h2>4. Border</h2>
+<p>Similar to the margin / padding shorthand, you can declare all sides of a border with one declaration. However, unlike margin / padding this is the only format for the border shorthand.  Addtionally, properties such as border-width, border-style, and border-color can be combined into a single line.</p>
+
+<blockquote><strong>border:</strong> [border-width] [border-style] [border-color];</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">div</span> <span class="p">{</span>
+     <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<h2>5. List</h2>
+
+<p>This is lesser used shorthand property for styling ordered and unordered lists.</p>
+<blockquote><strong>list-style:</strong> [list-style-type] [list-style-position] [list-style-image];</blockquote>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">list-style</span><span class="o">:</span> <span class="nt">disc</span> <span class="nt">inside</span> <span class="nt">url</span><span class="o">(</span><span class="nt">bullet</span><span class="nc">.gif</span><span class="o">);</span></code></pre></figure>
+
+<h2>Box Shadow</h2>
+<p>While this is not a shorthand property, box-shadow's default format is very akin to earlier css shorthand properties.</p>
+
+<blockquote><strong>box-shadow:</strong> [horizontal-length] [vertical-length] [blur] [spread] [color] [inset]</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">box-shadow</span><span class="o">:</span>  <span class="nt">2px</span> <span class="nt">2px</span> <span class="nt">3px</span> <span class="nt">0px</span> <span class="nt">rgba</span><span class="o">(</span><span class="nt">172</span><span class="o">,</span> <span class="nt">17</span><span class="o">,</span> <span class="nt">19</span><span class="o">,</span> <span class="nt">0</span><span class="nc">.69</span><span class="o">);</span></code></pre></figure>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/how-to-use-css3-gradients-with-background-images/" title="How to use CSS3 gradients with background images">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/reload-favicon-in-chrome-browser/" title="Reload favicon in Chrome Browser">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

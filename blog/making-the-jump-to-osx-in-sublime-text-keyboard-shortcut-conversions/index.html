@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Making the jump to OSX in Sublime Text: keyboard shortcut conversions | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Making the jump to OSX in Sublime Text: keyboard shortcut conversions" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="If you are like me and have spent most of your time programming in Linux or Windows, then switching over to OSX can be tricky. Keyboard shortcuts have changed and you have to deal with the placement of that pesky fn key. I&#39;ve listed below my complete Default (OSX).sublime-keymap file." />
+<meta property="og:description" content="If you are like me and have spent most of your time programming in Linux or Windows, then switching over to OSX can be tricky. Keyboard shortcuts have changed and you have to deal with the placement of that pesky fn key. I&#39;ve listed below my complete Default (OSX).sublime-keymap file." />
+<link rel="canonical" href="http://joshfrankel.me/blog/making-the-jump-to-osx-in-sublime-text-keyboard-shortcut-conversions/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/making-the-jump-to-osx-in-sublime-text-keyboard-shortcut-conversions/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-10-21T02:19:31+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"If you are like me and have spent most of your time programming in Linux or Windows, then switching over to OSX can be tricky. Keyboard shortcuts have changed and you have to deal with the placement of that pesky fn key. I&#39;ve listed below my complete Default (OSX).sublime-keymap file.","headline":"Making the jump to OSX in Sublime Text: keyboard shortcut conversions","dateModified":"2015-10-21T02:19:31+00:00","datePublished":"2015-10-21T02:19:31+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/making-the-jump-to-osx-in-sublime-text-keyboard-shortcut-conversions/"},"url":"http://joshfrankel.me/blog/making-the-jump-to-osx-in-sublime-text-keyboard-shortcut-conversions/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Making the jump to OSX in Sublime Text: keyboard shortcut conversions</h1>
+
+    
+      <p class="Banner-information">
+        <time>October 21, 2015</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>If you are like me and have spent most of your time programming in Linux or Windows, then switching over to OSX can be tricky. Keyboard shortcuts have changed and you have to deal with the placement of that pesky <code>fn</code> key. I've listed below my complete <code>Default (OSX).sublime-keymap</code> file.</p><!--excerpt-->
+
+<p>The keymap file contains many common keyboard shortcut conversions. Most of these deal with switching the <code>apple key</code> (command key) for the <code>ctrl</code> key. I've made a note at the bottom about the annoying <code>f5</code> keymapping for sorting a document alphabetically. There is probably a way to remove the original mapping or set it to do nothing, I have tried to use the <code>noop</code> command. But so far it is still persisting. If anyone knows of a fix I would love to see it in the comments.</p>
+
+<p>Additionally, I added some layout mappings for some swanky custom layouts.</p>
+
+<h2>Default (OSX).sublime-keymap</h2>
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+x"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cut"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+c"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"copy"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+v"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"paste_and_indent"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+s"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"save"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+z"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"undo"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+shift+z"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"redo"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"f3"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"find_next"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+g"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"find_next"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+shift+g"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"find_prev"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"shift+f3"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"find_prev"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"super+shift+1"</span><span class="p">],</span><span class="w">
+        </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"set_layout"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"args"</span><span class="p">:</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"cols"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"rows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"cells"</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"super+shift+2"</span><span class="p">],</span><span class="w">
+        </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"set_layout"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"args"</span><span class="p">:</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"cols"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"rows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"cells"</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+
+    </span><span class="err">//</span><span class="w"> </span><span class="err">side-by-side</span><span class="w"> </span><span class="err">column</span><span class="w"> </span><span class="err">with</span><span class="w"> </span><span class="err">small</span><span class="w"> </span><span class="err">row</span><span class="w"> </span><span class="err">underneath</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"super+shift+3"</span><span class="p">],</span><span class="w">
+        </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"set_layout"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"args"</span><span class="p">:</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"cols"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"rows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"cells"</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">]]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="err">//</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="err">rows</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="err">columns</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"super+shift+5"</span><span class="p">],</span><span class="w">
+        </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"set_layout"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"args"</span><span class="p">:</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"cols"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.33</span><span class="p">,</span><span class="w"> </span><span class="mf">0.67</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"rows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w">
+            </span><span class="s2">"cells"</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w">
+            </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">]]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+p"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"show_overlay"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"overlay"</span><span class="p">:</span><span class="w"> </span><span class="s2">"goto"</span><span class="p">,</span><span class="w"> </span><span class="s2">"show_files"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+shift+p"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"show_overlay"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"overlay"</span><span class="p">:</span><span class="w"> </span><span class="s2">"command_palette"</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"super+ctrl+p"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"prompt_select_workspace"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+r"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"show_overlay"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"overlay"</span><span class="p">:</span><span class="w"> </span><span class="s2">"goto"</span><span class="p">,</span><span class="w"> </span><span class="s2">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"@"</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+k"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_macro_file"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"file"</span><span class="p">:</span><span class="w"> </span><span class="s2">"res://Packages/Default/Delete Line.sublime-macro"</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"home"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"move_to"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bol"</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">fix</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">home</span><span class="w"> </span><span class="err">key</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"end"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"move_to"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eol"</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">fix</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">end</span><span class="w"> </span><span class="err">key</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"super+shift+a"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alignment"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+enter"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_macro_file"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"file"</span><span class="p">:</span><span class="w"> </span><span class="s2">"res://Packages/Default/Add Line.sublime-macro"</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+shift+enter"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_macro_file"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"file"</span><span class="p">:</span><span class="w"> </span><span class="s2">"res://Packages/Default/Add Line Before.sublime-macro"</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+d"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"find_under_expand"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+shift+up"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"swap_line_up"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+shift+down"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"swap_line_down"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"f1"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dash_doc"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+shift+super+d"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"clone_file"</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Duplicate</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">current</span><span class="w"> </span><span class="err">file</span><span class="w"> </span><span class="err">view</span><span class="p">,</span><span class="w"> </span><span class="err">useful</span><span class="w"> </span><span class="err">for</span><span class="w"> </span><span class="err">looking</span><span class="w"> </span><span class="err">at</span><span class="w"> </span><span class="err">different</span><span class="w"> </span><span class="err">places</span><span class="w"> </span><span class="err">at</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">same</span><span class="w"> </span><span class="err">time</span><span class="w"> </span><span class="err">in</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">same</span><span class="w"> </span><span class="err">file</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+forward_slash"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"toggle_comment"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">"block"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+
+    </span><span class="err">//</span><span class="w"> </span><span class="err">Attempting</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">reset</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">sort</span><span class="w"> </span><span class="err">lines</span><span class="w"> </span><span class="err">shortcut.</span><span class="w"> </span><span class="err">On</span><span class="w"> </span><span class="err">OSX</span><span class="w"> </span><span class="err">when</span><span class="w"> </span><span class="err">using</span><span class="w"> </span><span class="err">workspaces</span><span class="w"> </span><span class="err">quickly</span><span class="w">
+    </span><span class="err">//</span><span class="w"> </span><span class="err">switching</span><span class="w"> </span><span class="err">between</span><span class="w"> </span><span class="err">a</span><span class="w"> </span><span class="err">browser</span><span class="w"> </span><span class="err">and</span><span class="w"> </span><span class="err">sublime</span><span class="w"> </span><span class="err">while</span><span class="w"> </span><span class="err">pressing</span><span class="w"> </span><span class="err">f</span><span class="mi">5</span><span class="w"> </span><span class="err">will</span><span class="w"> </span><span class="err">sort</span><span class="w"> </span><span class="err">text</span><span class="w"> </span><span class="err">editor</span><span class="w"> </span><span class="err">lines</span><span class="w">
+    </span><span class="err">//</span><span class="w"> </span><span class="err">alphabetically.</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"key"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"f5"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"noop"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"key"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ctrl+f5"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"noop"</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"shift+ctrl+f5"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sort_lines"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"case_sensitive"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="s2">"keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"shift+super+ctrl+f5"</span><span class="p">],</span><span class="w"> </span><span class="s2">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sort_lines"</span><span class="p">,</span><span class="w"> </span><span class="s2">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"case_sensitive"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+</span><span class="p">]</span></code></pre></figure>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/drying-out-your-content-with-ruby-on-rails-internationalization/" title="Drying out your content with Ruby on Rails Internationalization">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/the-month-in-review-october-2015/" title="The year in review (2015)">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

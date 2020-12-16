@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Override an ActiveRecord attribute value while using the same getter method | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Override an ActiveRecord attribute value while using the same getter method" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Overriding methods as a Rubyist is extremely natural and powerful. Recently, I did run into a circumstance where I had an ActiveRecord object with a DateTime that I needed in a specific TimeZone (based on user input). If you ever have tried to override the getter for an attribute with the same name and have been stumped, this article details one way of making it work." />
+<meta property="og:description" content="Overriding methods as a Rubyist is extremely natural and powerful. Recently, I did run into a circumstance where I had an ActiveRecord object with a DateTime that I needed in a specific TimeZone (based on user input). If you ever have tried to override the getter for an attribute with the same name and have been stumped, this article details one way of making it work." />
+<link rel="canonical" href="http://joshfrankel.me/blog/overriding-activerecord-getters-with-the-same-attribute-name/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/overriding-activerecord-getters-with-the-same-attribute-name/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-07-18T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Overriding methods as a Rubyist is extremely natural and powerful. Recently, I did run into a circumstance where I had an ActiveRecord object with a DateTime that I needed in a specific TimeZone (based on user input). If you ever have tried to override the getter for an attribute with the same name and have been stumped, this article details one way of making it work.","headline":"Override an ActiveRecord attribute value while using the same getter method","dateModified":"2018-07-18T00:00:00+00:00","datePublished":"2018-07-18T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/overriding-activerecord-getters-with-the-same-attribute-name/"},"url":"http://joshfrankel.me/blog/overriding-activerecord-getters-with-the-same-attribute-name/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Override an ActiveRecord attribute value while using the same getter method</h1>
+
+    
+      <p class="Banner-information">
+        <time>July 18, 2018</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Overriding methods as a Rubyist is extremely natural and powerful. Recently, I did run into a circumstance where I had an ActiveRecord object with a DateTime that I needed in a specific TimeZone (based on user input). If you ever have tried to override the getter for an attribute with the same name and have been stumped, this article details one way of making it work.
+<!--excerpt--></p>
+
+<p>Alright, first off some example data to support our solution.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">=&gt;</span> <span class="no">Event</span>
+ <span class="ss">id: </span><span class="mi">1</span>
+ <span class="ss">name: </span><span class="s2">"How to be a pro Rubyist?"</span>
+ <span class="ss">start_time: </span><span class="no">Mon</span><span class="p">,</span> <span class="mo">02</span> <span class="no">Jul</span> <span class="mi">2018</span> <span class="mi">14</span><span class="p">:</span><span class="mi">11</span><span class="p">:</span><span class="mi">17</span> <span class="no">EDT</span> <span class="o">-</span><span class="mo">04</span><span class="p">:</span><span class="mo">00</span>
+ <span class="ss">time_zone: </span><span class="s2">"UTC"</span></code></pre></figure>
+
+<p>With the above, anytime I wanted to output the Event’s <code>start_time</code> to the front-end I would need to reach
+for <a href="https://apidock.com/rails/DateTime/in_time_zone">in_time_zone</a>.</p>
+
+<blockquote class="Info Info-right"><strong>in_time_zone</strong><br />
+  Returns the simultaneous time in Time.zone, or the specified zone.
+  <cite>- apidock.com, Ruby on Rails</cite>
+</blockquote>
+
+<p>Here’s an example of outputting the Event object’s <code>start_time</code> in the proper
+time zone:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">&lt;</span><span class="sx">% event </span><span class="o">=</span> <span class="no">Event</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">%&gt;</span>
+<span class="o">&lt;</span><span class="sx">%= event.start_time.in_time_zone(event.time_zone) %&gt;</span></code></pre></figure>
+
+<p>Quite, verbose no?</p>
+
+<p>Well what if we just override the <code>Event#start_time</code> getter to already
+perform the conversion?</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Event</span>
+  <span class="k">def</span> <span class="nf">start_time</span>
+    <span class="n">start_time</span><span class="p">.</span><span class="nf">in_time_zone</span><span class="p">(</span><span class="n">time_zone</span><span class="p">)</span>
+  <span class="k">end</span> 
+<span class="k">end</span></code></pre></figure>
+
+<p>Nope! This will result in the dreaded <code>SystemStackError: stack level too deep</code>, which basically translated to not having a proper stop condition in a recursion loop. Or in our case overriding a method and using the same method name within it.</p>
+
+<p>But all hope is not lost. <code>read_attribute</code> to the rescue!</p>
+
+<h2 id="read-attribute">Read Attribute</h2>
+
+<p><a href="https://apidock.com/rails/ActiveRecord/AttributeMethods/read_attribute">read_attribute</a> allows you to return the value from ActiveRecord before
+it makes it to the getter method. Perfect! Here’s the new working solution.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Event</span>
+  <span class="o">...</span>
+  <span class="k">def</span> <span class="nf">start_time</span>
+    <span class="n">read_attribute</span><span class="p">(</span><span class="ss">:start_time</span><span class="p">).</span><span class="nf">in_time_zone</span><span class="p">(</span><span class="n">time_zone</span><span class="p">)</span>
+  <span class="k">end</span> 
+<span class="k">end</span></code></pre></figure>
+
+<p>We’ve now successfully overridden a named attribute using the value from the same attribute. Neat!</p>
+
+<p>Got any other Ruby method tricks? Is there a better way to accomplish the above? Leave me a comment below.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/zero-downtime-migration-from-enum-to-single-table-inheritance/" title="Zero downtime migration from Enum to Single Table Inheritance">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/constructing-a-sql-select-from-subquery-in-activerecord/" title="Constructing a select * from subquery using ActiveRecord">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

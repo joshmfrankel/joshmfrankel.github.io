@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Deploying a jekyll blog to github pages with custom plugins and TravisCI | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Deploying a jekyll blog to github pages with custom plugins and TravisCI" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Deploying a new blog with Github Pages is a breeze. All you need is a new repo named after your Github username and a jekyll site on your master branch. Github also kindly provides several whitelisted plugins for ease-of-use which can be found here. Unfortunately, some of these are a bit outdated (I’m looking at you jekyll-paginate). More bad news is that because the plugins are whitelisted you can’t use any other plugins. We’re developers though, like a whitelist will stop us…" />
+<meta property="og:description" content="Deploying a new blog with Github Pages is a breeze. All you need is a new repo named after your Github username and a jekyll site on your master branch. Github also kindly provides several whitelisted plugins for ease-of-use which can be found here. Unfortunately, some of these are a bit outdated (I’m looking at you jekyll-paginate). More bad news is that because the plugins are whitelisted you can’t use any other plugins. We’re developers though, like a whitelist will stop us…" />
+<link rel="canonical" href="http://joshfrankel.me/blog/deploying-a-jekyll-blog-to-github-pages-with-custom-plugins-and-travisci/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/deploying-a-jekyll-blog-to-github-pages-with-custom-plugins-and-travisci/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-11-02T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Deploying a new blog with Github Pages is a breeze. All you need is a new repo named after your Github username and a jekyll site on your master branch. Github also kindly provides several whitelisted plugins for ease-of-use which can be found here. Unfortunately, some of these are a bit outdated (I’m looking at you jekyll-paginate). More bad news is that because the plugins are whitelisted you can’t use any other plugins. We’re developers though, like a whitelist will stop us…","headline":"Deploying a jekyll blog to github pages with custom plugins and TravisCI","dateModified":"2017-11-02T00:00:00+00:00","datePublished":"2017-11-02T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/deploying-a-jekyll-blog-to-github-pages-with-custom-plugins-and-travisci/"},"url":"http://joshfrankel.me/blog/deploying-a-jekyll-blog-to-github-pages-with-custom-plugins-and-travisci/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Deploying a jekyll blog to github pages with custom plugins and TravisCI</h1>
+
+    
+      <p class="Banner-information">
+        <time>November 2, 2017</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Deploying a new blog with Github Pages is a breeze. All you need is a new repo named after your Github username <username.github.io> and a jekyll site on your master branch.</username.github.io></p>
+
+<p>Github also kindly provides several whitelisted plugins for ease-of-use which <a href="https://pages.github.com/versions/">can be found here</a>. Unfortunately, some of these are a bit outdated (I’m looking at you <mark title="NO LONGER UNDER ACTIVE DEVELOPMENT">jekyll-paginate</mark>). More bad news is that because the plugins are whitelisted you can’t use any other plugins.</p>
+
+<p>We’re developers though, like a whitelist will stop us…
+<!--excerpt--></p>
+
+<h2 id="basic-setup">Basic Setup</h2>
+
+<p>If you just want a super simple Github Pages site and don’t care about custom plugins, the guide that Github provides <a href="https://pages.github.com/">here</a> will be more than adequate.</p>
+
+<p>If you’re interested in a more streamlined process keep reading and I’ll walk you through automating a build/deploy process.</p>
+
+<h2 id="automated-site-deploy-with-travisci">Automated Site Deploy with TravisCI</h2>
+
+<p>To circumvent the plugin restriction, we’ll automatically build our site on TravisCI using <code>jekyll build</code> and then pushing the static site up to our master branch on Github. It’s a straight-forward process but can become tedious if you have to do it everytime you write a new post. The workflow is described in the below flowchart.</p>
+
+<p><img src="/img/2017/github-pages-build-process.png" alt="Github Pages automatic build process" /></p>
+
+<h2 id="github-branch-setup">Github Branch Setup</h2>
+
+<p>The <strong>first thing we’ll want to do is create a new branch off of master called <em>source</em></strong>. (The naming here isn’t important but choose something you’ll remember). Once you’ve created your <em>source</em> branch there will be no need to use the master branch anymore for this repo.</p>
+
+<p><em>Source</em> will become where you write your blogs posts while master will remain where Github Pages loads your static site from. For example master will only include the <code>site/</code> directory while <em>source</em> will have the entire jekyll project.</p>
+
+<p>I would highly <strong>recommend changing your default branch in your repository to <em>source</em></strong>. Optionally, you can make the <em>source</em> branch protected to prevent it from being accidently deleted or overriden.</p>
+
+<p><img src="/img/2017/github-branch-settings.png" alt="Github Branch Settings" /></p>
+
+<h2 id="github-personal-access-token">Github Personal Access Token</h2>
+
+<p>Next, we’ll want to give TravisCI something to authenticate against to perform
+git pushes for us. To do this let’s create a personal access token.</p>
+
+<blockquote class="Info Info-right"><strong>Note</strong><br /> You can also pass your personal access token
+  securely by encrypting it into your <code>.travis.yml</code> file.</blockquote>
+
+<p>First click the <strong>Settings</strong> menu, located under your profile in the top right of Github.</p>
+
+<p>Next look for <strong>Developer Settings</strong> on the left sidebar and click it.</p>
+
+<p>Once there navigate to <strong>Personal access tokens</strong> and click the button <strong>Generate new token</strong>. Name the token something memorable (I use Travis CI) and set the permission scopes to everything under <strong>repo</strong>.</p>
+
+<p><img src="/img/2017/github-travis-permissions.png" alt="Github personal access token settings" /></p>
+
+<p>Make sure to copy your new token to your clipboard as we’re going to need it later on.</p>
+
+<h2 id="jekyll-site-configuration">Jekyll site configuration</h2>
+
+<p>We need to configure a few things for our Jekyll site to function appropriately with TravisCI.</p>
+
+<p>First add the following to your <code>Gemfile</code>.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">source</span> <span class="s2">"https://rubygems.org"</span>
+<span class="n">ruby</span> <span class="no">RUBY_VERSION</span>
+
+<span class="c1"># We'll need rake to build our site in TravisCI</span>
+<span class="n">gem</span> <span class="s2">"rake"</span><span class="p">,</span> <span class="s2">"~&gt; 12"</span>
+<span class="n">gem</span> <span class="s2">"jekyll"</span>
+
+<span class="c1"># Optional: Add any custom plugins here.</span>
+<span class="c1"># Some useful examples are listed below</span>
+<span class="n">group</span> <span class="ss">:jekyll_plugins</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s2">"jekyll-feed"</span>
+  <span class="n">gem</span> <span class="s2">"jekyll-sitemap"</span>
+  <span class="n">gem</span> <span class="s2">"jekyll-paginate-v2"</span>
+  <span class="n">gem</span> <span class="s2">"jekyll-seo-tag"</span>
+  <span class="n">gem</span> <span class="s2">"jekyll-compose"</span><span class="p">,</span> <span class="s2">"~&gt; 0.5"</span>
+  <span class="n">gem</span> <span class="s2">"jekyll-redirect-from"</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Any plugins we’re using above in our <code>Gemfile</code> we’ll also want to list in our Jekyll site <code>_config.yml</code> file.</p>
+
+<p>Additionally, we want to exclude certain files and directory so that they don’t end up in the <em>master</em> branch once TravisCI builds the <em>source</em> branch.</p>
+
+<p>Using the above example your <code>_config.yml</code> might look like:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="na">title</span><span class="pi">:</span> <span class="s">Your blog title</span>
+<span class="na">email</span><span class="pi">:</span> <span class="s">your.email@gmail.com</span>
+
+<span class="c1"># many other settings</span>
+<span class="c1"># ...</span>
+
+<span class="c1"># Any plugins within jekyll_plugin group from Gemfile</span>
+<span class="na">plugins</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">jekyll-feed</span>
+  <span class="pi">-</span> <span class="s">jekyll-sitemap</span>
+  <span class="pi">-</span> <span class="s">jekyll-paginate-v2</span>
+  <span class="pi">-</span> <span class="s">jekyll-seo-tag</span>
+  <span class="pi">-</span> <span class="s">jekyll-compose</span>
+  <span class="pi">-</span> <span class="s">jekyll-redirect-from</span>
+
+<span class="c1"># Exclude these files from the build process results.</span>
+<span class="c1"># Prevents them from showing up in the master branch which </span>
+<span class="c1"># is the live site.</span>
+<span class="na">exclude</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">vendor</span>
+  <span class="pi">-</span> <span class="s">Gemfile</span>
+  <span class="pi">-</span> <span class="s">Gemfile.lock</span>
+  <span class="pi">-</span> <span class="s">LICENSE</span>
+  <span class="pi">-</span> <span class="s">README.md</span>
+  <span class="pi">-</span> <span class="s">Rakefile</span></code></pre></figure>
+
+<p>Because we’re using our <em>master</em> branch to display our statically generated site, we’ll want to remove the <code>site/</code> directory from tracking.</p>
+
+<p>Add this to your <code>.gitignore</code>.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">.</span><span class="nf">sass</span><span class="o">-</span><span class="n">cache</span>
+<span class="p">.</span><span class="nf">jekyll</span><span class="o">-</span><span class="n">metadata</span>
+<span class="n">_site</span></code></pre></figure>
+
+<p>Next, and most importantly, we need a <code>.travis.yml</code> file to let TravisCI know how we want it to run. I’m going to run through it line-by-line with explanations of the settings.</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="na">language</span><span class="pi">:</span> <span class="s">ruby</span>
+<span class="na">rvm</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">2.3.1</span>
+<span class="na">install</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">bundle install</span>
+<span class="na">deploy</span><span class="pi">:</span>
+  <span class="na">provider</span><span class="pi">:</span> <span class="s">pages</span>
+  <span class="na">skip_cleanup</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">github_token</span><span class="pi">:</span> <span class="s">$GITHUB_TOKEN</span>
+  <span class="na">local_dir</span><span class="pi">:</span> <span class="s">_site</span>
+  <span class="na">target_branch</span><span class="pi">:</span> <span class="s">master</span>
+  <span class="na">on</span><span class="pi">:</span>
+    <span class="na">branch</span><span class="pi">:</span> <span class="s">source</span></code></pre></figure>
+
+<p><code>language: ruby</code> Use the ruby language</p>
+
+<p><code>rvm: - 2.3.1</code> Use RVM to set ruby version to 2.3.1</p>
+
+<p><code>install: - bundle install</code> Run bundle install to install all gems.</p>
+
+<p><code>provider: pages</code> Use TravisCI’s Github Pages provider</p>
+
+<p><code>skip_cleanup: true</code> Preserve files created during build phase.</p>
+
+<p><code>github_token: $GITHUB_TOKEN</code> Our personal access token. This is currently a reference to an environment variable which will be added in the TravisCI setup section below.</p>
+
+<p><code>local_dir: _site</code> Use all files found in this directory for deployment.</p>
+
+<p><code>target_branch: master</code> Push resulting build files to this branch on Github.</p>
+
+<p><code>on: branch: source</code> Only run TravisCI for this branch.</p>
+
+<p>You can find additional information from the <a href="https://docs.travis-ci.com/user/deployment/pages/">deployment documentation</a>.</p>
+
+<p>All of this together basically says, “Using the source branch from this repo, push all the files found within the site directory to the master branch of the repo”. This only works by using the following <code>Rakefile</code> to manually build the site.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># filename: Rakefile</span>
+<span class="n">task</span> <span class="ss">:default</span> <span class="k">do</span>
+  <span class="nb">puts</span> <span class="s2">"Running CI tasks..."</span>
+
+  <span class="c1"># Runs the jekyll build command for production</span>
+  <span class="c1"># TravisCI will now have a site directory with our</span>
+  <span class="c1"># statically generated files.</span>
+  <span class="n">sh</span><span class="p">(</span><span class="s2">"JEKYLL_ENV=production bundle exec jekyll build"</span><span class="p">)</span>
+  <span class="nb">puts</span> <span class="s2">"Jekyll successfully built"</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The <code>Rakefile</code> above is run on every build. Because of this you can add other checks to this process such as <a href="https://github.com/gjtorikian/html-proofer">html_proofer</a>. These will be required to pass without failure before TravisCI will deploy the build.</p>
+
+<p>Let’s move onto the last step. Setting up TravisCI for Github Pages.</p>
+
+<h2 id="travisci-setup">TravisCI Setup</h2>
+
+<p>Now that we have our site setup we need to hook it into TravisCI.</p>
+
+<p>First you’ll want to sign into TravisCI using your github account. This will give you a listing of all of your repositories.</p>
+
+<p><strong>Find your repository and enable it</strong>. It should be in the format of <strong>username.github.io</strong>.</p>
+
+<p><img src="/img/2017/enable-ci.png" alt="Enable CI for Repo" /></p>
+
+<p>As seen above, <strong>click the gear icon</strong> next to the newly enabled repository to go to the setting page.</p>
+
+<p>Remember when I said this?</p>
+
+<blockquote>
+  <p>Make sure to copy your new token to your clipboard as we’re going to need it later on.</p>
+</blockquote>
+
+<p>Now’s the time to dig up that token code again.</p>
+
+<blockquote class="Info Info-right"><strong>Note</strong><br /><code>GITHUB_TOKEN</code> needs to match your <code>.travis.yml</code> file's line <code>github_token: $GITHUB_TOKEN</code> to properly authenticate usage.</blockquote>
+
+<p>Once you have the code create a new environment variable named <code>GITHUB_TOKEN</code> on the TravisCI settings page.</p>
+
+<p><img src="/img/2017/environment-variable.png" alt="Environment Variables" /></p>
+
+<p>Here’s a screenshot of the generic settings that I recommend using for your build process.</p>
+
+<p><img src="/img/2017/travis-ci-setting.png" alt="General TravisCI settings" /></p>
+
+<p>Once, you’ve got everything set up try out pushing a new commit to your <em>source</em> branch. You should see the TravisCI build start, pass, and eventually if you navigate to <code>username.github.io</code> your site will be live! If for some reason your build fails look through the <strong>job log</strong> for any details on errors. I’d be happy to help troubleshoot them in the comments.</p>
+
+<p><img src="/img/2017/travis-ci-pass.png" alt="A passing build" /></p>
+
+<p>That’s it! Start blogging.</p>
+
+<h2 id="optional-custom-domains">Optional: Custom Domains</h2>
+
+<p>You can give your readers a more specialized experience by enabling a custom
+domain for them to navigate to. This is accomplished by pointing your <code>username.github.io</code> site at a domain registrar where you have purchased a domain name. (e.g. <a href="http://joshfrankel.me/">joshfrankel.me</a>)</p>
+
+<p>Don’t worry if this sounds scary. It is actually easy to setup. <a href="https://www.namecheap.com/support/knowledgebase/article.aspx/9645/2208/how-do-i-link-my-domain-to-github-pages">Namecheap has an excellent article that guides you through the entire process</a>.</p>
+
+<p>What you need to do is first create a CNAME file in your Github repository. The CNAME file should just hold your domain name in it. For example mine is below:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># filename: CNAME</span>
+<span class="n">joshfrankel</span><span class="p">.</span><span class="nf">me</span></code></pre></figure>
+
+<p>This tells Github Pages where you site is being published at.</p>
+
+<p><del>Below I’ve listed the basic setup for what you’ll need to do for other domain registrars. (From the Namecheap documentation)</del></p>
+
+<blockquote>
+  <ul>
+    <li><del>A record for @ pointing to 192.30.252.153</del></li>
+    <li><del>A record for @ pointing to 192.30.252.154</del></li>
+    <li>CNAME record for www pointing to your username.github.io (the username should be replaced with your actual GitHub account username):</li>
+  </ul>
+</blockquote>
+
+<h3 id="update-july-27th-2018">Update (July 27th, 2018)</h3>
+<p>Github has updated their servers and as such you’ll need to point your DNS at the following ip addresses. Similar to the above, you’ll want to create A records pointing at @ for each of the below ip addresses. <a href="https://help.github.com/articles/troubleshooting-custom-domains/#dns-configuration-errors">Here’s the related documentation</a>.</p>
+
+<blockquote>
+  <p>If you configured A records through your DNS provider, your A records must point your custom domain to the following IP addresses:</p>
+
+  <ul>
+    <li>185.199.108.153</li>
+    <li>185.199.109.153</li>
+    <li>185.199.110.153</li>
+    <li>185.199.111.153</li>
+  </ul>
+</blockquote>
+
+<p>If you now navigate to your repository’s settings page you should see something
+like this:</p>
+
+<p><img src="/img/2017/github-pages-custom-domain.png" alt="Github Pages custom domain settings" /></p>
+
+<p><strong>Note</strong> The small print around enablement of https states that it is unavailable for custom domains at present. However, there are additional resources and guides out there for <a href="https://www.jonathan-petitcolas.com/2017/01/13/using-https-with-custom-domain-name-on-github-pages.html">setting up third-party services such as CloudFlare for enabling https for Github Pages</a>. This may also be possible through other DNS hosts such as Namecheap (which I’m using).</p>
+
+<h2 id="optional-enable-html_proofer">Optional: Enable html_proofer</h2>
+
+<blockquote>
+  <p>…you can add other checks to this process such as <a href="https://github.com/gjtorikian/html-proofer">html_proofer</a>. These will be required to pass without failure before TravisCI will deploy the build.</p>
+</blockquote>
+
+<p>Like I mentioned above, one of the benefits of having a <code>Rakefile</code> is that 
+custom checks need to pass before the build will be sent out for deployment. One
+of those is a really helpful gem called <strong>html_proofer</strong> which allows for testing
+of rendered HTML to ensure validity.</p>
+
+<p>We can set this up with a few easy steps. First we’ll want to add <strong>html_proofer</strong>
+to our <code>Gemfile</code>.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Gemfile</span>
+
+<span class="n">gem</span> <span class="s2">"rake"</span><span class="p">,</span> <span class="s2">"~&gt; 12"</span>
+<span class="n">gem</span> <span class="s2">"jekyll"</span>
+<span class="c1"># Outside the jekyll plugin group</span>
+<span class="n">gem</span> <span class="s2">"html-proofer"</span></code></pre></figure>
+
+<p>Next we’ll add a few lines and configuration to our existing <code>Rakefile</code>
+to start testing the built <code>_site</code> folder contents.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s2">"html-proofer"</span> <span class="c1"># Require gem for using within tasks</span>
+
+<span class="n">task</span> <span class="ss">:default</span> <span class="k">do</span>
+  <span class="nb">puts</span> <span class="s2">"Running CI tasks..."</span>
+  <span class="n">sh</span><span class="p">(</span><span class="s2">"JEKYLL_ENV=production bundle exec jekyll build"</span><span class="p">)</span>
+  <span class="c1"># Add HTMLProofer.check_directory("./_site").run in order to start checking</span>
+  <span class="c1"># for invalid HTML</span>
+  <span class="no">HTMLProofer</span><span class="p">.</span><span class="nf">check_directory</span><span class="p">(</span>
+    <span class="s2">"./_site"</span><span class="p">,</span>
+    <span class="ss">url_ignore: </span><span class="p">[</span><span class="sr">/linkedin.com|php-fig.org|bower.io|bost.ocks.org|elementary.io/</span><span class="p">]</span> 
+  <span class="p">).</span><span class="nf">run</span>
+  <span class="nb">puts</span> <span class="s2">"Jekyll successfully built"</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The call to <strong>html_proofer</strong> should occur after the jekyll site is built from the
+<code>JEKYLL_ENV=production bundle exec jekyll build</code> line. This ensures that
+there are newly built files to validate against the linter’s settings.</p>
+
+<p>The basic code to get this working is: <code>HTMLProofer.check_directory("./_site").run</code>. This tells <strong>html_proofer</strong> to 
+look through the <code>_site</code> directory and run all available linters.</p>
+
+<p>We can test all this out locally by running the following command <code>rake</code> in our development directory. The <code>rake</code> command runs the default task found in the <code>Rakefile</code>.</p>
+
+<figure class="highlight"><pre><code class="language-terminal" data-lang="terminal"><span class="gp">&gt;</span> rake
+<span class="go">Running CI tasks...
+JEKYLL_ENV=production bundle exec jekyll build
+Configuration file: /home/josh/Development/joshmfrankel.github.io/_config.yml
+            Source: /home/josh/Development/joshmfrankel.github.io
+       Destination: /home/josh/Development/joshmfrankel.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+         AutoPages: Disabled/Not configured in site.config.
+        Pagination: Complete, processed 1 pagination page(s)
+                    done in 0.819 seconds.
+ Auto-regeneration: disabled. Use --watch to enable.
+Running ["ImageCheck", "ScriptCheck", "LinkCheck"] on ["./_site"] on *.html... 
+
+Checking 65 external links...
+Ran on 53 files!
+
+HTML-Proofer finished successfully.
+Jekyll successfully built</span></code></pre></figure>
+
+<p>At this point if
+you have existing content you’re likely to see many errors that need fixing. Take
+some time and fix as many of these as you can. A well tested blog is an efficient blog.</p>
+
+<p>As you can see from my example above <strong>html_proofer</strong> has many additional configuration
+options. Once of which is <code>url_ignore</code>. This is especially helpful for ignoring
+linting errors related to SSL, required sign-ins, and paywalls. For example, I have a social icon on my site that links to <a href="https://www.linkedin.com/in/joshmfrankel">https://www.linkedin.com/in/joshmfrankel</a>. LinkedIn requires a user
+to be logged in in order to view active profiles. Because of this the <strong>html_proofer</strong>
+check will fail. Therefore I added it to a blacklist of urls to ignore while 
+linting.</p>
+
+<h2 id="closing-thoughts">Closing thoughts</h2>
+
+<p>Is there something I could explain more? Were the steps above easy to follow? Got a Jekyll plugin you are digging? I’d love to hear about it in the comments below.</p>
+
+<p>Thanks for reading.</p>
+
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/2017-09-28-re-sequencing-primary-keys-in-rails-to-fix-uniqueness-violations/" title="Re-sequencing primary keys in Rails to fix uniqueness violations">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/ensure-dropping-a-database-table-is-reversible/" title="Ensure dropping a database table is reversible">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

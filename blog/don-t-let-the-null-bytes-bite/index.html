@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Don’t let the null bytes bite | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Don’t let the null bytes bite" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Have you ever encountered Argument error &quot;string contains null byte&quot;? What this means is that a null byte character \u0000 was sent as a part of the request body. This can indicate a malicious request from someone trying to probe your application for vulnerabilities. So how can you avoid the stinging byte of invalid characters? Rack to the rescue!" />
+<meta property="og:description" content="Have you ever encountered Argument error &quot;string contains null byte&quot;? What this means is that a null byte character \u0000 was sent as a part of the request body. This can indicate a malicious request from someone trying to probe your application for vulnerabilities. So how can you avoid the stinging byte of invalid characters? Rack to the rescue!" />
+<link rel="canonical" href="http://joshfrankel.me/blog/don-t-let-the-null-bytes-bite/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/don-t-let-the-null-bytes-bite/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-06-28T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Have you ever encountered Argument error &quot;string contains null byte&quot;? What this means is that a null byte character \\u0000 was sent as a part of the request body. This can indicate a malicious request from someone trying to probe your application for vulnerabilities. So how can you avoid the stinging byte of invalid characters? Rack to the rescue!","headline":"Don’t let the null bytes bite","dateModified":"2019-06-28T00:00:00+00:00","datePublished":"2019-06-28T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/don-t-let-the-null-bytes-bite/"},"url":"http://joshfrankel.me/blog/don-t-let-the-null-bytes-bite/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Don't let the null bytes bite</h1>
+
+    
+      <p class="Banner-information">
+        <time>June 28, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+  
+
+  
+    <section class="Series Series-section">
+      <h2>This post is part 1 of a 3 part series</h2>
+
+      <ul class="Series-listing">
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+            <li>
+              
+                <strong>(Current post)</strong> Don't let the null bytes bite
+              
+            </li>
+          
+        
+          
+            
+            <li>
+              
+                (2) <a href="/blog/recursively-validate-application-requests-with-rack/">Recursively validate application requests with Rack</a>
+              
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+            <li>
+              
+                (3) <a href="/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/">Invalidate requests when a user session contains null bytes in the Rack layer</a>
+              
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </section>
+  
+
+
+
+  <p>Have you ever encountered <code class="highlighter-rouge">Argument error "string contains null byte"</code>? What
+this means is that a null byte character <code class="highlighter-rouge">\u0000</code> was sent as a part of the request
+body. This can indicate a malicious request from someone trying to probe your
+application for vulnerabilities. So how can you avoid the stinging byte of
+invalid characters? Rack to the rescue!
+<!--excerpt--></p>
+
+<h2 id="so-what-are-null-bytes">So, what are null bytes?</h2>
+
+<p>The super abridged version…</p>
+
+<p>Ruby is compiled to C. C uses null bytes to delimit strings. When crossing between
+the two languages null byte injection vulnerabilities can be encountered. Basically
+bad people trying to exploit application params.</p>
+
+<p>For a more thorough understanding here’s an <a href="https://www.more-magic.net/posts/lessons-learned-from-nul-byte-bugs.html">excellent post on the subject</a>.
+It’s how I got to the simplified explanation above.</p>
+
+<h2 id="first-lets-recreate-the-error">First let’s recreate the error</h2>
+
+<p>Usually this error occurs when a param gets passed to a ActiveRecord model
+from a controller. This makes it easy to reproduce the issue. Let’s assume you
+have a model called <strong>User</strong> that contains a single attribute name.
+Let’s see what happens if we try to create a new User with a name containing the
+invalid character.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">User</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">name: </span><span class="s2">"Bad Person </span><span class="se">\u</span><span class="s2">0000"</span><span class="p">)</span>
+<span class="c1"># ArgumentError: string contains null byte</span>
+</code></pre></div></div>
+
+<p>ActiveRecord is protecting us here but invalid characters
+are still making their way from our controller to our model. We’d like to avoid
+these characters from interacting with the model layer and more so the controller
+layer. So how can we prevent characters from reaching these layers?</p>
+
+<p>I’ve listed out several options that could work:</p>
+
+<ol>
+  <li>Sanitize params into empty strings using <code class="highlighter-rouge">gsub</code> but we’d rather have
+the request fail if malicious activity is going on.</li>
+  <li>We could handle them on a case-by-case basis within controller endpoints 
+but we’d have to remember to do that everywhere.</li>
+  <li><strong>ApplicationController</strong> could allow for checking the request object for all controllers (which
+is closer to what we want) but really we don’t even want the request to make it this far.</li>
+  <li><strong>Rack</strong> provides the most ideal answer as it allows for intercepting requests before they make it into the application layer.</li>
+</ol>
+
+<h2 id="how-rack-works">How Rack works</h2>
+
+<p><img src="/img/2019/rack-layer-diagram.png" alt="Rack Layer Diagram" title="Rack Layer Diagram" /></p>
+
+<p>Rack sits in between the Server and the application. This allows for injecting
+bits of functionality in the form of Middleware. This Middleware accepts the application
+and environment allowing specific logic before loading a page. These execute in
+a specified order meaning that one Middleware’s sideeffect could become multiplicative
+if order isn’t taken into account.</p>
+
+<p>In others words think of Rack as a stack of exams that need to be graded. You 
+start at the top grading them one-by-one until you’re ready to present grades
+to the class.</p>
+
+<h2 id="using-rack-middleware-to-intercept-requests">Using Rack middleware to intercept requests</h2>
+
+<p>Since Rack sits between the controller and the server, we can use it to intercept
+requests. In our case we want to pre-validate requests against invalid characters. 
+Specifically, if a request body contains any invalid characters we want it to fail 
+with a 400 user error. The response should contain little detail as normal
+users won’t encounter it (don’t want to give more information than we have to).</p>
+
+<p>So here’s our requirements:</p>
+
+<ol>
+  <li>Create new middleware that intercepts client made requests</li>
+  <li>If the request body contains invalid characters then immediately respond with
+a 400 failure</li>
+</ol>
+
+<p>First we’ll create a new file called <strong>validate_request_params.rb</strong> within the <strong>app/middleware</strong>
+directory.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ValidateRequestParams</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="vi">@app</span> <span class="o">=</span> <span class="n">app</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="c1"># Load the current request based on the request environment</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+
+    <span class="c1"># Ending with this line basically says continue executing the application</span>
+    <span class="c1"># request as normal</span>
+    <span class="vi">@app</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Middleware must define a <strong>#call</strong> method which accepts a parameter that represents
+the request environment. It also needs to define the <strong>#initialize</strong> method which
+accepts a parameter for the application. Usually the <strong>#call</strong> method ends with calling
+<code class="highlighter-rouge">@app.call(env)</code> which continues the application execution with whatever side effects
+have occurred within the middleware. I’ve done that above.</p>
+
+<p>That’s great and all but we need to add this somewhere in order for it to load. The
+place to put this is within <code class="highlighter-rouge">application.rb</code></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">MyApplication</span>
+  <span class="k">class</span> <span class="nc">Application</span> <span class="o">&lt;</span> <span class="no">Rails</span><span class="o">::</span><span class="no">Application</span>
+    <span class="c1"># Require our file</span>
+    <span class="nb">require</span> <span class="s2">"./app/middleware/validate_request_params.rb"</span>
+
+    <span class="c1"># Insert our middleware into the stack before Rack::Head</span>
+    <span class="n">config</span><span class="p">.</span><span class="nf">middleware</span><span class="p">.</span><span class="nf">insert_before</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Head</span><span class="p">,</span> <span class="no">ValidateRequestParams</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>The above loads and inserts our middleware into the stack so that it loads before
+<strong>Rack::Head</strong>. This theoretically could work in a different order but I’ve found
+the above to suit my needs. Like I mentioned above, more complicated Rack setups
+might require deeper thinking in terms of ordering.</p>
+
+<p>Alright, so we’ve got a basic setup but nothing is happening yet. It’s time to write
+some tests.</p>
+
+<h2 id="rack-test">Rack-test</h2>
+
+<blockquote class="Info Info-right">
+  "Rack::Test is a small, simple testing API for Rack apps. It can be used on its own or as a reusable starting point for Web frameworks and testing libraries to build on."
+  <cite><a href="https://github.com/rack-test/rack-test">https://github.com/rack-test/rack-test</a></cite>
+</blockquote>
+
+<p>Rack-test provides a way to test the Rack layer of an application. It’s pretty 
+similar to a controller or request spec in RSpec.</p>
+
+<p>Assuming we have an endpoint for creating users <strong>post “/users”</strong> we can use it to
+send invalid characters in the request payload for testing.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"spec_helper"</span>
+<span class="nb">require</span> <span class="s2">"rack/test"</span>
+
+<span class="n">describe</span> <span class="no">ValidateRequestParams</span> <span class="k">do</span>
+  <span class="kp">include</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Test</span><span class="o">::</span><span class="no">Methods</span>
+
+  <span class="n">let</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="p">{</span> <span class="no">MyApplication</span><span class="o">::</span><span class="no">Application</span> <span class="p">}</span>
+
+  <span class="n">context</span> <span class="s2">"WITH invalid characters"</span> <span class="k">do</span>
+    <span class="n">let</span><span class="p">(</span><span class="ss">:null_byte</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"</span><span class="se">\u</span><span class="s2">0000"</span> <span class="p">}</span>
+
+    <span class="n">it</span> <span class="s2">"responds with 400 BadRequest for strings"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"I am </span><span class="si">#{</span><span class="n">null_byte</span><span class="si">}</span><span class="s2"> bad"</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">bad_request?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">context</span> <span class="s2">"WITHOUT invalid characters"</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s2">"responds with a 200 ok for strings"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"safe name"</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">ok?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s2">"responds with a 200 ok with no params"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">ok?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Let’s break the above down a bit more.</p>
+
+<p><code class="highlighter-rouge">require "rack/test"</code> use Rack-test. That’s it.</p>
+
+<p><code class="highlighter-rouge">include Rack::Test::Methods</code> includes some useful helper methods. <a href="https://github.com/rack-test/rack-test/blob/master/lib/rack/test/methods.rb#L58">These can
+all be found here</a>. 
+We’ll be using the <code class="highlighter-rouge">last_response</code> and <code class="highlighter-rouge">post</code> helper methods which return
+the last mock response from rack and perform a post HTTP call respectively.</p>
+
+<p><code class="highlighter-rouge">let(:app) { MyApplication::Application }</code> Rack test expects app to be a defined
+method within the spec. We’re using RSpec’s <code class="highlighter-rouge">let</code> syntax to define the method but
+we could have just as easily have written:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">app</span>
+  <span class="no">MyApplication</span><span class="o">::</span><span class="no">Application</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>App lets Rack know what is handling the mock request. From this we have three 
+tests:</p>
+
+<ol>
+  <li>Ensure a 400 Bad Request is raised when a request contains a null byte</li>
+  <li>Ensure requests with params still return a 200 status code</li>
+  <li>Ensure requests without params still return a 200 status code</li>
+</ol>
+
+<p>The second and third specs are important to ensure we didn’t break basic
+application functionality. With this we can begin writing out the necessary logic 
+to get this passing.</p>
+
+<h2 id="preventing-requests-with-invalid-characters">Preventing requests with invalid characters</h2>
+
+<p>Jumping back to our <strong>validate_request_params.rb</strong> file, we’ll add the logic
+necessary to prevent Strings containing invalid characters from being successful
+requests.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ValidateRequestParams</span>
+  <span class="no">INVALID_CHARACTERS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"</span><span class="se">\u</span><span class="s2">0000"</span> <span class="c1"># null bytes</span>
+  <span class="p">].</span><span class="nf">freeze</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="vi">@app</span> <span class="o">=</span> <span class="n">app</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+
+    <span class="n">invalid_characters_regex</span> <span class="o">=</span> <span class="no">Regexp</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="no">INVALID_CHARACTERS</span><span class="p">)</span>
+
+    <span class="n">has_invalid_character</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="nf">params</span><span class="p">.</span><span class="nf">values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">match?</span><span class="p">(</span><span class="n">invalid_characters_regex</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">if</span> <span class="n">has_invalid_character</span>
+      <span class="c1"># Stop execution and respond with the minimal amount of information</span>
+      <span class="k">return</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="p">{},</span> <span class="p">[</span><span class="s2">"Bad Request"</span><span class="p">]]</span>
+    <span class="k">end</span>
+
+    <span class="vi">@app</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Above we’re using a constant <strong>INVALID_CHARACTERS</strong> to contain any potential invalid
+characters (for now just null bytes).</p>
+
+<p>With that we’re using <code class="highlighter-rouge">Regexp.union</code> to convert
+it to a pipe delimited regular expression to allow for matching multiple invalid
+characters. For example if we had <code class="highlighter-rouge">INVALID_CHARCTERS = ["\u0000", "Clarence"].freeze</code> defined as our constant
+the regular expression would look like: <code class="highlighter-rouge">/\x00|Clarence/</code>. Basically, null bytes 
+or Clarence. Poor Clarence.</p>
+
+<p>Next we take the <strong>Rack::Request</strong> object defined as <code class="highlighter-rouge">request</code> and convert its params (which are
+just all the available query params) into an array of values from the key value pairs. In our example <code class="highlighter-rouge">request.params</code> would look like:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span> 
+  <span class="ss">name: </span><span class="s2">"I am </span><span class="se">\u</span><span class="s2">0000 bad"</span> 
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Add a call to <code class="highlighter-rouge">.values</code> converts it to a flattened array of string values <code class="highlighter-rouge">["I am \u0000 bad"]</code>.</p>
+
+<p>We use Enumerable <code class="highlighter-rouge">.any?</code> because it returns as soon as a truthy value is encountered.
+This is perfect as we want the request to fail if any user submitted value contains an
+invalid character. This saves processing time and keeps the logic snappy.</p>
+
+<p>Lastly, within the <code class="highlighter-rouge">.any?</code> block we match the string against the built regular expression
+of invalid characters and return true/false for <code class="highlighter-rouge">.match?</code>. We use <code class="highlighter-rouge">.respond_to?(:match)</code> to
+ensure that the value returned from the params array is an object the understands the match method. 
+In our case <strong>Strings</strong> respond to <code class="highlighter-rouge">match?</code>. This prevents other types from throwing errors 
+when they don’t understand how to match regular expressions.</p>
+
+<p>With that our tests pass and we call it a day…</p>
+
+<h2 id="what-about-objects-other-than-strings">What about objects other than Strings?</h2>
+
+<p>Alright, so strings are only ONE type of object that can be passed as a user supplied
+param. Technically, arrays and JSON could also be encountered in a request object.
+In the next post in the series, <a href="http://joshfrankel.me/blog/recursively-validate-application-requests-with-rack/">I’ll cover how to handle these efficiently using recursion</a>.</p>
+
+<p>How has using Rack helped solve your problem? Found a particularly useful
+Rack pattern? I’d love to discuss it in the comments below.</p>
+
+<p>As always, thanks again for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/signing-commits-for-github-and-sublime-merge/" title="Signing commits for Github and Sublime Merge">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/recursively-validate-application-requests-with-rack/" title="Recursively validate application requests with Rack">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

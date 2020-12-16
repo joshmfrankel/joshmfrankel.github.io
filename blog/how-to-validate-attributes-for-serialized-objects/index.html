@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>How to validate attributes for serialized objects | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="How to validate attributes for serialized objects" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Rail&#39;s out of the box validation feature set is fairly rich. You have the validates shortcut DSL which maps to all the default validators. The ability to override those default validators through custom validator classes. Finally, you can also write custom validator methods for specific use cases. For the purpose of this article, we&#39;ll focus on custom validator methods." />
+<meta property="og:description" content="Rail&#39;s out of the box validation feature set is fairly rich. You have the validates shortcut DSL which maps to all the default validators. The ability to override those default validators through custom validator classes. Finally, you can also write custom validator methods for specific use cases. For the purpose of this article, we&#39;ll focus on custom validator methods." />
+<link rel="canonical" href="http://joshfrankel.me/blog/how-to-validate-attributes-for-serialized-objects/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/how-to-validate-attributes-for-serialized-objects/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-06-03T15:54:38+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Rail&#39;s out of the box validation feature set is fairly rich. You have the validates shortcut DSL which maps to all the default validators. The ability to override those default validators through custom validator classes. Finally, you can also write custom validator methods for specific use cases. For the purpose of this article, we&#39;ll focus on custom validator methods.","headline":"How to validate attributes for serialized objects","dateModified":"2016-06-03T15:54:38+00:00","datePublished":"2016-06-03T15:54:38+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/how-to-validate-attributes-for-serialized-objects/"},"url":"http://joshfrankel.me/blog/how-to-validate-attributes-for-serialized-objects/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">How to validate attributes for serialized objects</h1>
+
+    
+      <p class="Banner-information">
+        <time>June 3, 2016</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Rail's out of the box validation feature set is fairly rich. You have the <code>validates</code> shortcut DSL which maps to all the default validators. The ability to override those default validators through <strong>custom validator classes</strong>. Finally, you can also write <strong>custom validator methods</strong> for specific use cases. For the purpose of this article, we'll focus on custom validator methods.</p>
+<!--excerpt-->
+
+<h2>Custom Validator methods</h2>
+<p>I recently ran across a good use case for custom validator methods. Adding validation to attributes on a serialized object isn't possible by default in Rails without using a custom validator method. Here's our default code logic.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Company</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">serialize</span> <span class="ss">:settings</span><span class="p">,</span> <span class="no">CompanySettings</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">CompanySettings</span>
+  <span class="no">SETTINGS_HASH</span> <span class="o">=</span> <span class="sx">%w(
+    industry_speciality
+    company_email
+    branding_color # We want to validate this!
+  )</span><span class="p">.</span><span class="nf">freeze</span>
+<span class="k">end</span></code></pre></figure>
+<p>Looking at the above code, we can see that Company contains an association called <code>settings</code> that is based off the class <code>CompanySettings</code>. This class allows for new columns to be easily added to a settings hash but has the unfortunate downside of preventing the usage of Rail's built-in default validators (since CompanySettings is not a model in this case). Ideally, having every attribute properly validated and tested is the way to go, so finding a solution to this problem was a priority.</p>
+<p>A colleague and I came across <a href="http://guides.rubyonrails.org/active_record_validations.html#custom-methods" target="_blank">custom methods</a> within the Rail's validators documentation. This solved our issue via the ability of a custom validation method as well as a matching spec for the new method. An added benefit from this solution, was the freedom in the future to add additional branches and error conditions. See the full solution below.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Company</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">serialize</span> <span class="ss">:settings</span><span class="p">,</span> <span class="no">CompanySettings</span>
+
+  <span class="no">VALID_COLOR_REGEX</span> <span class="o">=</span> <span class="sr">/\A#[0-9a-fA-F]{6}\z/</span>
+
+  <span class="c1"># Notice how this DSL uses validate instead of validates</span>
+  <span class="c1">#</span>
+  <span class="c1"># The reason for this is two-fold.</span>
+  <span class="c1">#</span>
+  <span class="c1"># 1. validates is the shortcut dsl for built-in validator classes</span>
+  <span class="c1"># 2. In order to use custom validator methods you first need to register</span>
+  <span class="c1"># the method with the validate API</span>
+  <span class="n">validate</span> <span class="ss">:branding_color</span>
+
+  <span class="k">def</span> <span class="nf">branding_color</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="p">.</span><span class="nf">branding_color</span><span class="p">.</span><span class="nf">present?</span> <span class="c1"># This is equivalent to validates allow_blank: true attribute</span>
+      <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="no">VALID_COLOR_REGEX</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="nf">branding_color</span><span class="p">)</span>
+      <span class="n">errors</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="ss">:settings_branding_color</span><span class="p">,</span> <span class="no">I18n</span><span class="p">.</span><span class="nf">t</span><span class="p">(</span><span class="s2">"company_settings.branding_color.error_message"</span><span class="p">))</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># spec/models/company_spec.rb</span>
+<span class="n">describe</span> <span class="no">Company</span> <span class="k">do</span>
+
+  <span class="n">describe</span> <span class="s2">"#branding_color"</span> <span class="k">do</span>
+    <span class="n">let</span><span class="p">(</span><span class="ss">:company</span><span class="p">)</span> <span class="p">{</span> <span class="n">build</span><span class="p">(</span><span class="ss">:company</span><span class="p">)</span> <span class="p">}</span>
+
+    <span class="n">it</span> <span class="s2">"is valid when custom link color is empty"</span> <span class="k">do</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">company</span><span class="p">.</span><span class="nf">valid?</span><span class="p">).</span><span class="nf">to</span> <span class="n">be</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s2">"is valid when custom link color is a correct color hex code"</span> <span class="k">do</span>
+      <span class="n">company</span><span class="p">.</span><span class="nf">settings</span><span class="p">.</span><span class="nf">branding_color</span> <span class="o">=</span> <span class="s2">"#abcdef"</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">company</span><span class="p">.</span><span class="nf">valid?</span><span class="p">).</span><span class="nf">to</span> <span class="n">be</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s2">"is invalid with a bad color hex code"</span> <span class="k">do</span>
+      <span class="n">company</span><span class="p">.</span><span class="nf">settings</span><span class="p">.</span><span class="nf">branding_color</span> <span class="o">=</span> <span class="s2">"invalid_color"</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">company</span><span class="p">.</span><span class="nf">valid?</span><span class="p">).</span><span class="nf">to</span> <span class="n">be</span> <span class="kp">false</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+<p>The previous code provides a way of properly validating a field that is within a serialized object. We also have the piece of mind that this will function how we expect thanks to a clear spec of the new validation method.</p>
+
+<h2>A little on custom validator classes</h2>
+<p>Generally, custom methods seem to work great for quick or difficult to validate attributes while custom validator classes are beneficial for multiple files that share the same validation method. Custom validator classes also give you the power to override the current implementations of default validators (like email or password) or write your own (MyValidatorClass).</p>
+
+<h2>Conclusion</h2>
+<p>Here are some quick basics for custom validation methods:</p>
+<ul>
+  <li>Must register a method with the <code>validate :method_name</code> syntax</li>
+  <li>Enables validation on otherwise difficult to validate attributes (e.g. serialized)</li>
+  <li>Allows for multiple error branches and messages</li>
+</ul>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/avoiding-destructive-criticism-by-critiquing-in-love/" title="Avoiding destructive criticism by Critiquing in Love">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/custom-named-belongs_to-associations-in-rails-with-foreign-key-constraints/" title="Custom Named Belongs_to Associations in Rails with foreign key constraints">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

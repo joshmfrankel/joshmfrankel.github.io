@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Signing commits for Github and Sublime Merge | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Signing commits for Github and Sublime Merge" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Signing commits is a great way to add additional level of confidence to your code. This is especially important if you are an open source contributor. By signing your commit you’re saying that it originated from a verified author. This is accomplished by using GPG which is a free encryption and signing tool. Github has taken this one step farther and now shows signed commit authors with a verified badge. Not only is this a great way to see at a glance if code comes from a trusted source, but the verified badge looks slick." />
+<meta property="og:description" content="Signing commits is a great way to add additional level of confidence to your code. This is especially important if you are an open source contributor. By signing your commit you’re saying that it originated from a verified author. This is accomplished by using GPG which is a free encryption and signing tool. Github has taken this one step farther and now shows signed commit authors with a verified badge. Not only is this a great way to see at a glance if code comes from a trusted source, but the verified badge looks slick." />
+<link rel="canonical" href="http://joshfrankel.me/blog/signing-commits-for-github-and-sublime-merge/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/signing-commits-for-github-and-sublime-merge/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-06-02T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Signing commits is a great way to add additional level of confidence to your code. This is especially important if you are an open source contributor. By signing your commit you’re saying that it originated from a verified author. This is accomplished by using GPG which is a free encryption and signing tool. Github has taken this one step farther and now shows signed commit authors with a verified badge. Not only is this a great way to see at a glance if code comes from a trusted source, but the verified badge looks slick.","headline":"Signing commits for Github and Sublime Merge","dateModified":"2019-06-02T00:00:00+00:00","datePublished":"2019-06-02T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/signing-commits-for-github-and-sublime-merge/"},"url":"http://joshfrankel.me/blog/signing-commits-for-github-and-sublime-merge/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Signing commits for Github and Sublime Merge</h1>
+
+    
+      <p class="Banner-information">
+        <time>June 2, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Signing commits is a great way to add additional level of confidence to your code.
+This is especially important if you are an open source contributor. By
+signing your commit you’re saying that it originated from a verified author.
+This is accomplished by using GPG which is a free encryption and signing tool.</p>
+
+<p>Github has taken this one step farther and now shows signed commit authors with
+a verified badge. Not only is this a great way to see at a glance if code comes
+from a trusted source, but the verified badge looks slick.
+<!--excerpt--></p>
+
+<p>For the remainder of this tutorial, I’m assuming you don’t have a generated GPG key. If
+you do (or aren’t sure) you can run the command:
+<code class="highlighter-rouge">gpg --list-secret-keys --keyid-format LONG</code>. This will list out all available
+GPG keys with public and private keys. If you’d like to use an existing
+private/public key pair, go ahead and skip down to the step, <a href="#finding-your-generated-gpg-key">Finding your GPG key”</a>.</p>
+
+<p><del>I’m also writing this tutorial from the perspective of a Linux distribution but
+it should work relatively the same for MacOS (not sure about Windows).</del> I’ve now
+updated this tutorial for both Linux Debian and MacOSX.</p>
+
+<h2 id="making-sure-gpg-is-installed">Making sure GPG is installed</h2>
+
+<blockquote class="Info Info-right"><strong>GPG (GNU Privacy Guard)</strong><br />
+  "GnuPG allows you to encrypt and sign your data and communications; it features a versatile key management system, along with access modules for all kinds of public key directories."
+  <cite>https://gnupg.org/</cite>
+</blockquote>
+
+<p>Most variants of Debian should have <acronym title="GNU Privacy Guard">GPG</acronym>
+installed by default. You can check this by running <code class="highlighter-rouge">which gpg</code> which should return
+the installation location.</p>
+
+<p>If it doesn’t then you need to install it with <code class="highlighter-rouge">sudo apt-get install gpg</code> for linux or <code class="highlighter-rouge">brew install gnupg</code> for homebrew on MacOS.</p>
+
+<h2 id="generating-a-new-gpg-key">Generating a new GPG key</h2>
+
+<p>Github has some great <a href="https://help.github.com/en/articles/generating-a-new-gpg-key">documentation on generating gpg keys</a>.
+<del>Unfortunately, the command it recommends for gpg as well as gpg2 doesn’t actually work. What I found works
+is the following</del>:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">gpg --gen-key
+</span></code></pre></div></div>
+
+<p><strong>UPDATE 2020</strong>: Upon running through this process on MacOS, I’ve found that <code class="highlighter-rouge">gpg --full-generate-key</code> works appropriately. For Linux
+based distributions you may still need to use the old –gen-key method above.</p>
+
+<p>We’re going to run through what the process will look like step-by-step.</p>
+
+<p>For the first prompt, <strong>just hit enter</strong>. This will select the default option. The default of RSA and RSA is what we want.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Please <span class="k">select </span>what kind of key you want:
+   <span class="o">(</span>1<span class="o">)</span> RSA and RSA <span class="o">(</span>default<span class="o">)</span>
+   <span class="o">(</span>2<span class="o">)</span> DSA and Elgamal
+   <span class="o">(</span>3<span class="o">)</span> DSA <span class="o">(</span>sign only<span class="o">)</span>
+   <span class="o">(</span>4<span class="o">)</span> RSA <span class="o">(</span>sign only<span class="o">)</span>
+Your selection?
+</code></pre></div></div>
+
+<p>Github recommends the maximum of 4096 so let’s use that. <strong>Type out 4096</strong>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RSA keys may be between 1024 and 4096 bits long.
+What keysize <span class="k">do </span>you want? <span class="o">(</span>2048<span class="o">)</span> 4096
+Requested keysize is 4096 bits
+</code></pre></div></div>
+
+<p>Next it will ask you if you want the key to expire. We don’t, so <strong>use the
+default by pressing enter</strong>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Please specify how long the key should be valid.
+         0 <span class="o">=</span> key does not expire
+      &lt;n&gt;  <span class="o">=</span> key expires <span class="k">in </span>n days
+      &lt;n&gt;w <span class="o">=</span> key expires <span class="k">in </span>n weeks
+      &lt;n&gt;m <span class="o">=</span> key expires <span class="k">in </span>n months
+      &lt;n&gt;y <span class="o">=</span> key expires <span class="k">in </span>n years
+Key is valid <span class="k">for</span>? <span class="o">(</span>0<span class="o">)</span>
+</code></pre></div></div>
+
+<p>Time for a confirmation. Is the above information correct? <strong>Type “y” to continue</strong>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Is this correct? <span class="o">(</span>y/N<span class="o">)</span> y
+</code></pre></div></div>
+
+<p>Now we need to identify ourselves. It wouldn’t make sense for a signed commit
+to be without identity verification would it?</p>
+
+<p>First step is to <strong>enter your full name</strong> as you’d like it to appear in the signature.
+I’ve listed my name out but please use your own (we don’t need any more Josh Frankel’s
+running amok).</p>
+
+<p><strong>NOTE</strong>: This name should match the one stored in your <code class="highlighter-rouge">~/.gitconfig</code> user name key.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>You need a user ID to identify your key<span class="p">;</span> the software constructs the user ID
+from the Real Name, Comment and Email Address <span class="k">in </span>this form:
+    <span class="s2">"Heinrich Heine (Der Dichter) &lt;heinrichh@duesseldorf.de&gt;"</span>
+
+Real name: Josh Frankel
+</code></pre></div></div>
+
+<blockquote class="Info Info-right">
+  "When asked to enter your email address, ensure that you enter the verified email
+address for your GitHub account. To keep your email address private, use your
+GitHub-provided no-reply email address."
+<cite><a href="https://help.github.com/en/articles/generating-a-new-gpg-key">Github</a></cite>
+</blockquote>
+
+<p>Next you’ll need to <strong>use the same email address that you use for Github</strong>. This is
+really important to ensure that your GPG signature matches the username. I believe
+it is also how Github determines whether or not to place the verified badge next
+to your commits.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Email address: josh@tutorial.com
+</code></pre></div></div>
+
+<p>You can leave Comment blank by <strong>pressing enter</strong>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Comment:
+</code></pre></div></div>
+
+<p>Next you’ll get an identity confirmation. If all the below is correct then
+<strong>type O for Okay</strong>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>You selected this USER-ID:
+    <span class="s2">"Josh Frankel &lt;josh@tutorial.com&gt;"</span>
+
+Change <span class="o">(</span>N<span class="o">)</span>ame, <span class="o">(</span>C<span class="o">)</span>omment, <span class="o">(</span>E<span class="o">)</span>mail or <span class="o">(</span>O<span class="o">)</span>kay/<span class="o">(</span>Q<span class="o">)</span>uit?
+</code></pre></div></div>
+
+<p>The next two sections deal with passphrase prompting at the command line for Debian
+and MacOSX respectively.</p>
+
+<h3 id="debian-gpg-passphrase">Debian GPG passphrase</h3>
+
+<p>Now it will prompt you to <strong>enter a passphrase</strong> which for me looked like this (it may
+be a command line prompt for other distributions and operating systems):</p>
+
+<p><img src="/img/2019/access-prompt.png" alt="Access prompt" title="Access Prompt" /></p>
+
+<p>You’ll be prompted to re-enter this to confirm. Don’t forget this password as it
+is necessary for signing commits. Think of it as logging into the GPG identity.
+I saved mine in a password manager.</p>
+
+<h3 id="macosx-gpg-passphrase">MacOSX GPG Passphrase</h3>
+<p>Ideally, you should receive a passphrase prompt at this point. If not then you most likely don’t have one configured. While
+not really clear, you can add the <strong>pinentry-mac</strong> program.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew install pinentry-mac
+</code></pre></div></div>
+
+<p>Next you’ll need to inform gpg-agent of pinentry-mac with the following append
+command:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo "pinentry-program /usr/local/bin/pinentry-mac" &gt;&gt; ~/.gnupg/gpg-agent.conf
+</code></pre></div></div>
+
+<p>After which if you’re still not able to sign commits you may need to restart
+your gpg-agent.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pkill gpg-agent
+gpg-agent --daemon
+</code></pre></div></div>
+
+<p>I believe that this is due to gpg-agent running as a daemon which means that it can’t
+prompt you to enter a passphrase. Instead it has to rely on pinentry-mac to send
+the passphrase prompt.</p>
+
+<h3 id="finish-key-generation">Finish key generation</h3>
+
+<p>After the identity confirmation, the last step is to just do random work on your computer until the GPG key is
+marked as trusted</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>We need to generate a lot of random bytes. It is a good idea to perform
+some other action <span class="o">(</span><span class="nb">type </span>on the keyboard, move the mouse, utilize the
+disks<span class="o">)</span> during the prime generation<span class="p">;</span> this gives the random number
+generator a better chance to gain enough entropy.
+
+gpg: key 3AA5C34371567BD2 marked as ultimately trusted
+public and secret key created and signed.
+
+gpg: checking the trustdb
+gpg: 3 marginal<span class="o">(</span>s<span class="o">)</span> needed, 1 <span class="nb">complete</span><span class="o">(</span>s<span class="o">)</span> needed, PGP trust model
+gpg: depth: 0  valid:   2  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 2u
+pub   4096R/3AA5C34371567BD2 2019-06-01
+      Key fingerprint <span class="o">=</span> X72D 8C40 70ZB 73A2 EFAE  981C ED3A 021E 7160 C89A
+uid                  Josh Frankel &lt;josh@tutorial.com&gt;
+sub   4096R/42B317FD4BA89E7A 2019-06-01
+</code></pre></div></div>
+
+<p>That’s it we’ve created our first GPG key. Nice job!</p>
+
+<h2 id="finding-your-generated-gpg-key">Finding your generated GPG Key</h2>
+
+<p>Now we need to grab our generated GPG key and add it to our Github account. We
+can do this with a couple commands.</p>
+
+<p><code class="highlighter-rouge">gpg --list-secret-keys --keyid-format LONG</code> will list out all your existing keys that have a public and private
+pairing.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg <span class="nt">--list-secret-keys</span> <span class="nt">--keyid-format</span> LONG
+
+/home/josh/.gnupg/secring.gpg
+<span class="nt">-----------------------------</span>
+sec   4096R/3AA5C34371567BD2 2019-06-01
+uid                          Josh Frankel &lt;josh@tutorial.com&gt;
+ssb   4096R/42B317FD4BA89E7A 2019-06-01
+</code></pre></div></div>
+
+<blockquote class="Info Info-right"><strong>ASCII mode</strong><br />
+  "Since PGP can operate both in ASCII mode and “raw” mode, it’s important to understand when to use which one.<br /><br />
+
+  When sending something that will be viewed as text (i.e. an email), you should use ASCII mode. On the other hand, when sending a file, you can (and should, it will make the encrypted file smaller) use the default non-ASCII mode.<br /><br />
+
+  To operate in ASCII mode, use the --armor (or -a) switch."
+  <cite>The Privacy Guide https://theprivacyguide.org/tutorials/gpg.html</cite>
+</blockquote>
+
+<p>Now, we need to export our GPG key to be used on Github via the command: <code class="highlighter-rouge">gpg --armor --export &lt;key-id&gt;</code></p>
+
+<p>First, grab the key id which can be found on the <code class="highlighter-rouge">sec</code> line after the keysize specification
+of <code class="highlighter-rouge">4096R</code>. In our case that means using <strong>3AA5C34371567BD2</strong> from above.</p>
+
+<p>Using the key id, we’ll gather the GPG key signature by using the <code class="highlighter-rouge">--armor</code> flag which is
+useful for seeing keys in ASCII format. Without this we won’t
+be able to copy our key and paste it into Github. Additionally, the <code class="highlighter-rouge">--export</code>
+flag simply exports the key that we specify.</p>
+
+<p>These must be used in tandem in order to gather proper output.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg <span class="nt">--armor</span> <span class="nt">--export</span> 3AA5C34371567BD2
+</code></pre></div></div>
+
+<p>This will output your GPG key to your console. Make sure to copy the entire thing
+starting with the <code class="highlighter-rouge">BEGIN</code> comment and ending with the <code class="highlighter-rouge">END</code> comment.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">-----BEGIN</span> PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1
+
+Lots of characters and lines of text
+Lots of characters and lines of text
+Lots of characters and lines of text
+<span class="nt">-----END</span> PGP PUBLIC KEY BLOCK-----
+</code></pre></div></div>
+
+<p>Let’s add our key to github!</p>
+
+<h2 id="adding-your-gpg-key-to-github">Adding your GPG key to Github</h2>
+
+<p>At this point we can follow <a href="https://help.github.com/en/articles/adding-a-new-gpg-key-to-your-github-account">Github’s guide directly which can be found here</a>. It has some great screenshots and
+step-by-step instructions. I won’t repeat them here. Once you’re done move onto the next
+section below for learning how to configure git for automatic signing.</p>
+
+<h2 id="automatically-signing-commits-in-git">Automatically signing commits in Git</h2>
+
+<p>We’ve added our GPG key to Github and the key matches our Github email address,
+we can configure git to start using it.</p>
+
+<p>This is done by setting our <code class="highlighter-rouge">user.signingkey</code> to match our GPG key id.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config <span class="nt">--global</span> user.signingkey 3AA5C34371567BD2
+</code></pre></div></div>
+
+<p>Running this command, will add a new entry to <strong>~/.gitconfig</strong> which looks like:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>user]
+  email <span class="o">=</span> ...
+  name <span class="o">=</span> ...
+  signingkey <span class="o">=</span> 3AA5C34371567BD2
+</code></pre></div></div>
+
+<p>Now by default Git will use the specified signingkey for signing commits.</p>
+
+<p>Commits are signed with the format of <code class="highlighter-rouge">git commit -S</code> <a href="https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work#_signing_commits">[More on signing commits here]</a>. Now, if you’re like me remembering to type out
+the <code class="highlighter-rouge">-S</code> flag every time is more mental gymnastics that you’re willing to do. Let’s make it automatic so that
+we don’t even need to think about it. We can do this by specifying a new configuration
+option of <strong>true</strong> for <code class="highlighter-rouge">commit.gpgsign</code>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config <span class="nt">--global</span> commit.gpgsign <span class="nb">true</span>
+</code></pre></div></div>
+
+<p>If we take a look at our <strong>~/.gitconfig</strong> configuration we’ll see another new
+entry:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>commit]
+  gpgsign <span class="o">=</span> <span class="nb">true</span>
+</code></pre></div></div>
+
+<p>Now the first time you go to sign a commit it will prompt you with entering a
+passphrase for the GPG key. We did this above after the identity verification step
+of generating a GPG key. If you have an existing key you’ll need to enter your
+created passphrase here as well.</p>
+
+<p>Can’t remember it? You can always create a new
+one to use by following the <a href="#generating-a-new-gpg-key">Generating a new GPG key</a> section of
+this tutorial.</p>
+
+<p>My prompt allowed me to remember my passphrase which means I no longer need to enter it.
+I really like how simple this makes the signing process. Let me know if this isn’t the
+case for operating system or if you have a different solution.</p>
+
+<p>On the flip-side, there’s something to be said about always entering the passphrase for every commit.
+This is a bit more secure if you consider the scenario of someone having access to your physical computer
+then a saved passphrase means it isn’t really you.
+That being said I’m not too worried about something like this as I’m using several other security
+features on my laptop.</p>
+
+<p>Enough exposition!</p>
+
+<p>Once you start signing commits you can see the signatures appear next to your
+commit headers in the log using <code class="highlighter-rouge">--show-signature</code>. Neat!</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git log <span class="nt">--show-signature</span>
+
+<span class="c"># Log output</span>
+commit xxxxxxxxx
+gpg: Signature made Wed 29 May 2019 09:30:37 AM EDT using RSA key ID 3AA5C34371567BD2
+gpg: Good signature from <span class="s2">"Josh Frankel &lt;josh@tutorial.com&gt;"</span>
+Author: Josh Frankel &lt;josh@tutorial.com&gt;
+Date:   Wed May 29 09:30:37 2019 <span class="nt">-0400</span>
+
+    Did some stuff and signed a commit. Yay!
+</code></pre></div></div>
+
+<p>And if you push a newly signed commit to Github you can see your verified identity
+badge in all its glory.</p>
+
+<p><img src="/img/2019/verified-commit-github.png" alt="Verified Github commit" title="Verified Github commit" /></p>
+
+<p>The badge is what it’s all about.</p>
+
+<h2 id="enabling-signing-of-commits-in-sublime-merge-or-other-git-clients">Enabling Signing of commits in Sublime Merge or other Git clients</h2>
+
+<p>Signing of commits works on the command line beautifully now. We can alleviate
+any concerns of identity as now all of our commits are signed and verified. But
+what about external Git tools?</p>
+
+<p>I prefer to use Git with a dedicated client. Having a
+Git client makes things like adding hunks or fixing conflicts a breeze. There
+are a ton of different ones out there but I’ve found that <strong>Sublime Merge</strong> is fast,
+simple, and integrates well into my existing Sublime Text workflow. (I’m a Sublime fan
+if you couldn’t tell.) <a href="https://www.sublimemerge.com/">It’s also free to try out just like Sublime</a></p>
+
+<p>The problem with external tools is that they don’t use the command line and therefore
+work differently than running <code class="highlighter-rouge">git commit -S</code> directly. In other words, when I first tried to commit via Sublime Merge
+I got the following cryptic error:</p>
+
+<p><img src="/img/2019/sublime-merge-error.png" alt="Sublime Merge signing error" title="Sublime Merge signing error" /></p>
+
+<p>The tip off point for me was the first line of the error message that mentioned
+<strong>/dev/tty</strong>. This is just a reference to your current terminal.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg: cannot open <span class="nb">tty</span> <span class="sb">`</span>/dev/tty<span class="s1">': No such device or address
+</span></code></pre></div></div>
+
+<p>So what can we do here?</p>
+
+<p>Well we can specify that we want to run GPG in <strong>no-tty</strong> mode.
+This means that the terminal won’t be used for output or prompting. This is perfect
+for external applications.</p>
+
+<p>To accomplish this we’ll need to add <strong>no-tty</strong> to our <strong>gpg.conf</strong> configuration.
+By doing so we can keep our process automated and ensure freedom of committing in our
+favorite external tools.</p>
+
+<p>Open <strong>~/.gnupg/gpg.conf</strong> and add <code class="highlighter-rouge">no-tty</code> to the end of the file. I added a comment
+to explain why the option was in there so that future me remembers.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># You may also list arbitrary keyservers here by URL.</span>
+<span class="c">#</span>
+<span class="c"># Try CERT, then PKA, then LDAP, then hkp://subkeys.net:</span>
+<span class="c">#auto-key-locate cert pka ldap hkp://subkeys.pgp.net</span>
+
+<span class="c"># No tty disables terminal prompts allowing Sublime Merge to work</span>
+no-tty
+</code></pre></div></div>
+
+<p>Now go back to Sublime Merge and try committing again. Viola, it works!</p>
+
+<p><img src="/img/2019/gpg-hooray.gif" alt="GPG Hooray Gif" title="GPG Hooray Gif" /></p>
+
+<p>One downside of adding no-tty to our <strong>gpg.conf</strong> is that trying to run gpg on the
+command line stops working because we just disabled tty (duh). If for some reason
+you need to use gpg you can always go back in and comment out the <code class="highlighter-rouge">no-tty</code> line
+on your <strong>gpg.conf</strong> file. I
+haven’t been able to find another way sign commits in a Git tool
+while not disabling gpg for the command line.</p>
+
+<p><img src="/img/2019/sublime-merge-success.png" alt="Sublime Merge signing success" title="Sublime Merge signing success" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>So to quickly wrap up here’s what we accomplished:</p>
+
+<ul>
+  <li>We generated a new GPG Key</li>
+  <li>We exported the generated key</li>
+  <li>We pasted the key into Github to match our account to GPG identity</li>
+  <li>We configured signing of commits to be automatic</li>
+  <li>We ensured that Git clients worked with signing commits</li>
+</ul>
+
+<p>With that git committing and as always I’d love to hear your questions and feedback
+in the comments. Thanks for reading.</p>
+
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/testing-request-specs-for-invalid-formats-pundit-authorization-and-activerecord-failures/" title="Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/don-t-let-the-null-bytes-bite/" title="Don't let the null bytes bite">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

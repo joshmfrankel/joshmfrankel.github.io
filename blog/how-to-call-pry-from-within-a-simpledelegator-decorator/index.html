@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>How to call Pry from within a SimpleDelegator Decorator | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="How to call Pry from within a SimpleDelegator Decorator" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I’m by nature a kinesthetic learning or someone that learns by doing. One of the ways I learn new Ruby codebases or techniques is to dive into them and see how they work during every step of their processing. Pry is a great tool for allowing me to dig directly into code. While, really useful for debugging and understanding, one thing that has bothered me about using Pry is that it doesn’t work properly with classes that inherit from SimpleDelegator. Instead it ends up in a method_missing block. Luckily, I recently learned a great workaround for this issue which we’ll get into below." />
+<meta property="og:description" content="I’m by nature a kinesthetic learning or someone that learns by doing. One of the ways I learn new Ruby codebases or techniques is to dive into them and see how they work during every step of their processing. Pry is a great tool for allowing me to dig directly into code. While, really useful for debugging and understanding, one thing that has bothered me about using Pry is that it doesn’t work properly with classes that inherit from SimpleDelegator. Instead it ends up in a method_missing block. Luckily, I recently learned a great workaround for this issue which we’ll get into below." />
+<link rel="canonical" href="http://joshfrankel.me/blog/how-to-call-pry-from-within-a-simpledelegator-decorator/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/how-to-call-pry-from-within-a-simpledelegator-decorator/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-04-10T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"I’m by nature a kinesthetic learning or someone that learns by doing. One of the ways I learn new Ruby codebases or techniques is to dive into them and see how they work during every step of their processing. Pry is a great tool for allowing me to dig directly into code. While, really useful for debugging and understanding, one thing that has bothered me about using Pry is that it doesn’t work properly with classes that inherit from SimpleDelegator. Instead it ends up in a method_missing block. Luckily, I recently learned a great workaround for this issue which we’ll get into below.","headline":"How to call Pry from within a SimpleDelegator Decorator","dateModified":"2018-04-10T00:00:00+00:00","datePublished":"2018-04-10T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/how-to-call-pry-from-within-a-simpledelegator-decorator/"},"url":"http://joshfrankel.me/blog/how-to-call-pry-from-within-a-simpledelegator-decorator/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">How to call Pry from within a SimpleDelegator Decorator</h1>
+
+    
+      <p class="Banner-information">
+        <time>April 10, 2018</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>I’m by nature a kinesthetic learning or someone that learns by doing. One of the 
+ways I learn new Ruby codebases or techniques is to dive into them and see how
+they work during every step of their processing. Pry is a great tool for allowing me to
+dig directly into code. While, really useful for debugging and understanding, one
+thing that has bothered me about using Pry is that it doesn’t work properly with classes
+that inherit from SimpleDelegator. Instead it ends up in a method_missing block. Luckily, 
+I recently learned a great workaround for this issue which we’ll get into below.
+<!--excerpt--></p>
+
+<h2 id="what-happens-when-calling-pry-within-a-decorator">What happens when calling Pry within a Decorator?</h2>
+
+<p>Let’s say you have the following Decorator that inherits from SimpleDelegator:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">UserDecorator</span> <span class="o">&lt;</span> <span class="no">SimpleDelegator</span>
+
+  <span class="c1"># @return [String] formats an email address with the User's name</span>
+  <span class="k">def</span> <span class="nf">format_email</span>
+    <span class="nb">binding</span><span class="p">.</span><span class="nf">pry</span> <span class="c1"># I want to know what's going on here</span>
+
+    <span class="s2">"{name} &lt;{email}&gt;"</span> <span class="c1">#=&gt; returns Josh &lt;josh@example.com&gt;</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>You’d typically expect to see the context be within the <code>UserDecorator</code>
+above. However, what actually happens is that we end up in the <code>Delegator#method_missing</code>
+magic method. It looks like the below code:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">   <span class="mi">78</span><span class="p">:</span> <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+   <span class="mi">79</span><span class="p">:</span>   <span class="n">r</span> <span class="o">=</span> <span class="kp">true</span>
+   <span class="mi">80</span><span class="p">:</span>   <span class="n">target</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nf">__getobj__</span> <span class="p">{</span><span class="n">r</span> <span class="o">=</span> <span class="kp">false</span><span class="p">}</span>
+   <span class="mi">81</span><span class="p">:</span> 
+   <span class="mi">82</span><span class="p">:</span>   <span class="k">if</span> <span class="n">r</span> <span class="o">&amp;&amp;</span> <span class="n">target</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+   <span class="mi">83</span><span class="p">:</span>     <span class="n">target</span><span class="p">.</span><span class="nf">__send__</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+   <span class="mi">84</span><span class="p">:</span>   <span class="k">elsif</span> <span class="o">::</span><span class="no">Kernel</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="kp">true</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="mi">85</span><span class="p">:</span>     <span class="o">::</span><span class="no">Kernel</span><span class="p">.</span><span class="nf">instance_method</span><span class="p">(</span><span class="n">m</span><span class="p">).</span><span class="nf">bind</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+   <span class="mi">86</span><span class="p">:</span>   <span class="k">else</span>
+   <span class="mi">87</span><span class="p">:</span>     <span class="k">super</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+   <span class="mi">88</span><span class="p">:</span>   <span class="k">end</span>
+   <span class="mi">89</span><span class="p">:</span> <span class="k">end</span></code></pre></figure>
+
+<h2 id="simpledelegator-workaround">SimpleDelegator workaround</h2>
+
+<blockquote class="Info Info-right"><strong>Pro Tips <sub>[2]</sub></strong><br />
+  <ul>
+      <li><strong>ls</strong> - lists all available variables</li>
+      <li><strong>next</strong> - execute the next line of code</li>
+      <li><strong>ls -grep [keyword]</strong> - lists all available variables matching a pattern</li>
+      <li><strong>whereami</strong> - shows the current code context in reference to Pry location</li>
+      <li><strong>!!!</strong> - exits out of current and future Pry debugger commands</li>
+      <li><strong>help</strong> - list of all available commands within a Pry session</li>
+  </ul>
+</blockquote>
+
+<p>Now, technically at this point you can still check variables as if you were in the
+<code>UserDecorator</code> above with commands like <code>ls</code> to list all the 
+accessible variables, but you really can’t see where you are in the code. This isn’t super
+helpful for times when you want to <code>next</code> your way through the code.</p>
+
+<p>However, there is a trick to getting around this which is hinted at in the method_missing 
+response above. Instead of using the vanilla <code class="highlighter-rouge">binding.pry</code> use the classifed name of <code class="highlighter-rouge">::Kernel.binding.pry</code><sup>[1]</sup>. Now you’ll be within your method’s context and be able to see your current breakpoint position.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">   <span class="mi">83</span><span class="p">:</span> <span class="k">def</span> <span class="nf">method_to_pry_into</span>
+<span class="o">=&gt;</span> <span class="mi">84</span><span class="p">:</span>   <span class="o">::</span><span class="no">Kernel</span><span class="p">.</span><span class="nf">binding</span><span class="p">.</span><span class="nf">pry</span>
+   <span class="mi">85</span><span class="p">:</span>   <span class="c1"># more logic here</span>
+   <span class="mi">86</span><span class="p">:</span> <span class="k">end</span></code></pre></figure>
+
+<p>Nice! Know any other cool tricks you’ve learned while using Pry? Maybe you know
+about another tool that has been useful to your learning? I’d love to hear about
+it in the comments below.</p>
+
+<p>Thanks for reading.</p>
+
+<h3 id="additional-resources">Additional Resources</h3>
+<ol>
+  <li><a href="https://github.com/pry/pry/issues/1462">Original Pry Github Issue &amp; Fix</a></li>
+  <li><a href="https://github.com/pry/pry/wiki/Command-system">Pry Command System</a></li>
+</ol>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/using-attr-accesor-for-class-level-methods/" title="Using attr_accesor for Class level methods">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/zero-downtime-migration-from-enum-to-single-table-inheritance/" title="Zero downtime migration from Enum to Single Table Inheritance">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

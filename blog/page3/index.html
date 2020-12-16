@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Page 3 of 8 for Development Simplified | A blog about ruby, sql, performance, and patterns. By Josh Frankel.</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Development Simplified" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A blog about ruby, sql, performance, and patterns. By Josh Frankel." />
+<meta property="og:description" content="A blog about ruby, sql, performance, and patterns. By Josh Frankel." />
+<link rel="canonical" href="http://joshfrankel.me/blog/page3/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/page3/" />
+<meta property="og:site_name" content="Development Simplified" />
+<link rel="prev" href="http://joshfrankel.me/blog/page2/" />
+<link rel="next" href="http://joshfrankel.me/blog/page4/" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"A blog about ruby, sql, performance, and patterns. By Josh Frankel.","headline":"Development Simplified","@type":"WebPage","url":"http://joshfrankel.me/blog/page3/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Development Simplified</h1>
+
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <div class="w-100">
+  <section class="Listing">
+  <!-- This loops through the paginated posts -->
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/formatting-enum-columns-into-a-human-readable-format-with-sql/">Formatting Enum columns into a human readable format with SQL</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-02-18">February 18, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Enum columns can be really handy when working with Rails. There are a lot of built-in helper methods that allow for quickly writing code and they make type-checking simple. However, when working with raw SQL they can be difficult to work with as they’re stored as integers and as such lose their meaning. Keep reading to dig into a shortcut for staying SQL-land while returning an Enum in a human readable format.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#Ruby">#Ruby</a>
+        
+          <a href="/blog/tags#Ruby on Rails">#Ruby on Rails</a>
+        
+          <a href="/blog/tags#SQL">#SQL</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/using-rspec-to-set-expectations-for-stdout/">Using RSpec to set expectations for stdout</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-02-14">February 14, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>I’ve been working on a gem in my spare time for code coverage and one of its goals is to output coverage reports to stdout. The hope is that while running something like guard for RSpec, also having test coverage output during the red-green-refactor cycling will be useful. What I didn’t realize beforehand is that output is fully testable within RSpec. Here’s an example of ensuring a proper message is sent via <code class="highlighter-rouge">puts</code>.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#RSpec">#RSpec</a>
+        
+          <a href="/blog/tags#Ruby">#Ruby</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/configure-puma-ssl-for-local-development-on-ubuntu/">Configure Puma SSL for local development on Ubuntu</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#tutorials">tutorials</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2018-11-29">November 29, 2018</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Having your development environment match production helps ensure that a feature works the same in both contexts. An example of when local SSL is beneficial is whenever you are dealing with hardware specific permissions such as a webcam or microphone. This tutorial is specifically for Debian based Linux on the lvh.me domain for Google Chrome but it could also be used in other contexts.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby on rails">#ruby on rails</a>
+        
+          <a href="/blog/tags#ssl">#ssl</a>
+        
+          <a href="/blog/tags#Ubuntu">#Ubuntu</a>
+        
+          <a href="/blog/tags#puma">#puma</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/constructing-a-sql-select-from-subquery-in-activerecord/">Constructing a select * from subquery using ActiveRecord</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#articles">articles</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2018-07-26">July 26, 2018</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>ActiveRecord is a great tool for making SQL a more readable. However, there
+are some things that are really difficult to do in pure ActiveRecord. One of those is 
+a <code>SELECT * FROM (subquery)</code> style of query. Before writing it in a raw
+SQL query, check out the following tip for preserving some ActiveRecord goodness.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby on rails">#ruby on rails</a>
+        
+          <a href="/blog/tags#PostgreSQL">#PostgreSQL</a>
+        
+          <a href="/blog/tags#ActiveRecord">#ActiveRecord</a>
+        
+          <a href="/blog/tags#SQL">#SQL</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/overriding-activerecord-getters-with-the-same-attribute-name/">Override an ActiveRecord attribute value while using the same getter method</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2018-07-18">July 18, 2018</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Overriding methods as a Rubyist is extremely natural and powerful. Recently, I did run into a circumstance where I had an ActiveRecord object with a DateTime that I needed in a specific TimeZone (based on user input). If you ever have tried to override the getter for an attribute with the same name and have been stumped, this article details one way of making it work.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby on rails">#ruby on rails</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/zero-downtime-migration-from-enum-to-single-table-inheritance/">Zero downtime migration from Enum to Single Table Inheritance</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#tutorials">tutorials</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2018-05-26">May 26, 2018</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>I’ve been refactoring quite a bit of legacy code recently. I love this kind
+of work because you get to architect new patterns and code pathways for future developers to use. Right past mistakes and make the future of the application just a bit brighter. My most recent refactoring involved converting an Enum based architecture to utilize Rail’s Single Table Inheritance setup. So what does it take to move from one architecture to another? Keep reading to find out strategies that I use to help keep bugs to a minimum while ensuring that end-users experience zero downtime.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby on rails">#ruby on rails</a>
+        
+          <a href="/blog/tags#composition">#composition</a>
+        
+          <a href="/blog/tags#single table inheritance">#single table inheritance</a>
+        
+          <a href="/blog/tags#databases">#databases</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/how-to-call-pry-from-within-a-simpledelegator-decorator/">How to call Pry from within a SimpleDelegator Decorator</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#fixes">fixes</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2018-04-10">April 10, 2018</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>I’m by nature a kinesthetic learning or someone that learns by doing. One of the 
+ways I learn new Ruby codebases or techniques is to dive into them and see how
+they work during every step of their processing. Pry is a great tool for allowing me to
+dig directly into code. While, really useful for debugging and understanding, one
+thing that has bothered me about using Pry is that it doesn’t work properly with classes
+that inherit from SimpleDelegator. Instead it ends up in a method_missing block. Luckily, 
+I recently learned a great workaround for this issue which we’ll get into below.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby">#ruby</a>
+        
+          <a href="/blog/tags#gems">#gems</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/using-attr-accesor-for-class-level-methods/">Using attr_accesor for Class level methods</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#tutorials">tutorials</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2018-04-04">April 4, 2018</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>The beginning steps to writing a new class usually involve writing a quick
+<code>def initialize</code> method. The purpose of these type of methods is to
+setup any dependencies or configurations necessary for the object to fulfill its
+responsibility. With instance variables, a common paradigm is to use an attr_reader
+or attr_writer to read/write values. However, these methods specifically work
+off of instance variables.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby">#ruby</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/enable-eslint-for-sublimelinter-while-using-asdf-for-version-management/">Enable ESLint for SublimeLinter while using asdf for version management</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#fixes">fixes</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2018-04-03">April 3, 2018</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>SublimeLinter is an excellent tool for linting new code quickly and efficiently. Version managers like rvm, nvm, and <a href="https://github.com/asdf-vm/asdf">asdf</a> are also great tools for smoothly switching between projects with different version requirements. Getting both SublimeLinter and version manager to play nice can sometimes be challenging. I’m going to quickly talk about the simple steps I took to getting ESLint and <a href="https://github.com/asdf-vm/asdf">asdf</a> to work with SublimeLinter below.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#sublime text">#sublime text</a>
+        
+          <a href="/blog/tags#eslint">#eslint</a>
+        
+          <a href="/blog/tags#asdf">#asdf</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/ensure-dropping-a-database-table-is-reversible/">Ensure dropping a database table is reversible</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2018-02-22">February 22, 2018</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>When dropping a database table in a migration all data contained within the dropped table will be lost as well. This is to be expected since the table schema no longer exists. However, it is possible to make such a migration reversible so that at least the database structure is preserved.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby on rails">#ruby on rails</a>
+        
+          <a href="/blog/tags#databases">#databases</a>
+        
+          <a href="/blog/tags#migration">#migration</a>
+        
+      </div>
+    </article>
+  
+</section>
+
+<!-- Pagination links -->
+<section class="Pagination">
+  
+    
+      <li >
+        <a href="/blog/index.html" title="Development Simplified">1</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page2/index.html" title="Development Simplified">2</a>
+      </li>
+    
+      <li class="selected">
+        <a href="/blog/page3/index.html" title="Development Simplified">3</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page4/index.html" title="Development Simplified">4</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page5/index.html" title="Development Simplified">5</a>
+      </li>
+    
+  
+</section>
+
+
+</div>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

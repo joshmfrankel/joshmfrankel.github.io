@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Prevent CSS transitions on page load with ES6 | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Prevent CSS transitions on page load with ES6" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I recently noticed on my blog that sometimes the CSS hover transitions for font-size, border-color, and color animate on page load. While this doesn’t impact the final design, it does make the initial page load a bit of a stylistic mess. I stumbled upon a great post on css-tricks that outlined a fix for this issue using jQuery. However, my goal for this site has always been keeping it as lean as possible. That&#39;s why I use Jekyll for static pages and minimal scripting (outside Disqus and Google Analytics). So of course I dug into how we can skip jQuery and just use ES6." />
+<meta property="og:description" content="I recently noticed on my blog that sometimes the CSS hover transitions for font-size, border-color, and color animate on page load. While this doesn’t impact the final design, it does make the initial page load a bit of a stylistic mess. I stumbled upon a great post on css-tricks that outlined a fix for this issue using jQuery. However, my goal for this site has always been keeping it as lean as possible. That&#39;s why I use Jekyll for static pages and minimal scripting (outside Disqus and Google Analytics). So of course I dug into how we can skip jQuery and just use ES6." />
+<link rel="canonical" href="http://joshfrankel.me/blog/prevent-css-transitions-on-page-load-with-es6/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/prevent-css-transitions-on-page-load-with-es6/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-04-11T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"I recently noticed on my blog that sometimes the CSS hover transitions for font-size, border-color, and color animate on page load. While this doesn’t impact the final design, it does make the initial page load a bit of a stylistic mess. I stumbled upon a great post on css-tricks that outlined a fix for this issue using jQuery. However, my goal for this site has always been keeping it as lean as possible. That&#39;s why I use Jekyll for static pages and minimal scripting (outside Disqus and Google Analytics). So of course I dug into how we can skip jQuery and just use ES6.","headline":"Prevent CSS transitions on page load with ES6","dateModified":"2019-04-11T00:00:00+00:00","datePublished":"2019-04-11T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/prevent-css-transitions-on-page-load-with-es6/"},"url":"http://joshfrankel.me/blog/prevent-css-transitions-on-page-load-with-es6/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Prevent CSS transitions on page load with ES6</h1>
+
+    
+      <p class="Banner-information">
+        <time>April 11, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>I recently noticed on my blog that sometimes the CSS hover transitions for <code class="highlighter-rouge">font-size</code>, <code class="highlighter-rouge">border-color</code>, and
+<code class="highlighter-rouge">color</code> animate on page load. While this doesn’t impact the final design, it does make the
+initial page load a bit of a stylistic mess.</p>
+
+<p itemprop="description">I stumbled upon a <a href="https://css-tricks.com/transitions-only-after-page-load/">great post on css-tricks</a> that outlined a fix for this issue using <strong>jQuery</strong>. However, my goal for this site has always been keeping it as lean as possible. That's why I use Jekyll for static pages and minimal scripting (outside Disqus and Google Analytics). So of course I dug into how we can skip <strong>jQuery</strong> and just use <strong>ES6</strong>.</p>
+<!--excerpt-->
+
+<p>Here’s what the issue looks like:</p>
+
+<div class="article-image" itemprop="image" itemscope="" itemtype="https://schema.org/ImageObject">
+  <img src="/img/2019/page-load-transition.gif" alt="Page loading with CSS transition" />
+  <meta itemprop="url" content="/img/2019/page-load-transition.gif" />
+  <meta itemprop="width" content="1005" />
+  <meta itemprop="height" content="410" />
+</div>
+
+<p>The fix discussed in the above article goes like this. First we add a new class to the body (or could be html) element. This can be whatever you want. I called mine <code class="highlighter-rouge">.preload-transitions</code> for extra readability.</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;body</span> <span class="na">class=</span><span class="s">"preload-transitions"</span><span class="nt">&gt;</span>
+  <span class="c">&lt;!-- more elements --&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+
+<span class="c">&lt;!-- Alternative for html --&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">class=</span><span class="s">"preload-transitions"</span><span class="nt">&gt;</span>
+ <span class="c">&lt;!-- more elements --&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p>Next we write a <strong>SCSS</strong> rule (you could also just use CSS here but I preferred SCSS for cleaning the rule up a bit) that ensures that all elements beneath the class above have their transitions disabled. And for extra assurance drop an <code class="highlighter-rouge">!important</code> on them. <code class="highlighter-rouge">!important</code> just means that we really, really want this value to be used over other inherited rules.</p>
+
+<figure class="highlight"><pre><code class="language-scss" data-lang="scss"><span class="c1">// Note the * after the class name. This just selects everything after the initial</span>
+<span class="c1">// class definition</span>
+<span class="nc">.preload-transitions</span> <span class="o">*</span> <span class="p">{</span>
+  <span class="c1">// Dry this up a bit with SCSS variable</span>
+  <span class="nv">$null-transition</span><span class="p">:</span> <span class="nb">none</span> <span class="o">!</span><span class="n">important</span><span class="p">;</span>
+
+  <span class="na">-webkit-transition</span><span class="p">:</span> <span class="nv">$null-transition</span><span class="p">;</span>
+  <span class="na">-moz-transition</span><span class="p">:</span> <span class="nv">$null-transition</span><span class="p">;</span>
+  <span class="na">-ms-transition</span><span class="p">:</span> <span class="nv">$null-transition</span><span class="p">;</span>
+  <span class="na">-o-transition</span><span class="p">:</span> <span class="nv">$null-transition</span><span class="p">;</span>
+  <span class="nl">transition</span><span class="p">:</span> <span class="nv">$null-transition</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Lastly, we diverge from using <strong>jQuery</strong> and instead lean on <strong>ES6</strong>. First we’ll add an
+event listener to the <code class="highlighter-rouge">DOMContentLoaded</code> event (also known as page load). Next we
+find the CSS class that disables the transitions <code class="highlighter-rouge">.preload-transitions</code>. Lastly, once
+we know the DOM element, we remove the class from it.</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">"DOMContentLoaded"</span><span class="p">,</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="kd">let</span> <span class="nx">node</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.preload-transitions'</span><span class="p">);</span>
+    <span class="nx">node</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="s1">'preload-transitions'</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="nt">&lt;/script&gt;</span></code></pre></figure>
+
+<p>That’s it we’re done!</p>
+
+<p>As far as browser support goes here’s some general notes with links to 
+caniuse.com entries:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">addEventListener</code> works on all browsers except IE &lt; 9 (<a href="https://caniuse.com/#search=addEventListener">link</a>)</li>
+  <li><code class="highlighter-rouge">querySelector</code> has similar support to <code class="highlighter-rouge">addEventListener</code> with FireFox 2-3 also not supported (<a href="https://caniuse.com/#search=querySelector">link</a>)</li>
+  <li><code class="highlighter-rouge">classList</code> has partial support in IE and Opera (<a href="https://caniuse.com/#search=classList">link</a>)</li>
+</ul>
+
+<p>Have another CSS transition trick or hack? Did this solution work for you? Tell me about it below.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/using-a-foreign-key-with-a-custom-named-association-without-using-add-reference-or-add-foreign-key/" title="Adding a foreign key with a custom named association without using add_reference or add_foreign_key">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/using-request-based-constraints-to-only-accept-json-formats-for-endpoints/" title="Using request-based constraints to only accept JSON formats for endpoints">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

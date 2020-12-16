@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>What is Object Oriented Programming? | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="What is Object Oriented Programming?" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Phew… that was a mouthful. Here is how I would define Object Oriented Programming; A programming pattern that allows specific chunks of functionality (objects) to interact with each other through the use of class functions (methods) and store class specific data (properties)." />
+<meta property="og:description" content="Phew… that was a mouthful. Here is how I would define Object Oriented Programming; A programming pattern that allows specific chunks of functionality (objects) to interact with each other through the use of class functions (methods) and store class specific data (properties)." />
+<link rel="canonical" href="http://joshfrankel.me/blog/what-is-object-oriented-programming/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/what-is-object-oriented-programming/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2013-01-14T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Phew… that was a mouthful. Here is how I would define Object Oriented Programming; A programming pattern that allows specific chunks of functionality (objects) to interact with each other through the use of class functions (methods) and store class specific data (properties).","headline":"What is Object Oriented Programming?","dateModified":"2013-01-14T00:00:00+00:00","datePublished":"2013-01-14T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/what-is-object-oriented-programming/"},"url":"http://joshfrankel.me/blog/what-is-object-oriented-programming/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">What is Object Oriented Programming?</h1>
+
+    
+      <p class="Banner-information">
+        <time>January 14, 2013</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <blockquote>"Object-oriented programming (OOP) is a programming paradigm that represents concepts as "objects" that have data fields(attributes that describe the object) and associated procedures known as methods. Objects, which are instances of classes, are used to interact with one another to design applications and computer programs." <a href="http://en.wikipedia.org/wiki/Object-oriented_programming"> -Wikipedia</a></blockquote>
+<p>Phew... that was a mouthful. Here is how I would define Object Oriented Programming; A programming pattern that allows specific chunks of functionality (objects) to interact with each other through the use of class functions (methods) and store class specific data (properties).</p>
+
+<p>When I first started learning about OOP the sheer amount of knowledge and abstractness of the subject was overwhelming to say the least. There is an entire different set of terminology and language to learn while trying to understand the basic theory.</p>
+
+<h6><strong>Some Quick Terminology</strong></h6>
+<ul>
+	<li>Object - <em>Defined within a class file. The basic building block for oop</em></li>
+	<li>Method - <em>A class specific function; contains necessary functionality</em></li>
+	<li>Property - <em>A class specific variable</em></li>
+	<li>Parameter - <em>The variable passed in the method declaration</em></li>
+</ul>
+<p>As I am a kinesthetic learner I find the best way to learn something is to practice it. So lets walk through an example of OOP using a real world system. The following code examples are written in php but the concepts can be used regardless of language.</p>
+<h2>A Car is Object Oriented</h2>
+<p>Think about the following statement, "A car is an object oriented system". What this means is that you can think of a car as a physical object in space. The object accomplishes a specific purpose and has attributes that are specific to it. Learning object oriented programming in the context of a real-world system is also easier to understand than trying to use an abstract programming example. So from now on whenever I say Car think object.</p>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+
+<span class="c1">// Class wrapper</span>
+<span class="k">class</span> <span class="nc">Car</span> <span class="p">{</span>
+
+<span class="p">}</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+<h2>A Car has Specifications</h2>
+<p>There are about a million different specifications associated with a car. These are based on the type of car, year, and model. If we look at two cars of the same type, year, and model they should... theoretically... be identical.</p>
+
+<p>For our representation of the Car object lets create the following properties: manufacturer, weight, turned on status, and the current speed.</p>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+
+<span class="c1">// Properties</span>
+<span class="k">class</span> <span class="nc">Car</span> <span class="p">{</span>
+
+     <span class="k">private</span> <span class="nv">$manufacturer</span> <span class="o">=</span> <span class="s1">'Honda'</span><span class="p">;</span>
+     <span class="k">private</span> <span class="nv">$weight</span> <span class="o">=</span> <span class="mi">2300</span><span class="p">;</span>
+     <span class="k">private</span> <span class="nv">$isTurnedOn</span> <span class="o">=</span> <span class="k">FALSE</span><span class="p">;</span>
+     <span class="k">private</span> <span class="nv">$speed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="c1">// A variable outside the class holding the Car Object</span>
+<span class="nv">$Car</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Car</span><span class="p">();</span>
+
+<span class="cp">?&gt;</span></code></pre></figure>
+<h2>A Car Performs Specific Functions</h2>
+<p>Cars perform many different methods of function. We will limit ours to the following: Brake, Accelerate, and Start Ignition. What we have just done is provided the structure for our object. We now know exactly the amount of functionality needed and even the names for the methods we will use. Planning out the design of an Object Oriented system from the beginning is important to help keep code efficient and <abbr title="Don't Repeat Yourself">DRY</abbr>.</p>
+<h3><strong>Methods</strong></h3>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">Car</span> <span class="p">{</span>
+
+     <span class="k">private</span> <span class="nv">$manufacturer</span> <span class="o">=</span> <span class="s1">'Honda'</span><span class="p">;</span>
+     <span class="k">private</span> <span class="nv">$weight</span> <span class="o">=</span> <span class="mi">2300</span><span class="p">;</span>
+     <span class="k">private</span> <span class="nv">$isTurnedOn</span> <span class="o">=</span> <span class="k">FALSE</span><span class="p">;</span>
+     <span class="k">private</span> <span class="nv">$speed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">brake</span> <span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">accelerate</span> <span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">startIgnition</span> <span class="p">()</span> <span class="p">{</span>
+
+     <span class="p">}</span>
+
+<span class="p">}</span>
+
+<span class="c1">// A variable outside the class holding the Car Object</span>
+<span class="nv">$Car</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Car</span><span class="p">();</span>
+
+<span class="cp">?&gt;</span></code></pre></figure>
+<blockquote><strong>Conceptualize:</strong> A method such as Repair Car Engine would not be suited for our Car Object. A car would not repair itself. This would be performed by a Mechanic (a potential other object).</blockquote>
+<h2>Visibility and Encapsulation</h2>
+<p>You may have noticed the word "public" before the methods. This is what is known as visibility. Visibility refers to how accessible a method or property is to other classes. This is necessary for understanding proper encapsulation.</p>
+
+<p>There are three types of visibility. Public, Protected, and Private. A <strong>public</strong> method/property is accessible to the class it originates inside, any child class that extends it, as well as other classes. A <strong>protected</strong> method/property is visible to only the class where it originates and child classes. A <strong>private</strong> method/property is visible to only the class it originates in.</p>
+<blockquote><strong>Best Practice:</strong> When trying to decide visibility for methods and properties you should provide only the bare minimum necessary to execute.</blockquote>
+<p>Encapsulation is the idea of hiding the implementation of your class and exposing its functionality in a limited way. This prevents overriding of functionality and reduces duplicate code.</p>
+
+<p>In order to properly encapsulate our class we need to set the visibility for each of our properties and methods. Lucky for you it has already been done. Our methods were all listed as public and our properties were labeled private. The properties now are only accessible to the class Car. A common design pattern is to create helper methods called getters and setters.</p>
+<h2>Getters and Setters</h2>
+<p>This is actually a fairly straight forward concept. They literally do exactly what they say and nothing more. A getter method returns a property while a setter method sets it. These allow other methods to access the Car objects private variable for manufacturer.</p>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="sd">/**
+ * Getter for Manufacturer
+**/</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">getManufacturer</span> <span class="p">()</span> <span class="p">{</span>
+     <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">manufacturer</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="sd">/**
+ * Setter for Manufacturer
+**/</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">setManufacturer</span> <span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+     <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">manufacturer</span> <span class="o">=</span> <span class="nv">$value</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+<p>I have introduced a new keyword called $this. $this refers to the current class it is within so in this instance $this will include all the methods and properties for the Car class. By calling $this->manufacturer inside getManufacturer we return the private variable manufacturer. This will help to differentiate between variables defined within a method (local variables) and a class properties (public, protected, private).</p>
+<blockquote><strong>Quick Note: </strong>When calling a property using $this you do not use a second dollar sign. $this->$manufacturer will generate an error.</blockquote>
+<p>We can now set and get the car's properties on the fly. Getters and Setters may seem tedious and unnecessary (and they sometimes are in smaller applications) but they should help you to provide access points for other classes while forcing you to organize your code. Here's a quick simple example.</p>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="nv">$Car</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Car</span><span class="p">();</span>
+
+<span class="nv">$manufacturer</span> <span class="o">=</span> <span class="nv">$Car</span><span class="o">-&gt;</span><span class="na">getManufacturer</span><span class="p">();</span>
+
+<span class="c1">// Outputs Honda, the default value</span>
+<span class="k">echo</span> <span class="nv">$manufacturer</span><span class="p">;</span>
+
+<span class="nv">$Car</span><span class="o">-&gt;</span><span class="na">setManufacturer</span><span class="p">(</span><span class="s1">'Acura'</span><span class="p">);</span>
+
+<span class="nv">$manufacturer</span> <span class="o">=</span> <span class="nv">$Car</span><span class="o">-&gt;</span><span class="na">getManufacturer</span><span class="p">();</span>
+
+<span class="c1">// Outputs Acura</span>
+<span class="k">echo</span> <span class="nv">$manufacturer</span><span class="p">;</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+<h2>Gentleman, Start Your Engines</h2>
+<p>Now that we have some of the basics completed, lets move onto some actual functionality. First lets flesh out the startIgnition method. This method will check the isTurnedOn property to see if it is false (turned off) and if so will change it to True.</p>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">startIgnition</span> <span class="p">()</span> <span class="p">{</span>
+
+     <span class="c1">// Check to see if the car is already turned on</span>
+     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isTurnedOn</span><span class="p">)</span> <span class="p">{</span>
+
+          <span class="c1">// If the car is off lets turn it on</span>
+          <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isTurnedOn</span> <span class="o">=</span> <span class="k">TRUE</span><span class="p">;</span>
+     <span class="p">}</span>
+
+<span class="p">}</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+<p>The isTurnedOn property now can be checked before running other methods. We can use this to perform a sanity check on the turned on state of the car. A car wouldn't be able to accelerate or brake if is isn't turned on, right?</p>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">accelerate</span> <span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+
+     <span class="c1">// Check to see if the car is already turned on</span>
+     <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isTurnedOn</span><span class="p">)</span> <span class="p">{</span>
+
+          <span class="c1">// If the car is turned on then add the parameter value</span>
+          <span class="c1">// from the private speed variable.</span>
+          <span class="c1">// We are increasing in speed.</span>
+          <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">speed</span> <span class="o">+=</span> <span class="nv">$value</span><span class="p">;</span>
+     <span class="p">}</span>
+
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">brake</span> <span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+
+     <span class="c1">// Check to see if the car is already turned on</span>
+     <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isTurnedOn</span><span class="p">)</span> <span class="p">{</span>
+
+          <span class="c1">// If the car is turned on then subtract the parameter value</span>
+          <span class="c1">// from the private speed variable.</span>
+          <span class="c1">// We are decreasing in speed.</span>
+          <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">speed</span> <span class="o">-=</span> <span class="nv">$value</span><span class="p">;</span>
+     <span class="p">}</span>
+
+<span class="p">}</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+<p>Our accelerate and brake methods now will only run if the car is already turned on. This is the expected result. Both methods can have lots of functionality added to them. I'll leave these up to you but here are some questions to get you thinking.</p>
+<ul>
+	<li>Can the car brake and decelerate if the car's speed is already at zero?</li>
+	<li>Is there a top speed or limit to how fast the car can travel?</li>
+	<li>Does a car take time to accelerate or brake</li>
+</ul>
+<h2>88 MPH</h2>
+<p>The last piece of our Car class will be to output some information that the user can utilize. This will include a new getter method for the car's speed and an output method to display a string that is user readable.</p>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">getSpeed</span> <span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// Get the current speed</span>
+     <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">speed</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">outputCurrentSpeed</span> <span class="p">()</span> <span class="p">{</span>
+
+     <span class="c1">// Set the local variable (output) to equal a string</span>
+     <span class="c1">// that contains the returned result from the getSpeed method.</span>
+     <span class="nv">$output</span> <span class="o">=</span> <span class="s1">'You are traveling at '</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getSpeed</span><span class="p">()</span> <span class="o">.</span> <span class="s1">' mph'</span><span class="p">;</span>
+
+     <span class="k">return</span> <span class="nv">$output</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+<p>Again by using the $this keyword we refer to the current object. Because the object is a Car object we can access the newly created getSpeed method to return the speed of the car. As displayed above this is concatenated into a string for output. With the functionality of our class completed we can now try it out and see it in action.</p>
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+<span class="nv">$Car</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Car</span><span class="p">();</span>
+
+<span class="c1">// Start the Car</span>
+<span class="nv">$Car</span><span class="o">-&gt;</span><span class="na">startIgnition</span><span class="p">();</span>
+
+<span class="c1">// Accelerate to 88 mph</span>
+<span class="nv">$Car</span><span class="o">-&gt;</span><span class="na">accelerate</span><span class="p">(</span><span class="mi">88</span><span class="p">);</span>
+
+<span class="c1">// This will output "You are traveling at 88 mph"</span>
+<span class="k">echo</span> <span class="nv">$Car</span><span class="o">-&gt;</span><span class="na">outputCurrentSpeed</span><span class="p">();</span>
+
+<span class="c1">// Lets stop the car</span>
+<span class="nv">$Car</span><span class="o">-&gt;</span><span class="na">brake</span><span class="p">(</span><span class="mi">88</span><span class="p">);</span>
+
+<span class="c1">// This will output "You are traveling at 0 mph"</span>
+<span class="k">echo</span> <span class="nv">$Car</span><span class="o">-&gt;</span><span class="na">outputCurrentSpeed</span><span class="p">();</span>
+<span class="cp">?&gt;</span></code></pre></figure>
+<h2>Summary</h2>
+<p>There you have it. A working OOP class structure. Feel free to build upon this or add other methods.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/create-a-jquery-twitter-plugin-from-scratch/" title="Create a jQuery Twitter plugin from scratch">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/responsive-browser-testing-with-adobe-edge-inspect/" title="Responsive Browser Testing with Adobe Edge Inspect">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

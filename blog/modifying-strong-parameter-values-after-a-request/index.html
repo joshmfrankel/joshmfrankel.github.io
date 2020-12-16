@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Modifying strong parameter values after a request | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Modifying strong parameter values after a request" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Strong parameters are a great way of guarding against unexpected request params. They allow you to specify the names of keys that are accepted from a given request. I’ve found working between a JavaScript front-end and Rails back-end sometimes you need to adjust request values (especially when at an intermediary step during a refactor). However, strong parameter values can’t be modified which makes this a bit more complex." />
+<meta property="og:description" content="Strong parameters are a great way of guarding against unexpected request params. They allow you to specify the names of keys that are accepted from a given request. I’ve found working between a JavaScript front-end and Rails back-end sometimes you need to adjust request values (especially when at an intermediary step during a refactor). However, strong parameter values can’t be modified which makes this a bit more complex." />
+<link rel="canonical" href="http://joshfrankel.me/blog/modifying-strong-parameter-values-after-a-request/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/modifying-strong-parameter-values-after-a-request/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-09-03T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Strong parameters are a great way of guarding against unexpected request params. They allow you to specify the names of keys that are accepted from a given request. I’ve found working between a JavaScript front-end and Rails back-end sometimes you need to adjust request values (especially when at an intermediary step during a refactor). However, strong parameter values can’t be modified which makes this a bit more complex.","headline":"Modifying strong parameter values after a request","dateModified":"2019-09-03T00:00:00+00:00","datePublished":"2019-09-03T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/modifying-strong-parameter-values-after-a-request/"},"url":"http://joshfrankel.me/blog/modifying-strong-parameter-values-after-a-request/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Modifying strong parameter values after a request</h1>
+
+    
+      <p class="Banner-information">
+        <time>September 3, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Strong parameters are a great way of guarding against unexpected request params. They allow you to specify the names
+of keys that are accepted from a given request. I’ve found working between a JavaScript
+front-end and Rails back-end sometimes you need to adjust request values (especially when at an
+intermediary step during a refactor). However, strong parameter values can’t be modified which
+makes this a bit more complex.
+<!--excerpt--></p>
+
+<h2 id="strong-parameters-are-immutable">Strong Parameters are Immutable</h2>
+
+<p>You may have heard the term immutable before in functional programming languages. This is essentially a fancy
+way of saying that an object cannot be changed. You could also refer to this object as static. For more details, <a href="https://lispcast.com/what-is-immutability/" target="_blank">here’s a great
+post on the subject</a>.</p>
+
+<p>In other words the following controller code will not work for changing an
+integer (department_id) to a string (department):</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">user_params</span><span class="p">[</span><span class="ss">:department</span><span class="p">]</span> <span class="o">=</span> <span class="no">Department</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:department_id</span><span class="p">]).</span><span class="nf">name</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">user_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">save</span>
+      <span class="c1"># success</span>
+    <span class="k">else</span>
+      <span class="c1"># failure</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">user_params</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:user</span><span class="p">).</span><span class="nf">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="ss">:department_id</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>It looks like we should be setting a new key <code class="highlighter-rouge">:department</code> based on using the request param
+<code class="highlighter-rouge">:department_id</code> to look up the corresponding department name. However, in practice this only
+returns the original object.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">user_params</span> <span class="c1">#=&gt; &lt;ActionController::Parameters {"name"=&gt;"Rick Grimes", "department_id"=&gt;"2"} permitted: true&gt;</span>
+<span class="n">user_params</span><span class="p">[</span><span class="ss">:department</span><span class="p">]</span> <span class="o">=</span> <span class="no">Department</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:department_id</span><span class="p">]).</span><span class="nf">name</span> <span class="c1">#=&gt; "Leader"</span>
+
+<span class="c1"># Nothing changes</span>
+<span class="n">user_params</span> <span class="c1">#=&gt; &lt;ActionController::Parameters {"name"=&gt;"Rick Grimes", "department_id"=&gt;"2"} permitted: true&gt;</span>
+</code></pre></div></div>
+
+<p>This is because <a href="https://edgeapi.rubyonrails.org/classes/ActionController/Parameters.html#method-i-permit">ActionController::Parmeters#permit</a> is designed to return a new instance of the object everytime it is called. Looking at the above implementation of <code class="highlighter-rouge">#user_params</code> we see that everytime we call <code class="highlighter-rouge">#user_params</code> it
+in turn calls <code class="highlighter-rouge">#permit</code>. This means that each time we call it we get a new object. Here’s the internal implementation for <code class="highlighter-rouge">ActionController::Parameters#permit</code> I’m talking about.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># File actionpack/lib/action_controller/metal/strong_parameters.rb, line 554</span>
+<span class="k">def</span> <span class="nf">permit</span><span class="p">(</span><span class="o">*</span><span class="n">filters</span><span class="p">)</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">new</span> <span class="c1"># Always returns a new instance</span>
+
+  <span class="c1"># more implementation code</span>
+</code></pre></div></div>
+
+<p>So modifying strong parameters directly will never work if there is a call to <code class="highlighter-rouge">#permit</code>
+anywhere in the chain. Ok, so now we understand why this is happening we need to side step the issue.</p>
+
+<blockquote class="Info Info-right">
+  <strong>Note:</strong> If <code>#require</code> is being used WITHOUT <code>#permit</code> you CAN modify
+strong parameters directly.
+</blockquote>
+
+<h2 id="how-to-modify-strong-parameters">How to modify Strong Parameters</h2>
+
+<p>There are a couple of different approaches to fixing this issue. I’ll list them out below
+for clarity.</p>
+
+<ul>
+  <li><strong>IDEAL:</strong> Refactor logic so that you don’t need to change request parameters in a controller action</li>
+  <li>Modify request params before Strong Parameters</li>
+  <li>Use a temporary variable to save the current state of strong parameters and then update it</li>
+  <li>Use Hash#merge while using the params</li>
+  <li>Memoize (or cache) strong parameters return value</li>
+  <li>Don’t use strong parameters</li>
+</ul>
+
+<p>We’ll run through these below</p>
+
+<h3 id="refactoring-logic">Refactoring logic</h3>
+
+<p>This one is self-explanatory. If you’re needing to mutate request parameters after they
+pass through strong parameters this is likely a code smell. Ideally you should fix this
+and have the front-end send the proper data format that the back-end expects. If you can’t
+(which can happen in legacy code) then try another option.</p>
+
+<h3 id="modify-request-params-before-strong-parameters">Modify request params before Strong Parameters</h3>
+
+<p>This is one I’ve used in the past with great success. Basically, you inject logic in between
+the request and the call to Strong Parameters by manipulating the <code class="highlighter-rouge">params</code> object.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">params</span><span class="p">[</span><span class="ss">:department</span><span class="p">]</span> <span class="o">=</span> <span class="no">Department</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:department_id</span><span class="p">]).</span><span class="nf">name</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">create_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">save</span>
+      <span class="c1"># success</span>
+    <span class="k">else</span>
+      <span class="c1"># failure</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">user_params</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:user</span><span class="p">).</span><span class="nf">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="ss">:department_id</span><span class="p">,</span> <span class="ss">:department</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Because <code class="highlighter-rouge">params[:department]</code> is on the request params and not Strong Parameters,
+we can safely add the value before the <code class="highlighter-rouge">User.new(create_params)</code> call. One thing
+to note with this approach is that we need to add the <code class="highlighter-rouge">:department</code> key to the
+user_params permit listing in order to properly use the new value without removing
+it.</p>
+
+<h3 id="using-a-temporary-variable">Using a temporary variable</h3>
+
+<p>Ole’ faithful. Not elegant but certainly clear in its purpose. Using a temporary variable
+allows us to save the parameters into a variable that we can then modify. In the case
+below we use <code class="highlighter-rouge">create_params</code> and assign it to the Strong Parameters object <code class="highlighter-rouge">user_params</code>. This way
+we aren’t calling <code class="highlighter-rouge">#permit</code> each time we access the object.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">create_params</span> <span class="o">=</span> <span class="n">user_params</span> <span class="c1"># temporary variable</span>
+    <span class="n">create_params</span><span class="p">[</span><span class="ss">:department</span><span class="p">]</span> <span class="o">=</span> <span class="no">Department</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:department_id</span><span class="p">]).</span><span class="nf">name</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">create_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">save</span>
+      <span class="c1"># success</span>
+    <span class="k">else</span>
+      <span class="c1"># failure</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">user_params</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:user</span><span class="p">).</span><span class="nf">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="ss">:department_id</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="use-hashmerge-while-using-the-params">Use Hash#merge while using the params</h3>
+
+<p>Another method is to use <code class="highlighter-rouge">Hash#merge</code> to add another key-value pair at the time
+of parameter usage. Merge’s update won’t persist so you have to use it immediately
+where you want the additional value.</p>
+
+<p>It becomes a one-liner below but there is a bit more mental juggling involved
+to understand it. Also there is the hidden gotcha of if you use user_params
+after the <code class="highlighter-rouge">#merge</code> it <strong>WILL NOT</strong> contain the previously merged in values.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span>
+      <span class="n">user_params</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="ss">department: </span><span class="no">Department</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:department_id</span><span class="p">]).</span><span class="nf">name</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># user_params no longer contains the :department key-value pair</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">save</span>
+      <span class="c1"># success</span>
+    <span class="k">else</span>
+      <span class="c1"># failure</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">user_params</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:user</span><span class="p">).</span><span class="nf">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="ss">:department_id</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="memoize-strong-parameters">Memoize strong parameters</h3>
+
+<p>Memoize is another way of saying store the result into this variable so that I can
+refer back to it in the future without re-calculating it. Or just caching. Ruby achieves
+this with the <code class="highlighter-rouge">||=</code> operator.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">UserController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="n">user_params</span><span class="p">[</span><span class="ss">:department</span><span class="p">]</span> <span class="o">=</span> <span class="no">Department</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:department_id</span><span class="p">]).</span><span class="nf">name</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">user_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="p">.</span><span class="nf">save</span>
+      <span class="c1"># success</span>
+    <span class="k">else</span>
+      <span class="c1"># failure</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">user_params</span>
+    <span class="vi">@_user_params</span> <span class="o">||=</span> <span class="n">params</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:user</span><span class="p">).</span><span class="nf">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="ss">:department_id</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>One nice thing about this approach is that the original implementation within <code class="highlighter-rouge">#create</code>
+now works. The downside here is that Strong parameters works differently now that the
+default. Though I’d say this is a small price to pay.</p>
+
+<h3 id="dont-use-strong-parameters">Don’t use strong parameters</h3>
+
+<p>This is always an option. If a request is complicated enough and the code is unable to
+be refactored crafting a custom workflow to deal with it might be the best approach.
+Use sparingly so you don’t end up with a codebase that has a custom parameters implementation
+on every Controller.</p>
+
+<p>For requests that only require a single parameter you can safely skip Strong parameters
+altogether and instead just use the specific value you expect. (i.e. <code class="highlighter-rouge">User.new(params[:name])</code>)</p>
+
+<h2 id="wrapping-up">Wrapping up</h2>
+
+<p>With that we’ve discussed several different approaches to dealing with modifying Strong Parameter
+values. I was reading up a lot about this the other day and stumbled across a <a href="https://stackoverflow.com/questions/18369592/modify-ruby-hash-in-place-rails-strong-params" target="_blank">StackOverflow posting</a>
+that contained many of the methods I had tried out in the past which directly inspired this article.</p>
+
+<p>Got any additional tricks with Strong parameters? I’d love to hear about them in the comments.</p>
+
+<p>Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/recursively-validate-application-requests-with-rack/" title="Recursively validate application requests with Rack">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/using-callback-functions-with-setstate-in-react/" title="Using callback functions with setState in React">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

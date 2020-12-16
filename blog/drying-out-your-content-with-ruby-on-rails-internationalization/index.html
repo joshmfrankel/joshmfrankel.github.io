@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Drying out your content with Ruby on Rails Internationalization | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Drying out your content with Ruby on Rails Internationalization" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Internationalization is an important topic for many corporations that have a multi-national client base. It allows for easy translation capabilities and helps to protect the future of the application against code debt. However, even if you are not providing translations for your application you can still use internationalization to dry up your content. Let&#39;s get started." />
+<meta property="og:description" content="Internationalization is an important topic for many corporations that have a multi-national client base. It allows for easy translation capabilities and helps to protect the future of the application against code debt. However, even if you are not providing translations for your application you can still use internationalization to dry up your content. Let&#39;s get started." />
+<link rel="canonical" href="http://joshfrankel.me/blog/drying-out-your-content-with-ruby-on-rails-internationalization/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/drying-out-your-content-with-ruby-on-rails-internationalization/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-10-03T19:53:27+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Internationalization is an important topic for many corporations that have a multi-national client base. It allows for easy translation capabilities and helps to protect the future of the application against code debt. However, even if you are not providing translations for your application you can still use internationalization to dry up your content. Let&#39;s get started.","headline":"Drying out your content with Ruby on Rails Internationalization","dateModified":"2015-10-03T19:53:27+00:00","datePublished":"2015-10-03T19:53:27+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/drying-out-your-content-with-ruby-on-rails-internationalization/"},"url":"http://joshfrankel.me/blog/drying-out-your-content-with-ruby-on-rails-internationalization/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Drying out your content with Ruby on Rails Internationalization</h1>
+
+    
+      <p class="Banner-information">
+        <time>October 3, 2015</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Internationalization is an important topic for many corporations that have a multi-national client base. It allows for easy translation capabilities and helps to protect the future of the application against code debt. However, even if you are not providing translations for your application you can still use internationalization to dry up your content. Let's get started.</p>
+<!--excerpt-->
+
+<h2>What is internationalization?</h2>
+<p>Internationalization or (<strong>I18n</strong> from now on), helps to provide translatable text files in the form of yaml inside the <code>config/locales/</code> folder. To start your rails application will most likely have something like <code>en.yml</code>. This allows you to create key value pairs to be used for the English language. The power with <strong>I18n</strong> is the keys specified can then be matched to another language file as long as the key name corresponds appropriately.</p>
+
+<blockquote><strong>Note: </strong> I18n is an abbreviation for internationalization as well as the class name in Ruby.</blockquote>
+
+<p>For example you could have a Russian translation file of <code>ru.yml</code> with a matching key that provides the russian translation as the key. Here it is in code format (Please forgive my Russian translation as I don't speak Russian and had to use Google translate)</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="c1"># Example of en.yml</span>
+<span class="na">en</span><span class="pi">:</span>
+  <span class="na">user</span><span class="pi">:</span>
+    <span class="na">access_denied</span><span class="pi">:</span> <span class="s2">"</span><span class="s">You</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">authorized</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">see</span><span class="nv"> </span><span class="s">this</span><span class="nv"> </span><span class="s">page"</span>
+
+<span class="c1"># Example of ru.yml</span>
+<span class="na">ru</span><span class="pi">:</span>
+  <span class="na">user</span><span class="pi">:</span>
+    <span class="na">access_denied</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Вы</span><span class="nv"> </span><span class="s">не</span><span class="nv"> </span><span class="s">авторизованы</span><span class="nv"> </span><span class="s">,</span><span class="nv"> </span><span class="s">чтобы</span><span class="nv"> </span><span class="s">увидеть</span><span class="nv"> </span><span class="s">эту</span><span class="nv"> </span><span class="s">страницу"</span></code></pre></figure>
+
+<p>Now anytime a locale change is detected by the <strong>Rails</strong> app it will switch internationalization files. You can simulate this action in the browser by using a querystring with the locale filename like this <code>?locale=ru</code></p>
+
+<h2>Why should I use this if I don't plan on translating anything?</h2>
+
+<p>I'm glad you asked that. While using <strong>I18n</strong> for a site that doesn't require a translation seems like extra work at first it does lead to some good coding practices with keeping your application <strong>DRY</strong>. First lets talk about how you use <strong>I18n</strong> before I show you the benefits of it.</p>
+
+<h3>Using I18n</h3>
+
+<p>You can utilize your translation files by using the following methods: <code>I18n.t('key.name.goes.here')</code> for <strong>Models</strong> and <code>t('the.period.represents.the.colon.from.the.yml.file')</code> for <strong>Controllers</strong> and <strong>Views</strong>.</p>
+<blockquote><strong>Simplified: </strong>By placing these methods in your code you are essentially telling <strong>Rails</strong>, "Please print the value associated with this key based on my current locale".</blockquote>
+
+<h2>The benefit on small applications</h2>
+<p>Take a look at the following controller code.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">index</span>
+  <span class="k">unless</span> <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+    <span class="n">redirect_to</span> <span class="ss">:back</span><span class="p">,</span> <span class="ss">:alert</span> <span class="o">=&gt;</span> <span class="s2">"Access denied."</span>
+  <span class="k">end</span>
+  <span class="vi">@users</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">all</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">show</span>
+  <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span>
+  <span class="k">unless</span> <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+    <span class="k">unless</span> <span class="vi">@user</span> <span class="o">==</span> <span class="n">current_user</span>
+      <span class="n">redirect_to</span> <span class="ss">:back</span><span class="p">,</span> <span class="ss">:alert</span> <span class="o">=&gt;</span> <span class="s2">"Access denied."</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">update</span>
+  <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span>
+  <span class="k">unless</span> <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+    <span class="n">redirect_to</span> <span class="ss">:back</span><span class="p">,</span> <span class="ss">:alert</span> <span class="o">=&gt;</span> <span class="s2">"Access denied."</span>
+  <span class="k">end</span>
+  <span class="k">if</span> <span class="vi">@user</span><span class="p">.</span><span class="nf">update_attributes</span><span class="p">(</span><span class="n">secure_params</span><span class="p">)</span>
+    <span class="n">redirect_to</span> <span class="n">users_path</span><span class="p">,</span> <span class="ss">:notice</span> <span class="o">=&gt;</span> <span class="s2">"User updated."</span>
+  <span class="k">else</span>
+    <span class="n">redirect_to</span> <span class="n">users_path</span><span class="p">,</span> <span class="ss">:alert</span> <span class="o">=&gt;</span> <span class="s2">"Unable to update user."</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">destroy</span>
+  <span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span>
+  <span class="k">unless</span> <span class="n">current_user</span><span class="p">.</span><span class="nf">admin?</span>
+    <span class="n">redirect_to</span> <span class="ss">:back</span><span class="p">,</span> <span class="ss">:alert</span> <span class="o">=&gt;</span> <span class="s2">"Access denied."</span>
+  <span class="k">end</span>
+  <span class="n">user</span><span class="p">.</span><span class="nf">destroy</span>
+  <span class="n">redirect_to</span> <span class="n">users_path</span><span class="p">,</span> <span class="ss">:notice</span> <span class="o">=&gt;</span> <span class="s2">"User deleted."</span>
+<span class="k">end</span></code></pre></figure>
+<p><small><em>(Sample property of RailsApps)</em></small></p>
+<p>So what's wrong here?</p>
+<p>There is a lot of duplication in the code. For the purpose of this article just focus on the fact that the line <code>:alert => "Access Denied."</code> appears four times.</p>
+<blockquote><strong>Note: </strong>There are many other optimizations that could be accomplished including moving duplicate logic into a single method.</blockquote>
+<p>Now multiply that across even a small app and you might have something like 20 instances of the exact same text. What happens if the client wants you to change <strong>"Access Denied"</strong> to <strong>"I'm sorry dave, but I'm afraid I can't do that"</strong>. You better be ready to do a project wide find and replace on your code because you are going to need to change it <strong>20 times!</strong></p>
+<p>However, by using <strong>I18n</strong> we can significantly cut down on our code debt and future proof your application. Now the above code of <code>:alert => "Access Denied"</code> will become <code>:alert => t('user.alert.access_denied')</code>. Here is what the <strong>en.yml</strong> file looks like</p>
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="na">en</span><span class="pi">:</span>
+  <span class="na">user</span><span class="pi">:</span>
+    <span class="na">alert</span><span class="pi">:</span>
+      <span class="na">access_denied</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Access</span><span class="nv"> </span><span class="s">Denied"</span></code></pre></figure>
+<p>Now when the client request comes in you can simply change your <strong>en.yml</strong> file to this.</p>
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="na">en</span><span class="pi">:</span>
+  <span class="na">user</span><span class="pi">:</span>
+    <span class="na">alert</span><span class="pi">:</span>
+      <span class="na">access_denied</span><span class="pi">:</span> <span class="s2">"</span><span class="s">I'm</span><span class="nv"> </span><span class="s">sorry</span><span class="nv"> </span><span class="s">dave,</span><span class="nv"> </span><span class="s">but</span><span class="nv"> </span><span class="s">I'm</span><span class="nv"> </span><span class="s">afraid</span><span class="nv"> </span><span class="s">I</span><span class="nv"> </span><span class="s">can't</span><span class="nv"> </span><span class="s">do</span><span class="nv"> </span><span class="s">that"</span></code></pre></figure>
+<p>Viola, you just changed 20 different instances of the exact same content from a single location. Bravo!</p>
+<img src="/img/2015/I18n-doge.png" alt="Generated from dogr.io" />
+<p>The only downside to this method is that you need to type a little more code to display the content. However, even though <code>"Access Denied"</code> is less typing than <code>t('user.alert.access_denied')</code> by using <strong>I18n</strong> to <strong>dry</strong> out your code, it will allow you to have a singularly defined location for content. I don't know about you but changing code in one place vs 20 is a big time saver.</p>
+
+<h2>TL;DR</h2>
+<ul>
+  <li><strong>I18n</strong> provides a single location to update content. This reduces code debt.</li>
+  <li>The code is slighly longer<code>:alert => "Access Denied"</code> vs. <code>:alert => t('users.alert.access_denied')</code></li>
+  <li>Models use <code>I18n.t('key.name')</code></li>
+  <li>Controllers and Views use <code>t('key.name')</code></li>
+  <li>Internationalization files are stored in <code>config/locales</code></li>
+</ul>
+
+
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/how-to-output-a-string-from-the-elusive-non-output-block-method-concat/" title="How to output a string from the elusive non-output block method; concat">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/making-the-jump-to-osx-in-sublime-text-keyboard-shortcut-conversions/" title="Making the jump to OSX in Sublime Text: keyboard shortcut conversions">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

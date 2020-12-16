@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Should I use px or ems for css font-size? Neither, use rem! | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Should I use px or ems for css font-size? Neither, use rem!" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="While setting the size of a font is relatively simple; choosing the unit of measuring the size can become complex quickly. At their core there are two types of font-size units; relative and absolute. Relative units are calculated by their parent element&#39;s font-size while absolute units are set at a fixed value. Both types of units are useful." />
+<meta property="og:description" content="While setting the size of a font is relatively simple; choosing the unit of measuring the size can become complex quickly. At their core there are two types of font-size units; relative and absolute. Relative units are calculated by their parent element&#39;s font-size while absolute units are set at a fixed value. Both types of units are useful." />
+<link rel="canonical" href="http://joshfrankel.me/blog/should-i-use-px-or-ems-for-css-font-size-neither-use-rem/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/should-i-use-px-or-ems-for-css-font-size-neither-use-rem/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2013-01-30T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"While setting the size of a font is relatively simple; choosing the unit of measuring the size can become complex quickly. At their core there are two types of font-size units; relative and absolute. Relative units are calculated by their parent element&#39;s font-size while absolute units are set at a fixed value. Both types of units are useful.","headline":"Should I use px or ems for css font-size? Neither, use rem!","dateModified":"2013-01-30T00:00:00+00:00","datePublished":"2013-01-30T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/should-i-use-px-or-ems-for-css-font-size-neither-use-rem/"},"url":"http://joshfrankel.me/blog/should-i-use-px-or-ems-for-css-font-size-neither-use-rem/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Should I use px or ems for css font-size? Neither, use rem!</h1>
+
+    
+      <p class="Banner-information">
+        <time>January 30, 2013</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>While setting the size of a font is relatively simple; choosing the unit of measuring the size can become complex quickly.</p>
+
+<p>At their core there are two types of font-size units; relative and absolute. Relative units are calculated by their parent element's font-size while absolute units are set at a fixed value. Both types of units are useful.</p><!--excerpt-->
+
+<p>I often will use both px and em for font-size but recently in CSS3 development there has been a new unit. This unit is called <a href="#rem">rem</a> or root em unit and allows for far greater flexibility with typography.</p>
+<h2>Units for Special Cases</h2>
+<p>..Unless you have a good reason for using these, there are far more efficient and easy to understand units.</p>
+<h3>%</h3>
+<p>Percentage is a relative unit and works exactly how you would think. The unit sizes a font based on its parent's font size. So if the parent is 100% and the child is 25% the child element is 25% of its parent's 100%.</p>
+
+<p>One area for using a percentage is to style a top level html element like body or html to allow units like em to have easier size calculations. This will set the top level parent element so that converting an em to pixel is as easy as moving the decimal point.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">html</span> <span class="p">{</span>
+
+    <span class="c">/* ems now are base ten so 1.4em = 14px */</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">62.5%</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<h3>pt</h3>
+<p>The pt or Point unit is something you have probably seen before in your favorite word processing application. A pt unit refers to physical space on a sheet of paper and is therefore an absolute unit. Because of this they should only ever be used with printer friendly stylesheets.</p>
+<h2>Units to Avoid like the Plague</h2>
+<h3>Keyword</h3>
+<p>I really dislike this unit of measure and generally try to avoid it. Although using a keyword font size ensures that there will be no scaling due to it being a unit of absolute size; they provide little to no fine tuning. This is because there are only 6 different keywords. They range from xx-small to medium and back up to xx-large. Lets move on to something more useful.</p>
+<h2>Units that are Useful</h2>
+<h3>px</h3>
+<p>Pixels are the by far the most accurate and easiest to understand unit of measurement. By setting a font-size in px you are literally instructing the browser to render the font at that exact pixel height. The font will never have a height greater than the pixel value set. This is my bread-and-butter unit.  When you need exact measurements go with px.</p>
+<h3>em</h3>
+<p>According to w3.org an em unit is measured by, "the computed font size of the parent element". So what does this mean for us? It means that the em unit is dependent upon it's parent's font-size and is also another relative unit of measure.</p>
+
+<p>Since it is dependent upon the parent element the em has a potential to become compounded.  This can lead to some unexpected results. An example of this is if the parent has a font-size of 4em and the child has a font-size of 2em. In actuality the child element will have a font-size of 8em.</p>
+
+<p>To calculate the size of an em you take the parent and multiply it by the child. However, keep in mind that if we have additional parents that they must be calculated as well. This can make em units somewhat difficult to keep track of as the font size can compound quickly.</p>
+<h2 id="rem">A Real Unit of Measure</h2>
+<h3>rem</h3>
+<p>The rem unit or root em is such a sublime solution to the problem of font sizing. The root element of a page is always the html tag. So by defining a % (yes, this would be a good place to use this method) on the html element, you now have control over every single element using the rem unit.</p>
+
+<p>Back to the previous code example.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">html</span> <span class="p">{</span>
+
+    <span class="c">/* rems now are base ten so 1.4em = 14px */</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">62.5%</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">h1</span> <span class="p">{</span>
+     <span class="nl">font-size</span><span class="p">:</span> <span class="m">2.8rem</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<p>By using this we can now set an h1 tag to 2.8rem and it will render as if it is 28px.</p>
+<h2>Flexible Typography</h2>
+<p>If we are by chance using media queries it is possible to utilize them to typography that will scales with the page size. This is accomplished by redeclaring the font-size percentage for the html element inside a media query. Now all we have to do is change 1 value to affect all font-sizes on multiple devices. This is getting pretty handy now.</p>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="k">@media</span> <span class="n">only</span> <span class="n">screen</span> <span class="n">and</span> <span class="p">(</span><span class="n">min-width</span><span class="p">:</span> <span class="m">1140px</span><span class="p">)</span> <span class="p">{</span>
+
+	<span class="c">/**
+	 * Set the Base Font Size
+	 */</span>
+	<span class="nt">html</span> <span class="p">{</span>
+		<span class="nl">font-size</span><span class="p">:</span> <span class="m">90%</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>As with any new unit there is a catch which is browser support. Fortunately all modern browsers support the rem unit. For older non-compliant browsers by using a font-size with a pixel measurement directly before the rem value allows us to specify a default value.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">h1</span> <span class="p">{</span>
+    <span class="c">/* The default value if rem units aren't supported */</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+
+    <span class="c">/* Our fancy new rem unit */</span>
+    <span class="nl">font-size</span><span class="p">:</span> <span class="m">2rem</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<p>So there you have it a new unit of measuring font-size and a method for creating flexible typography.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/responsive-browser-testing-with-adobe-edge-inspect/" title="Responsive Browser Testing with Adobe Edge Inspect">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/how-to-use-css3-gradients-with-background-images/" title="How to use CSS3 gradients with background images">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

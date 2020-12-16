@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Fix “missing template for request format and variant” while testing Ajax request in a Request Spec | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Fix “missing template for request format and variant” while testing Ajax request in a Request Spec" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Request specs have a lot of benefits over traditional controller specs. They allow for full stack testing at the controller level. One thing I recently ran into was how to write this for AJAX requests." />
+<meta property="og:description" content="Request specs have a lot of benefits over traditional controller specs. They allow for full stack testing at the controller level. One thing I recently ran into was how to write this for AJAX requests." />
+<link rel="canonical" href="http://joshfrankel.me/blog/fix-missing-template-for-request-format-and-variant-while-testing-ajax-request-in-request-spec/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/fix-missing-template-for-request-format-and-variant-while-testing-ajax-request-in-request-spec/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-30T20:58:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Request specs have a lot of benefits over traditional controller specs. They allow for full stack testing at the controller level. One thing I recently ran into was how to write this for AJAX requests.","headline":"Fix “missing template for request format and variant” while testing Ajax request in a Request Spec","dateModified":"2020-04-30T20:58:00+00:00","datePublished":"2020-04-30T20:58:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/fix-missing-template-for-request-format-and-variant-while-testing-ajax-request-in-request-spec/"},"url":"http://joshfrankel.me/blog/fix-missing-template-for-request-format-and-variant-while-testing-ajax-request-in-request-spec/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Fix "missing template for request format and variant" while testing Ajax request in a Request Spec</h1>
+
+    
+      <p class="Banner-information">
+        <time>April 30, 2020</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Request specs have a lot of benefits over traditional controller specs. They allow
+for full stack testing at the controller level. One thing I recently ran
+into was how to write this for AJAX requests.
+<!--excerpt--></p>
+
+<p><a href="#solution">Take me to the solution</a></p>
+
+<p>If you’re familiar with controller specs then you might have seen the following
+format before:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">xhr</span> <span class="ss">:get</span><span class="p">,</span> <span class="ss">:new</span>
+</code></pre></div></div>
+
+<p>For an endpoint that uses AJAX, I first tried the following request spec style:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">get</span> <span class="n">users</span><span class="p">,</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Geralt'</span> <span class="p">},</span> <span class="ss">as: :js</span>
+</code></pre></div></div>
+
+<p>Knowing that this was a javascript request seemed logical to me. Unfortunately,
+I was met with the following error:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Failure/Error: @app.call(env)
+
+ActionController::UnknownFormat:
+  MembershipsController#create is missing a template for this request format and variant.
+
+  request.formats: ["text/html"]
+  request.variant: []
+</code></pre></div></div>
+
+<p>Ok… So that message above tells us that the requested format was <code class="highlighter-rouge">text/html</code>. But
+<code class="highlighter-rouge">as: :js</code> was specified since the template is an <code class="highlighter-rouge">.js.erb</code>.</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>Coming full circle we need to specify that the request being made is an AJAX or
+XHR style request. Adding the option <code class="highlighter-rouge">xhr: true</code> solves this issue.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">get</span> <span class="n">users</span><span class="p">,</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">name: </span><span class="s1">'Geralt'</span> <span class="p">},</span> <span class="ss">xhr: </span><span class="kp">true</span>
+</code></pre></div></div>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/configure-rspec-for-multiple-databases-with-database-cleaner-support/" title="Configure RSpec for multiple databases with Database Cleaner support">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/a-journey-into-writing-union-queries-with-active-record/" title="A Journey into Writing Union queries with Active Record">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

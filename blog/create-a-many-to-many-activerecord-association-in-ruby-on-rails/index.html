@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Create a many-to-many ActiveRecord association in Ruby on Rails with has_many :through and has_and_belongs_to_many | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Create a many-to-many ActiveRecord association in Ruby on Rails with has_many :through and has_and_belongs_to_many" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A common obstacle when building web applications are relational database associations. Without these it would be difficult to decrease the amount of duplicate data as well as increasing the overall database efficiency. The most common relationships are the: one-to-one, one-to-many, and many-to-many." />
+<meta property="og:description" content="A common obstacle when building web applications are relational database associations. Without these it would be difficult to decrease the amount of duplicate data as well as increasing the overall database efficiency. The most common relationships are the: one-to-one, one-to-many, and many-to-many." />
+<link rel="canonical" href="http://joshfrankel.me/blog/create-a-many-to-many-activerecord-association-in-ruby-on-rails/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/create-a-many-to-many-activerecord-association-in-ruby-on-rails/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-01-28T13:51:26+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"A common obstacle when building web applications are relational database associations. Without these it would be difficult to decrease the amount of duplicate data as well as increasing the overall database efficiency. The most common relationships are the: one-to-one, one-to-many, and many-to-many.","headline":"Create a many-to-many ActiveRecord association in Ruby on Rails with has_many :through and has_and_belongs_to_many","dateModified":"2016-01-28T13:51:26+00:00","datePublished":"2016-01-28T13:51:26+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/create-a-many-to-many-activerecord-association-in-ruby-on-rails/"},"url":"http://joshfrankel.me/blog/create-a-many-to-many-activerecord-association-in-ruby-on-rails/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Create a many-to-many ActiveRecord association in Ruby on Rails with has_many :through and has_and_belongs_to_many</h1>
+
+    
+      <p class="Banner-information">
+        <time>January 28, 2016</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p itemprop="description">A common obstacle when building web applications are relational database associations. Without these it would be difficult to decrease the amount of duplicate data as well as increasing the overall database efficiency. The most common relationships are the: one-to-one, one-to-many, and many-to-many.</p>
+<!--excerpt-->
+<p>In this article I'll go through the creation of a many-to-many relationship with the built-in <code>Ruby on Rails ActiveRecord</code> associations, <code>has_many :through</code> and <code>has_and_belongs_to_many:</code>. Additionally, the specific differences between the two will be examined, but before all that let's first get some background on what is a many-to-many relationship.</p>
+
+<h2>The Many-to-Many Relationship</h2>
+<p>In relational database schemas, a <code>many-to-many</code> association is when a database table is built in a way that relates it to another table through a joining table. There needs to be at least three table to accomplish this. This allows the developer to query the relationship between the two tables gather their respective collections.</p>
+<p>Diving into an example, let's say you have an application that requires data for programmers, clients, and their connected projects. You could start by saying that a <code>Programmer</code> is a member of a <code>Project</code> as well as a <code>Client</code>. This would lead you to design your database schema to resemble something like this:</p>
+<div class="thumbnail">
+  <img src="/img/2016/many-to-many-bad-erd.png" alt="An ERD example of what not to do" />
+  <div class="caption">An ERD example of what not to do</div>
+</div>
+<p>Unfortunately, you now have set yourself up for a headache later on. To use this database you'll have to contend with having to create a <code>project_id</code> foreign key in each subsequent table that needs an association with the <code>Project</code> table. This can get hairy pretty quick.</p>
+<p class="well floated"><strong>Referential Integrity</strong><br />A standard of databases that states data must remain consistent and valid when dealing with a relationship between two tables.</p>
+<p>As an example, you could delete say a <code>Project</code> record that is related to a <code>Programmer</code> and <code>Client</code>. Well now both the <code>Programmer</code> and <code>Client</code> records contain a <code>project_id</code> key that refers to a deleted record. Which would be a violation of basic referential integrity.</p>
+
+<p>So, that didn't work out very well. Let's take another stab at it from the opposite direction.</p>
+<p>If every <code>Project</code> has a <code>Programmer</code> and <code>Client</code> attached to it, then we could say that a <code>Project</code> belongs to a <code>Programmer</code> and a <code>Project</code> also belongs to a <code>Client</code>. Here it is organized into a new entity relationship diagram.</p>
+
+<div class="thumbnail" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+  <img src="/img/2016/many-to-many-good.png" alt="An ERD example of a Many-to-many association" />
+  <meta itemprop="url" content="/img/2016/many-to-many-good.png" />
+  <meta itemprop="width" content="780" />
+  <meta itemprop="height" content="398" />
+  <div class="caption" itemprop="caption">
+    An ERD example of a Many-to-Many association
+  </div>
+</div>
+<p>Let's double check it to make sure it passes the previous problem we ran into.</p>
+<p>If we were to delete a <code>Project</code> we would lose the project's data as well as the two foreign key fields: <code>programmer_id</code> and <code>client_id</code>. However, we don't end up with any invalid records in our system. Additionally, both the <code>Programmer</code> and <code>Client</code> records are completely usable as stand-alone data.</p>
+<p>Good job! Looks like we successfully created a working database structure. Next I'm going to show off how to create these tables from the command line and the Rails association methods that make using them easier.</p>
+
+<h2>How to leverage ActiveRecord Associations</h2>
+<p>There are a few different types of ActiveRecord associations. <code>has_one</code> signifies that a model has one record of another specific model. <code>has_many</code> is the same except there can be many records. <code>belongs_to</code> is used to show that the model on the other side of the association is part of or belongs to the associated model.</p>
+<p>These are some of the basic fundamentals of ActiveRecord Assocations, at least from a theorhetical standpoint. However, for the purposes of this article we will focus on many-to-many associations which are accomplished with two of the more challenging associations that can be implemented. The <code>has_many :through</code> and the <code>has_and_belongs_to_many:</code>.</p>
+
+<h2>has_many :through</h2>
+<p class="well floated"><strong>Rails Tip</strong><br /> I am using the shortened version of the <code>rails generate</code> command which is simply <code>rails g</code>. Nifty!</p>
+<p>The first step to implementing a <code>has_many :through</code> association is to run the rails
+generator to create the model and the migration files. We will use the entity relationship diagram (pictured above) to
+create our application. I've listed the appropriate migrations below. I recommend using the <code>rails generate model</code> syntax, as it not only gives you a model but the matching migration file as well.</p>
+
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">rails g model Programmer name:string
+rails g model Client name:string
+rails g model Project programmer:references client:references
+rake db:migrate</code></pre></figure>
+<p>Pay close attention to the <code>Project</code> model command syntax. The <code>:references</code> syntax is a shortcut for
+creating an index on the preceding field name, programmer and client in this instance, as well as marking them as foreign key constraints for the programmers and clients database tables.</p>
+<p class="well floated"><strong>What is a Join Table?</strong><br /> A join table acts as an intermediary between two or more tables. This provides a convient location for shared database fields to be stored (project_name or budget would be examples) as well as associating the tables to each other.</p>
+<p>For example using the programmer field, the <code>:references</code> syntax will create a reference to a model with name programmer by creating an id called <code>programmer_id</code> on the projects table and will constrain it to the programmers table. Once migrated (<strong>hint</strong>: <code>rake db:migrate</code>) you will be able to use the association between programmers and clients through the project <strong>join table</strong>.</p>
+
+<p>Next, we'll need to come up with the proper Rails association methods to use. I find this part is easier when they are spoken out loud or in my head before I go about creating them. Not only is this a good practice to get into with the Rails methods but also before you create the initial database diagram.</p>
+<p>This may sound silly, but it can really help you to catch any logic in the associations that doesn't make sense. So speaking these out loud.</p>
+<ul>
+  <li>"A Programmer has many projects."</li>
+  <li>"A Client has many projects."</li>
+  <li>"A Project belongs to a Programmer."</li>
+  <li>"A Project belongs to a Client."</li>
+  <li>"A Programmer has many Clients through a Project."</li>
+  <li>"A Client has many Programmers through a Project."</li>
+</ul>
+<p>Alright, those seem to make sense (we already know that they should work based on the discussion at the beginning of the article). Now we need to add the Rails methods to our respective model files.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/model/programmer.rb</span>
+<span class="k">class</span> <span class="nc">Programmer</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:projects</span>
+  <span class="n">has_many</span> <span class="ss">:clients</span><span class="p">,</span> <span class="ss">through: :projects</span>
+<span class="k">end</span>
+
+<span class="c1"># app/model/client.rb</span>
+<span class="k">class</span> <span class="nc">Client</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:projects</span>
+  <span class="n">has_many</span> <span class="ss">:programmers</span><span class="p">,</span> <span class="ss">through: :projects</span>
+<span class="k">end</span>
+
+<span class="c1"># app/model/project.rb</span>
+<span class="k">class</span> <span class="nc">Projects</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">belongs_to</span> <span class="ss">:programmer</span>
+  <span class="n">belongs_to</span> <span class="ss">:client</span>
+<span class="k">end</span></code></pre></figure>
+<p>By utilizing these associations we now have access to a number of helper methods (16 to be exact). Here they are directly from the RailsGuides documentation.</p>
+<h3>Built-in Association Methods</h3>
+<ul>
+  <li>collection(force_reload = false)</li>
+  <li>collection<<(object, ...)</li>
+  <li>collection.delete(object, ...)</li>
+  <li>collection.destroy(object, ...)</li>
+  <li>collection=(objects)</li>
+  <li>collection_singular_ids</li>
+  <li>collection_singular_ids=(ids)</li>
+  <li>collection.clear</li>
+  <li>collection.empty?</li>
+  <li>collection.size</li>
+  <li>collection.find(...)</li>
+  <li>collection.where(...)</li>
+  <li>collection.exists?(...)</li>
+  <li>collection.build(attributes = {}, ...)</li>
+  <li>collection.create(attributes = {})</li>
+  <li>collection.create!(attributes = {})</li>
+</ul>
+<p>This is now a properly set up has_many :through association which can be utilized by the preceding methods. I've given examples of <code>collection.create(attributes = {})</code> and <code>collection</code> below.</p>
+<div class='well'>
+  <h3>Create Association</h3>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">programmer</span> <span class="o">=</span> <span class="no">Programmer</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Josh Frankel'</span><span class="p">)</span>
+<span class="n">client</span>     <span class="o">=</span> <span class="no">Client</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Mr. Nic Cage'</span><span class="p">)</span>
+
+<span class="n">programmer</span><span class="p">.</span><span class="nf">projects</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">client: </span><span class="n">client</span><span class="p">)</span></code></pre></figure>
+  <h3>List ActiveRecord Collection</h3>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">programmer</span><span class="p">.</span><span class="nf">clients</span>
+ <span class="o">=&gt;</span> <span class="c1">#&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Client id: 1, created_at: "2016-01-25 18:45:00", updated_at: "2016-01-25 18:45:00", name: "Mr. Nic Cage"&gt;]&gt;</span></code></pre></figure>
+</div>
+
+<h2>has_and_belongs_to_many:</h2>
+<p>An alternative way for creating many-to-many associations in Rails, is to use the <code>has_and_belongs_to_many</code> association or <abbr title="has_and_belongs_to_many">HABTM</abbr> for short. The setup is very similiar to the <code>has_many :through</code> association. The migration is slightly different though for the <code>has_many :through</code> association so you'll need to make sure you are running these on a clean database (or you can rollback to previous migrations and create new ones).</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">rails g model Programmer name:string
+rails g model Client name:string
+rails g migration CreateClientsProgrammers programmer:references client:references
+rake db:migrate</code></pre></figure>
+<p class="well floated"><strong>Custom names for join tables</strong><br /> If you really want to use a different name for the join table you can add the <code>join_table: :database_table_name</code> to your model association to point it to another database table.<br /><br /><strong>Format</strong>: <code>has_and_belongs_to_many :clients, join_table: :projects</code></p>
+<p>One of the first differences to notice is that we are not creating a model for the join table (projects). <code>has_and_belongs_to_many</code> doesn't require you to creating a model for this table. Additionaly, this type of association relies off of the two other tables for its naming convention, <code>clients_programmers</code> in this instance.</p>
+
+
+<p>So again we need to create the proper associations in our model code. Speak these out loud. Again they are slightly different than the <code>has_many :through</code> association.</p>
+<ul>
+  <li>"A Programmer has many Clients"</li>
+  <li>"A Programmer can belong to a Client"</li>
+  <li>"A Client has many Programmers"</li>
+  <li>"A Client can belong to a Programmer"</li>
+</ul>
+<p>And, in our respective model code.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/model/programmer.rb</span>
+<span class="k">class</span> <span class="nc">Programmer</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_and_belongs_to_many</span> <span class="ss">:clients</span>
+<span class="k">end</span>
+
+<span class="c1"># app/model/client.rb</span>
+<span class="k">class</span> <span class="nc">Client</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_and_belongs_to_many</span> <span class="ss">:programmers</span>
+<span class="k">end</span></code></pre></figure>
+<p>Once again here is how you would utilize the associations in your code or console.</p>
+<div class='well'>
+  <h3>Create Association</h3>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">programmer</span> <span class="o">=</span> <span class="no">Programmer</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Josh Frankel'</span><span class="p">)</span>
+
+<span class="n">programmer</span><span class="p">.</span><span class="nf">clients</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Mr. Nic Cage'</span><span class="p">)</span></code></pre></figure>
+  <h3>List ActiveRecord Collection</h3>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">programmer</span><span class="p">.</span><span class="nf">clients</span>
+ <span class="o">=&gt;</span> <span class="c1">#&lt;ActiveRecord::Associations::CollectionProxy [#&lt;Client id: 1, created_at: "2016-01-25 18:45:00", updated_at: "2016-01-25 18:45:00", name: "37Signals"&gt;]&gt;</span></code></pre></figure>
+</div>
+<p>Now, you might be asking yourself "Why would I ever use the has_many :through association when has_and_belongs_to_many: is much easier to setup". Well the next section will explain the downsides of it and why generally using <code>has_many :through</code> is the best practice.</p>
+
+<h2>When should I use them? has_many :through vs HABTM</h2>
+<p>While it looks like less work to use a <code>has_and_belongs_to_many</code> association, it actually can end up
+costing you a lot of time down the road.</p>
+<h3>Validations</h3>
+<p>Imagine you build a system with the aforementioned HABTM association. One day your client (your actual client not the database table in the article) requests that the <code>Project</code> table must always have data for a name and description field filled out or else it will be invalid. With a HABTM association there isn't a model in which to place the validation code. While with <code>has_many :through</code> you have a model immediately ready for usage which would allow you to do write something like this:</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Project</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">validates</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+  <span class="n">validates</span> <span class="ss">:description</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+<span class="k">end</span></code></pre></figure>
+<h3>Shared Functionality</h3>
+<p>Furthermore, suppose that this same client (again, the person paying you for the application) requested that anytime a project's deadline_date was less than the current date that the system would automatically set the project as closed. With a HABTM association you would need to create an additional class or potentially a concern to package this functionality. While with <code>has_many :through</code> having the model available gives you a logical place to bundle the shared methods.</p>
+<p>Here is an example of the shared methods while building upon the already existing model validations from above:</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Project</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">validates</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+  <span class="n">validates</span> <span class="ss">:description</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span>
+
+  <span class="k">def</span> <span class="nf">status_update</span>
+    <span class="n">close_project</span> <span class="k">unless</span> <span class="n">active?</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">active?</span>
+    <span class="n">current_date</span> <span class="o">&lt;</span> <span class="n">deadline_date</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">close_project</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">status</span> <span class="o">=</span> <span class="ss">:closed</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+<p>There isn't anywhere to place this without creating more files with a HABTM association. This is by far the largest downside. <code>has_many :through</code> on the other hand gives you a model for your join table, allowing you to validate fields and add shared functionality through methods.<p>
+<h3>Difference in creation</h3>
+<p>Here is an example of a difference in some of the built-in methods that are created when you use either one of these associations. For <code>has_many :through</code> you can create objects on the collection as seen above in the following format:</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># First example</span>
+<span class="n">client</span> <span class="o">=</span> <span class="no">Client</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Chris Cornell'</span><span class="p">)</span>
+<span class="n">programmer</span><span class="p">.</span><span class="nf">projects</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">client: </span><span class="n">client</span><span class="p">)</span>
+
+<span class="c1"># Another way of doing the same thing</span>
+<span class="n">programmer</span><span class="p">.</span><span class="nf">projects</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">client: </span><span class="no">Client</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Keanu Reeves'</span><span class="p">))</span></code></pre></figure>
+<p>Unfortunately, since we don't have a model with the configured HABTM association we'll need to build the association on the specific collection. Perceptive readers might have noticed this earlier in the HABTM create association example. Here it is again:</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">programmer</span><span class="p">.</span><span class="nf">clients</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Mr. Nic Cage'</span><span class="p">)</span></code></pre></figure>
+<p>Notice how for HABTM, we use <code>programmer.clients.create(client_attribute: value)</code> to build the collection, unlike a <code>has_many :through</code> where we can use the join table model like so: <code>programmer.projects.create(client: client_object)</code>. Just another difference between the two association methods.</p>
+<h3>Existing database schemas</h3>
+<p>The best use case for a HABTM association is when you are working with an already built database. For some reason maybe the <code>has_many :through</code> association just isn't going to work with the existing structure. Or maybe the system is already utilizing a custom HABTM association and removing it could irrevocably break parts of the system.</p>
+<p>A little dramatic I know.</p>
+<p>These sort of cases typically happen with legacy applications as HABTM is an older feature of Rails. With some good refactoring they could be removed from the system, given there is a good suite of tests configured.</p>
+<h3>Recommended usage</h3>
+<blockquote class="Info Info-right"><div class="page-header">RailsGuides</div> "The simplest rule of thumb is that you should set up a has_many :through relationship if you need to work with the relationship model as an independent entity. If you don't need to do anything with the relationship model, it may be simpler to set up a has_and_belongs_to_many relationship (though you'll need to remember to create the joining table in the database).<br /><br />
+You should use has_many :through if you need validations, callbacks, or extra attributes on the join model."</blockquote>
+<p>I would recommend that 99% of the time that you stick to creating <code>has_many :through</code> associations. They end up being much cleaner as well as saving you time down the road by giving you a model that is tied to your database's join table.</p>
+<p>The other 1% of the time, <code>has_and_belongs_to_many:</code> is very useful for legacy relational database schemas as well as older systems. Sometimes HABTM makes a lot of sense for these situations.</p>
+<h2>Conclusion</h2>
+<p>While <code>has_and_belongs_to_many:</code> associations are quicker to setup they tend not to scale well as your applications requires more functionality. <code>has_many :through</code> on the other hand are very versatile and give the added benefit of having a model directly mapped to your join table.</p>
+<p>Both types of many-to-many associations require the creation of a migration for a join table, a table that sits between two other tables and helps to association them to each other. This table is directly mapped to a model when using a <code>has_many :through</code> association but not a HABTM.</p>
+
+<h3>TL;DR</h3>
+<p><strong>has_many :through</strong></p>
+<ul>
+  <li>Requires a join table in the database</li>
+  <li>Creates a model for the join table which allows shared functionality and validations. 1 to 1 matching between database table and model.</li>
+  <li>Scales better and is more versatile</li>
+  <li>Allows for creation of objects on the collection <code>programmer.projects.create(client: client_object)</code></li>
+  <li>Takes slightly more setup work</li>
+</ul>
+<p><strong>has_and_belongs_to_many:</strong></p>
+<ul>
+  <li>Requires a join table in the database</li>
+  <li>Does not map a model to the join table, which means one less file but no validations or shared functionality without the creation of a second class</li>
+  <li>Allows for custom join table names via: <code>join_table: :database_table_name</code></li>
+  <li>Faster to setup</li>
+  <li>Best for legacy architecture</li>
+</ul>
+
+<p>So we've gone through the basics of designing a good many-to-many database structure, the console commands needed to create proper migrations, and the different setups of Rail's two many-to-many association methods.</p>
+<p>Was there something you would like added to this article? Got a better use case for the <code>has_and_belongs_to_many:</code> association? How about a favorite association? Weigh in on it in the comments below.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/add-multiple-columns-to-a-ruby-on-rails-migration/" title="Add multiple columns to an existing table with a Rails migration">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/a-development-roadmap-for-2016/" title="A development roadmap for 2016">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

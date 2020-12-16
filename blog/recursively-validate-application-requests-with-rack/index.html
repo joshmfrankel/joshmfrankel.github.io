@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Recursively validate application requests with Rack | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Recursively validate application requests with Rack" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Previously, I described a process of using Rack to validate request objects for malicious formats (specifically null bytes). However, request params come in many different formats from arrays to hashes to arrays containing hashes, there are a lot of different cases to cover. Fortunately using recursion allows for an elegant solution that covers each scenario." />
+<meta property="og:description" content="Previously, I described a process of using Rack to validate request objects for malicious formats (specifically null bytes). However, request params come in many different formats from arrays to hashes to arrays containing hashes, there are a lot of different cases to cover. Fortunately using recursion allows for an elegant solution that covers each scenario." />
+<link rel="canonical" href="http://joshfrankel.me/blog/recursively-validate-application-requests-with-rack/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/recursively-validate-application-requests-with-rack/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-07-16T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"Previously, I described a process of using Rack to validate request objects for malicious formats (specifically null bytes). However, request params come in many different formats from arrays to hashes to arrays containing hashes, there are a lot of different cases to cover. Fortunately using recursion allows for an elegant solution that covers each scenario.","headline":"Recursively validate application requests with Rack","dateModified":"2019-07-16T00:00:00+00:00","datePublished":"2019-07-16T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/recursively-validate-application-requests-with-rack/"},"url":"http://joshfrankel.me/blog/recursively-validate-application-requests-with-rack/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Recursively validate application requests with Rack</h1>
+
+    
+      <p class="Banner-information">
+        <time>July 16, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+  
+
+  
+    <section class="Series Series-section">
+      <h2>This post is part 2 of a 3 part series</h2>
+
+      <ul class="Series-listing">
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+            <li>
+              
+                (1) <a href="/blog/don-t-let-the-null-bytes-bite/">Don't let the null bytes bite</a>
+              
+            </li>
+          
+        
+          
+            
+            <li>
+              
+                <strong>(Current post)</strong> Recursively validate application requests with Rack
+              
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+            <li>
+              
+                (3) <a href="/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/">Invalidate requests when a user session contains null bytes in the Rack layer</a>
+              
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </section>
+  
+
+
+
+  <p>Previously, I described a process of using Rack to validate request objects
+for malicious formats (specifically null bytes). However, request params come
+in many different formats from arrays to hashes to arrays containing hashes, there
+are a lot of different cases to cover. Fortunately using recursion allows for
+an elegant solution that covers each scenario.</p>
+
+<!--excerpt-->
+
+<p>If you haven’t read the first post in this series it lays a lot of the groundwork
+we’re going to go over in this post. If you’re interested you can find it here: <a href="http://joshfrankel.me/blog/don-t-let-the-null-bytes-bite/">“Don’t let the null bytes bite”</a>.</p>
+
+<p>Onward!</p>
+
+<h3 id="adding-test-support-for-request-param-formats">Adding test support for request param formats</h3>
+
+<p>First let’s list out all the possible permutations that a request object value can be formatted in:</p>
+
+<ol>
+  <li>Just a plain String value (We’ve already supported this)</li>
+  <li>An array of strings values</li>
+  <li>A JSON key value pair where the value is a string</li>
+  <li>A nested variation of 2 and 3 above (example: An array with JSON key value pairs that contain string values)</li>
+</ol>
+
+<p>It’s time again to write some more tests:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"spec_helper"</span>
+<span class="nb">require</span> <span class="s2">"rack/test"</span>
+
+<span class="n">describe</span> <span class="no">ValidateRequestParams</span> <span class="k">do</span>
+  <span class="kp">include</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Test</span><span class="o">::</span><span class="no">Methods</span>
+
+  <span class="n">let</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="p">{</span> <span class="no">MyApplication</span><span class="o">::</span><span class="no">Application</span> <span class="p">}</span>
+
+  <span class="n">context</span> <span class="s2">"WITH invalid characters"</span> <span class="k">do</span>
+    <span class="n">let</span><span class="p">(</span><span class="ss">:null_byte</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"</span><span class="se">\u</span><span class="s2">0000"</span> <span class="p">}</span>
+
+    <span class="n">it</span> <span class="s2">"responds with 400 BadRequest for strings"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"I am </span><span class="si">#{</span><span class="n">null_byte</span><span class="si">}</span><span class="s2"> bad"</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">bad_request?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Newly added</span>
+    <span class="n">it</span> <span class="s2">"responds with 400 BadRequest for hashes with strings"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="p">{</span> <span class="ss">inner_key: </span><span class="s2">"I am </span><span class="si">#{</span><span class="n">null_byte</span><span class="si">}</span><span class="s2"> bad"</span> <span class="p">}</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">bad_request?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Newly added</span>
+    <span class="n">it</span> <span class="s2">"responds with 400 BadRequest for arrays with strings"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="p">[</span><span class="s2">"I am </span><span class="si">#{</span><span class="n">null_byte</span><span class="si">}</span><span class="s2"> bad"</span><span class="p">]</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">bad_request?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Newly added</span>
+    <span class="n">it</span> <span class="s2">"responds with 400 BadRequest for arrays containing hashes with string values"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="p">[</span>
+        <span class="p">{</span>
+          <span class="ss">inner_key: </span><span class="s2">"I am </span><span class="si">#{</span><span class="n">null_byte</span><span class="si">}</span><span class="s2"> bad"</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">bad_request?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">context</span> <span class="s2">"WITHOUT invalid characters"</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s2">"responds with a 200 ok"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">ok?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s2">"responds with a 200 ok for strings"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"safe name"</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">ok?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Newly added</span>
+    <span class="n">it</span> <span class="s2">"responds with a 200 ok for hashes with strings"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="p">{</span> <span class="ss">inner_key: </span><span class="s2">"safe name"</span> <span class="p">}</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">ok?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Newly added</span>
+    <span class="n">it</span> <span class="s2">"responds with a 200 ok for arrays with strings"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="p">[</span><span class="s2">"safe name"</span><span class="p">]</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">ok?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Newly added</span>
+    <span class="n">it</span> <span class="s2">"responds with a 200 ok for arrays containing hashes with string values"</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="s2">"/users"</span><span class="p">,</span> <span class="ss">name: </span><span class="p">[{</span> <span class="ss">inner_key: </span><span class="s2">"safe name"</span> <span class="p">}]</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">ok?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>The above just continued the previous format we established for testing request values that are strings. Now it just supports a couple more valid formats. Onto making all this pass.</p>
+
+<h3 id="adding-logic-to-validate-multiple-request-param-formats">Adding logic to validate multiple request param formats</h3>
+
+<p>Once I have all my test cases written out the next step I like to take is writing the simplest implementation to get all of them passing. For this, the plan is to check the type of the request param and navigate to
+any contained string values.</p>
+
+<p>Building on our existing implementation above we can adjust the <strong>#call</strong> method to call out to a private method which allows us to better organize the upcoming logic. We’ll start by abstracting the current String logic.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ValidateRequestParams</span>
+  <span class="no">INVALID_CHARACTERS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"</span><span class="se">\u</span><span class="s2">0000"</span> <span class="c1"># null bytes</span>
+  <span class="p">].</span><span class="nf">freeze</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="vi">@app</span> <span class="o">=</span> <span class="n">app</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">has_invalid_character?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">params</span><span class="p">.</span><span class="nf">values</span><span class="p">)</span>
+      <span class="k">return</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="p">{},</span> <span class="p">[</span><span class="s2">"Bad Request"</span><span class="p">]]</span>
+    <span class="k">end</span>
+
+    <span class="vi">@app</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+    <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+      <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+        <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">string_contains_invalid_character?</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="n">invalid_characters_regex</span> <span class="o">=</span> <span class="no">Regexp</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="no">INVALID_CHARACTERS</span><span class="p">)</span>
+
+    <span class="n">string</span><span class="p">.</span><span class="nf">match?</span><span class="p">(</span><span class="n">invalid_characters_regex</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Now checking for invalid characters in a String is contained within its
+own method. Additionally, the boolean check within <strong>#call</strong> now has
+its own method dedicated to determining this value.</p>
+
+<p>Moving onto adding support for arrays we can add the following code to the <strong>#has_invalid_character?</strong> private method:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+  <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+    <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+      <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">array_value</span><span class="o">|</span>
+        <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">array_value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Started to get a bit verbose above but stick with me. I’ve got a plan to clean it up. Adding support for JSON params follows a similar format as arrays:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+  <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+    <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+      <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">array_value</span><span class="o">|</span>
+        <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">array_value</span><span class="p">)</span> <span class="k">if</span> <span class="n">array_value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:values</span><span class="p">)</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">hash_value</span><span class="o">|</span>
+        <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">hash_value</span><span class="p">)</span> <span class="k">if</span> <span class="n">hash_value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>So that’s a rats nest of code now isn’t it? There are a couple problems with it aside from the fact it’s hard to read.</p>
+
+<ol>
+  <li>It has nested conditional logic</li>
+  <li>There are repeated conditionals. The code isn’t confident into what value it is receiving</li>
+  <li>Arrays and JSON logic only supports 1 level of nesting. What if you had something like <code class="highlighter-rouge">key: [{ another_key: { super_inner_key: ["bad \u0000"] }}]</code></li>
+  <li>Our test that checks, “responds with 400 BadRequest for arrays containing hashes with string values” is failing because the request is coming back successful</li>
+</ol>
+
+<p>Given all of that we can determine a solution by looking for commonalities between the various branching conditionals. So what can we identify about them?</p>
+
+<ol>
+  <li>All formats eventually nest down into a string value</li>
+  <li>Formats can be multi-level nested</li>
+</ol>
+
+<p>That’s it! Each needs to determine its lowest level string value to compare to our created regular expression above. Here’s where recursion is our friend.</p>
+
+<h2 id="what-is-recursion">What is recursion?</h2>
+
+<p>Recursion is when you define a method that calls itself until a stop condition is
+reached. Essentially, its an infinite loop with a conditional return at some point.</p>
+
+<blockquote class="Info Info-right">
+"The Fibonacci sequence [consists of a sequence where] each number is the sum of the two preceding ones, starting from 0 and 1"
+<cite><a href="https://en.wikipedia.org/wiki/Fibonacci_number">- Wikipedia</a></cite>
+</blockquote>
+
+<p>A classic example of a problem easily solved by recursion is determine the nth number
+in the Fibonacci sequence. The sequence goes like: 0 + 1 = 1 + 1 = 2 + 1 = 3 + 2 = 5. So if we wanted to know the 10th number in the sequence we can write a recursive method that stops after 10 iterations.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">ending_index</span><span class="p">,</span> <span class="n">current_number</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">previous_number</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">current_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">current_index</span> <span class="o">==</span> <span class="n">ending_index</span>
+    <span class="k">return</span> <span class="n">previous_number</span>
+  <span class="k">else</span>
+    <span class="n">current_index</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">next_number</span> <span class="o">=</span> <span class="n">current_number</span> <span class="o">+</span> <span class="n">previous_number</span>
+    <span class="n">fibonacci</span><span class="p">(</span><span class="n">ending_index</span><span class="p">,</span> <span class="n">next_number</span><span class="p">,</span> <span class="n">current_number</span><span class="p">,</span> <span class="n">current_index</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">fibonacci</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1">#=&gt; 55</span>
+</code></pre></div></div>
+
+<p>So starting from 1 the tenth number in the sequence is 55. How this works is that
+fibonacci calls itself within the else condition above while passing along previous
+values and indexes. When the current index is equal to the ending index (or stop
+condition) we return the previous number which happens to be the nth number in the 
+sequence. So writing the above out in full:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">1</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">-</span> <span class="no">First</span> <span class="n">number</span> <span class="n">is</span> <span class="mi">1</span>
+<span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="no">Second</span> <span class="n">number</span> <span class="n">is</span> <span class="n">still</span> <span class="mi">1</span>
+<span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="no">Third</span> <span class="n">is</span> <span class="mi">2</span>
+<span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">-</span> <span class="no">Fourth</span> <span class="n">is</span> <span class="mi">3</span>
+<span class="mi">5</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">-</span> <span class="no">Fifth</span> <span class="n">is</span> <span class="mi">5</span>
+<span class="mi">8</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">-</span> <span class="no">Sixth</span> <span class="n">is</span> <span class="mi">8</span>
+<span class="mi">13</span> <span class="o">+</span> <span class="mi">8</span> <span class="o">-</span> <span class="no">Seventh</span> <span class="n">is</span> <span class="mi">13</span>
+<span class="mi">21</span> <span class="o">+</span> <span class="mi">13</span> <span class="o">-</span> <span class="no">Eighth</span> <span class="n">is</span> <span class="mi">21</span>
+<span class="mi">34</span> <span class="o">+</span> <span class="mi">21</span> <span class="o">-</span> <span class="no">Ninth</span> <span class="n">is</span> <span class="mi">34</span>
+<span class="mi">55</span> <span class="o">+</span> <span class="mi">34</span> <span class="o">-</span> <span class="no">And</span> <span class="n">tenth</span> <span class="n">is</span> <span class="mi">55</span>
+<span class="o">=&gt;</span> <span class="mi">55</span>
+</code></pre></div></div>
+
+<p>That’s pretty much it to recursion. A method that calls self with a stop condition. One thing to note is that since the above could easily become an infinite loop defining a stop condition early prevents stack level too deep errors.</p>
+
+<p>This is a pretty simple example of it so let’s go back to a more practical application of it.</p>
+
+<h2 id="recursively-validate-request-params">Recursively validate request params</h2>
+
+<p>Looking back at our requirements above:</p>
+
+<ol>
+  <li>All formats eventually nest down into a string value</li>
+  <li>Formats can be multi-level nested</li>
+</ol>
+
+<p>We can use recursion to shape the method signature. Additionally, since we built the supporting unit tests changing our logic becomes easy to know if we’ve got it right or not.</p>
+
+<p>Converting our current implementation to recursion looks like the following:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">has_invalid_character?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">params</span><span class="p">.</span><span class="nf">values</span><span class="p">)</span>
+      <span class="k">return</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="p">{},</span> <span class="p">[</span><span class="s2">"Bad Request"</span><span class="p">]]</span>
+    <span class="k">end</span>
+
+    <span class="vi">@app</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+    <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+      <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kp">false</span> <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="mi">2</span>
+
+    <span class="n">depth</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+      <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:values</span><span class="p">)</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">hash_value</span><span class="o">|</span>
+        <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">hash_value</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">array_value</span><span class="o">|</span>
+        <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">array_value</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">string_contains_invalid_character?</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="n">invalid_characters_regex</span> <span class="o">=</span> <span class="no">Regexp</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="no">INVALID_CHARACTERS</span><span class="p">)</span>
+
+    <span class="n">string</span><span class="p">.</span><span class="nf">match?</span><span class="p">(</span><span class="n">invalid_characters_regex</span><span class="p">)</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>Breaking this down step by step, we’ve converted the previous <strong>#has_invalid_character?</strong> method to instead call out to a new recursive method called <strong>#check_for_invalid_characters_recursively</strong>. The allows the new method to focus on recursion while the <strong>#has_invalid_character?</strong> can just loop through values returning early as soon as one is true.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+  <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+    <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>The recursive method shouldn’t look much different than the previous implementation of <strong>#has_invalid_character?</strong> (since we moved the logic out of it). We still have the <code class="highlighter-rouge">if...elsif...else</code> conditional based on type. The notable change here occurs for Hashes and Array in that they now call <strong>#check_for_invalid_characters_recursively</strong> with the current value in the Hash or Array and the current depth of iteration (more on this in a minute).</p>
+
+<h3 id="breaking-down-the-logic-flow-step-by-step">Breaking down the logic flow step-by-step</h3>
+
+<p>So if we assume that the request param looks like <code class="highlighter-rouge">params: { safe: "nothing dangerous", sketchy: { devious: "evil \u0000 string" } }</code> the program flows looks like this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># request.params.values #=&gt; ["nothing dangerous", {:devious=&gt;"evil \u0000 string"}]</span>
+<span class="k">if</span> <span class="n">has_invalid_character?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">params</span><span class="p">.</span><span class="nf">values</span><span class="p">)</span>
+
+<span class="c1">#...</span>
+<span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+  <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+    <span class="c1"># First iteration:</span>
+    <span class="c1"># value =&gt; "nothing dangerous"</span>
+    <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="c1"># First iteration:</span>
+  <span class="c1"># value =&gt; "nothing dangerous"</span>
+  <span class="c1"># depth =&gt; 0</span>
+  <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+    <span class="c1"># Returns false because there is not an invalid string present in "nothing dangerous"</span>
+    <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="k">elsif</span> <span class="c1"># ...</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+
+<span class="c1"># Second Iteration</span>
+<span class="c1"># {:devious=&gt;"evil \u0000 string"}</span>
+
+<span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+  <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+    <span class="c1"># Second iteration:</span>
+    <span class="c1"># value =&gt; {:devious=&gt;"evil \u0000 string"}</span>
+    <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="c1"># Second iteration:</span>
+  <span class="c1"># value =&gt; {:devious=&gt;"evil \u0000 string"}</span>
+  <span class="c1"># depth =&gt; 0</span>
+
+  <span class="n">depth</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># depth =&gt; 1</span>
+  <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+  
+  <span class="c1"># {:devious=&gt;"evil \u0000 string"} responds to .values</span>
+  <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:values</span><span class="p">)</span>
+    <span class="c1"># value.values converts it back to an array</span>
+    <span class="c1"># #=&gt; ["evil \u0000 string"]</span>
+    <span class="n">value</span><span class="p">.</span><span class="nf">values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">hash_value</span><span class="o">|</span>
+      <span class="c1"># hash_value =&gt; "evil \u0000 string"</span>
+      <span class="c1"># depth =&gt; 1</span>
+      <span class="c1"># below re-calls the current method recursively</span>
+      <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">hash_value</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># Third iteration</span>
+<span class="c1"># We've now drilled down through the hash to extract the lowest level</span>
+<span class="c1"># value that is a string. We're ready to validate it</span>
+<span class="k">def</span> <span class="nf">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="c1"># Third iteration:</span>
+  <span class="c1"># value =&gt; "evil \u0000 string"</span>
+  <span class="c1"># depth =&gt; 1</span>
+  <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+    <span class="c1"># Returns true because "evil \u0000 string" contains a null byte</span>
+    <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="k">elsif</span> <span class="c1"># ...</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+
+<span class="c1"># The true return above kicks us back up into the parent iterator</span>
+<span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+  <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+    <span class="c1"># Since the below line returned true the above .any? call is also true.</span>
+    <span class="c1"># This indicates that the request contained invalid characters and we</span>
+    <span class="c1"># should immediately reject it with a 400 error</span>
+    <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># Back to the #call method we returned as soon as a value contained</span>
+<span class="c1"># something invalid. Take that malicious requests!</span>
+<span class="k">if</span> <span class="n">has_invalid_character?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">params</span><span class="p">.</span><span class="nf">values</span><span class="p">)</span>
+  <span class="k">return</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="p">{},</span> <span class="p">[</span><span class="s2">"Bad Request"</span><span class="p">]]</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>So a rough outline of the above could look like:</p>
+
+<ol>
+  <li>Given a request send through all params as an Array</li>
+  <li>Continue to iterate recursively until the value is a string and check it
+for invalid characters.</li>
+  <li>As soon as one value contains something malicious stop execution as .any? becomes
+true.</li>
+</ol>
+
+<p>You might still be wondering with the depth variable is included above. The reason
+for this is to avoid performance issues with malicious requests. Our above strategy
+relies on recursion to detect invalid characters but if an attacker instead crafted
+a request with 100 keys that each contained 100 keys where each had a value the recursion
+above would be forced to traverse all the params. This could lead to memory issues and/or
+timeouts. Using the depth variable acts as safeguard in that we only check request params
+2 levels deep. This is reasonable to most request formats and should catch most issues.
+2 is an arbitrary value as I could have also said 5 here.</p>
+
+<p>This is all accomplished with the following code:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="k">return</span> <span class="kp">false</span> <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="mi">2</span>
+
+  <span class="n">depth</span> <span class="o">+=</span> <span class="mi">1</span>
+
+  <span class="c1"># ... some conditional</span>
+    <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">hash_value</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Each recursive loop, increments a counter that prevents recursion from traversing
+to far down the request object. The depth variable is always passed along anytime
+an Array or Hash is encountered as those indicate that we need to traverse inside
+of them. Strings on the other hand are the ending state we wish to have values
+be formatted in.</p>
+
+<h2 id="wrap-up">Wrap up</h2>
+
+<p>So with all of that we now have a way to determine malicious values within a request
+object regardless of it being a String, Array, or Hash. Avoiding the sting of null bytes one request at a time.</p>
+
+<p>But wait! What about if a user’s session contains null bytes in it? Have no fear as the <a href="http://joshfrankel.me/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/">next post in this series
+covers how to handle it</a>.</p>
+
+<p>What’s a fun way you’ve used recursion to solve a complex programming problem? I’d love to discuss what the outcome was below in the comments.</p>
+
+<p>Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/don-t-let-the-null-bytes-bite/" title="Don't let the null bytes bite">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/modifying-strong-parameter-values-after-a-request/" title="Modifying strong parameter values after a request">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

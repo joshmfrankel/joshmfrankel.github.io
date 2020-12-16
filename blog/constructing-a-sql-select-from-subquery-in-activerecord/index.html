@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Constructing a select * from subquery using ActiveRecord | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Constructing a select * from subquery using ActiveRecord" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="ActiveRecord is a great tool for making SQL a more readable. However, there are some things that are really difficult to do in pure ActiveRecord. One of those is a SELECT * FROM (subquery) style of query. Before writing it in a raw SQL query, check out the following tip for preserving some ActiveRecord goodness." />
+<meta property="og:description" content="ActiveRecord is a great tool for making SQL a more readable. However, there are some things that are really difficult to do in pure ActiveRecord. One of those is a SELECT * FROM (subquery) style of query. Before writing it in a raw SQL query, check out the following tip for preserving some ActiveRecord goodness." />
+<link rel="canonical" href="http://joshfrankel.me/blog/constructing-a-sql-select-from-subquery-in-activerecord/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/constructing-a-sql-select-from-subquery-in-activerecord/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-07-26T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"ActiveRecord is a great tool for making SQL a more readable. However, there are some things that are really difficult to do in pure ActiveRecord. One of those is a SELECT * FROM (subquery) style of query. Before writing it in a raw SQL query, check out the following tip for preserving some ActiveRecord goodness.","headline":"Constructing a select * from subquery using ActiveRecord","dateModified":"2018-07-26T00:00:00+00:00","datePublished":"2018-07-26T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/constructing-a-sql-select-from-subquery-in-activerecord/"},"url":"http://joshfrankel.me/blog/constructing-a-sql-select-from-subquery-in-activerecord/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Constructing a select * from subquery using ActiveRecord</h1>
+
+    
+      <p class="Banner-information">
+        <time>July 26, 2018</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>ActiveRecord is a great tool for making SQL a more readable. However, there
+are some things that are really difficult to do in pure ActiveRecord. One of those is 
+a <code>SELECT * FROM (subquery)</code> style of query. Before writing it in a raw
+SQL query, check out the following tip for preserving some ActiveRecord goodness.
+<!--excerpt--></p>
+
+<h2 id="our-database-structure">Our database structure</h2>
+
+<p><img src="/img/2018/select_all_from_subquery.png" alt="User to Artist attendances" /></p>
+
+<p>The way the above works is that a User is able to attend the Concert of a particular
+Artist. An Artist <code>has_many</code> Concerts (since they perform in multiple locations) and a 
+User can Attend as many Concerts as they want. A User is assumed as having attended a particular Artist’s Concert if they have a valid Attendance record. The resulting models might look 
+like the following code:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_many</span> <span class="ss">:attendances</span>
+  <span class="n">has_many</span> <span class="ss">:attended_concerts</span><span class="p">,</span> <span class="ss">through: :attendances</span><span class="p">,</span> <span class="ss">source: :concert</span>
+  <span class="n">has_many</span> <span class="ss">:attended_artists</span><span class="p">,</span> <span class="ss">through: :attended_concerts</span><span class="p">,</span> <span class="ss">source: :artist</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Attendance</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">belongs_to</span> <span class="ss">:user</span>
+  <span class="n">belongs_to</span> <span class="ss">:concert</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Concert</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_many</span> <span class="ss">:attendances</span>
+  <span class="n">belongs_to</span> <span class="ss">:artist</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Artist</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_many</span> <span class="ss">:concerts</span>
+  <span class="n">has_many</span> <span class="ss">:attendances</span><span class="p">,</span> <span class="ss">through: :concerts</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Now that we’ve defined a simple database structure and model code, let’s say our task is to return a table that contains the following:</p>
+
+<blockquote class="Info Info-right"><strong>Association source option</strong><br />
+  The :source option specifies the source association name for a has_many :through association. You only need to use this option if the name of the source association cannot be automatically inferred from the association name.
+  <br />
+  <cite><a href="https://guides.rubyonrails.org/association_basics.html#options-for-has-one-source">- guides.rubyonrails.org</a></cite>
+</blockquote>
+
+<ol>
+  <li>The first column should display the Artist of the Concert</li>
+  <li>Then the user whom attended</li>
+  <li>(Here’s the tricky part) The user’s latest attendance if they have seen an artist more than once.</li>
+  <li>We want Attendances sorted by newest first in the results</li>
+</ol>
+<div class="clearfix"></div>
+
+<p>Here’s an example of desired output:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Artist</th>
+      <th>Attendee</th>
+      <th>Latest Attendance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pretty Lights</td>
+      <td>Sean Bean</td>
+      <td>Mon, 16 Jul 2018 15:39:36 EDT -04:00</td>
+    </tr>
+    <tr>
+      <td>Bassnectar</td>
+      <td>Emilia Clarke</td>
+      <td>Wed, 06 Jun 2018 15:42:02 EDT -04:00</td>
+    </tr>
+    <tr>
+      <td>Kodomo</td>
+      <td>Kit Harington</td>
+      <td>Fri, 27 Apr 2018 15:42:17 EDT -04:00</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For our above example, let’s also specify that Sean Bean has attended a Pretty Lights concert three times in the last year. We only want to see his most latest attendance which happens to be July 16th, 2018 above.</p>
+
+<h2 id="getting-into-the-sql">Getting into the SQL</h2>
+
+<p>With the above specifications we could write some SQL code to query for the results like so:</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="k">SELECT</span> <span class="n">art</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">artist</span><span class="p">,</span>
+  <span class="n">u</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">attendee</span><span class="p">,</span>
+  <span class="k">MAX</span><span class="p">(</span><span class="k">c</span><span class="p">.</span><span class="n">start_time</span><span class="p">)</span> <span class="k">as</span> <span class="n">latest_attendance</span>
+<span class="k">FROM</span> <span class="n">users</span> <span class="n">u</span>
+<span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">attendances</span> <span class="n">a</span> <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">u</span><span class="p">.</span><span class="n">id</span>
+<span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">concerts</span> <span class="k">c</span> <span class="k">ON</span> <span class="k">c</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">concert_id</span>
+<span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">artists</span> <span class="n">art</span> <span class="k">ON</span> <span class="n">art</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">artist_id</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">art</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">u</span><span class="p">.</span><span class="n">name</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">latest_attendance</span> <span class="k">DESC</span></code></pre></figure>
+
+<p>Here’s the above SQL translated to ActiveRecord:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">User</span>
+  <span class="p">.</span><span class="nf">all</span>
+  <span class="p">.</span><span class="nf">joins</span><span class="p">(</span><span class="ss">attendances: </span><span class="p">{</span> <span class="ss">concert: :artist</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nf">select</span><span class="p">(</span><span class="s2">"
+    users.name as attendee,
+    artists.name as artist,
+    MAX(concerts.start_time) as latest_attendance
+  "</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">group</span><span class="p">(</span><span class="ss">:id</span><span class="p">,</span> <span class="s2">"artist"</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="s2">"latest_time DESC"</span><span class="p">)</span></code></pre></figure>
+
+<p>We’re done! Right? Well not quite. As with any real world project, there’s a new client request.</p>
+
+<h2 id="theres-always-another-requirement">There’s always another requirement</h2>
+
+<p>The client now wants to display the Concert’s location along with latest attendance for each User / Artist combination. That seems like it would be as easy as adding location into the select clause and grouping by it with <code>.group(:id, "artist, latest_attendance")</code> but unfortunately that would only give you <code>latest_attendance</code> specified by unique <code>locations</code> as you can see below.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Artist</th>
+      <th>Attendee</th>
+      <th>Latest Attendance</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pretty Lights</td>
+      <td>Sean Bean</td>
+      <td>Mon, 16 Jul 2018 15:39:36 EDT -04:00</td>
+      <td>Los Angeles, CA</td>
+    </tr>
+    <tr>
+      <td>Pretty Lights</td>
+      <td>Sean Bean</td>
+      <td>Sat, 14 Jul 2018 19:00:18 EDT -04:00</td>
+      <td>Atlanta, GA</td>
+    </tr>
+    <tr>
+      <td>Pretty Lights</td>
+      <td>Sean Bean</td>
+      <td>Tue, 10 Jul 2018 19:00:46 EDT -04:00</td>
+      <td>Indianapolis, IN</td>
+    </tr>
+    <tr>
+      <td>Bassnectar</td>
+      <td>Emilia Clarke</td>
+      <td>Wed, 06 Jun 2018 15:42:02 EDT -04:00</td>
+      <td>Houston, TX</td>
+    </tr>
+    <tr>
+      <td>Kodomo</td>
+      <td>Kit Harington</td>
+      <td>Fri, 27 Apr 2018 15:42:17 EDT -04:00</td>
+      <td>Miami, FL</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This is great information but isn’t quite accurate to the client’s requirements. (Also, apparently Sean Bean has been flying all over the country and is a huge Pretty Lights fan. Who knew?)</p>
+
+<blockquote class="Info Info-right"><strong>PostgreSQL DISTINCT ON</strong><br />
+  SELECT DISTINCT ON ( expression [, ...] ) keeps only the first row of each set of rows where the given expressions evaluate to equal. 
+  <br />
+  <cite><a href="https://www.postgresql.org/docs/9.5/static/sql-select.html">- postgresql.org</a></cite>
+</blockquote>
+
+<p>In order to properly select the <code>latest_attendance</code> while keeping it in sync with the location we’ll need to use a subquery to keep them associated with each other while filtering it to only return a single row. We can accomplish this with PostgreSQL’s <code>DISTINCT ON</code> clause.</p>
+
+<p>Using <code>DISTINCT ON</code> we can eliminate returned rows by making the results unique to the selected content. Let’s see if we can write the proper SQL for this.</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="p">(</span>
+  <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span><span class="p">(</span><span class="n">art</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">art</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">artist</span><span class="p">,</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">attendee</span><span class="p">,</span>
+    <span class="k">c</span><span class="p">.</span><span class="n">start_time</span> <span class="k">as</span> <span class="n">latest_attendance</span>
+  <span class="k">FROM</span> <span class="n">users</span> <span class="n">u</span>
+  <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">attendances</span> <span class="n">a</span> <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">u</span><span class="p">.</span><span class="n">id</span>
+  <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">concerts</span> <span class="k">c</span> <span class="k">ON</span> <span class="k">c</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">concert_id</span>
+  <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">artists</span> <span class="n">art</span> <span class="k">ON</span> <span class="n">art</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">artist_id</span>
+  <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">art</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">latest_attendance</span> <span class="k">DESC</span>
+<span class="p">)</span> <span class="n">inner_query</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">inner_query</span><span class="p">.</span><span class="n">latest_attendance</span> <span class="k">DESC</span></code></pre></figure>
+
+<p>The above works by ensuring that all the results are distinct by the <code>artists.id</code>. We then order the subquery by latest_attendance descending in order to grab the latest start time. However, because we’re using the <code>DISTINCT ON</code> clause for filtering the order by clause has to contain the same constraint of <code>art.id</code> as the first argument like so: <code>ORDER BY art.id, latest_attendance DESC</code>. This means that the records aren’t quite in the right order because the Artist’s id takes precedence over the latest_attendance in the sort order. The magic happens when we also order the subquery in the outer query by its latest_attendance descending <code>ORDER BY inner_query.latest_attendance DESC</code>. This ensures that we only are looking at the latest result for a given Artist.</p>
+
+<p>An alternative syntax for the above query could be to use a <a href="https://www.postgresql.org/docs/9.1/static/queries-with.html">Common Table Expression</a> via the <code>WITH</code> keyword in PostgreSQL. It could be considered a more readable query.</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="k">WITH</span> <span class="n">inner_query</span> <span class="k">AS</span> <span class="p">(</span>
+  <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span><span class="p">(</span><span class="n">art</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">art</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">artist</span><span class="p">,</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">attendee</span><span class="p">,</span>
+    <span class="k">c</span><span class="p">.</span><span class="n">start_time</span> <span class="k">as</span> <span class="n">latest_attendance</span>
+  <span class="k">FROM</span> <span class="n">users</span> <span class="n">u</span>
+  <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">attendances</span> <span class="n">a</span> <span class="k">ON</span> <span class="n">a</span><span class="p">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">u</span><span class="p">.</span><span class="n">id</span>
+  <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">concerts</span> <span class="k">c</span> <span class="k">ON</span> <span class="k">c</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">concert_id</span>
+  <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">artists</span> <span class="n">art</span> <span class="k">ON</span> <span class="n">art</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">artist_id</span>
+  <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">art</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">latest_attendance</span> <span class="k">DESC</span>
+<span class="p">)</span>
+
+<span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">inner_query</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">inner_query</span><span class="p">.</span><span class="n">latest_attendance</span> <span class="k">DESC</span></code></pre></figure>
+
+<p>At this point you could just run the above raw SQL directly using <code>ActiveRecord::Base.connection.execute(raw_sql)</code> and that would be a perfectly reasonable way of accomplishing our goal.</p>
+
+<p>Here we have the final dataset. Note that while Sean Bean attended 3 Pretty Lights Concerts we only wanted the information regarding his latest attendance with a matching Concert location.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Artist</th>
+      <th>Attendee</th>
+      <th>Latest Attendance</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pretty Lights</td>
+      <td>Sean Bean</td>
+      <td>Mon, 16 Jul 2018 15:39:36 EDT -04:00</td>
+      <td>Los Angeles, CA</td>
+    </tr>
+    <tr>
+      <td>Bassnectar</td>
+      <td>Emilia Clarke</td>
+      <td>Wed, 06 Jun 2018 15:42:02 EDT -04:00</td>
+      <td>Houston, TX</td>
+    </tr>
+    <tr>
+      <td>Kodomo</td>
+      <td>Kit Harington</td>
+      <td>Fri, 27 Apr 2018 15:42:17 EDT -04:00</td>
+      <td>Miami, FL</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>However, by doing this in raw SQL we lose <code>ActiveRecord's</code> built in helpers and chainability as we are instead returning a <code>PG::Result object</code>.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">raw_sql</span> <span class="o">=</span> <span class="o">&lt;&lt;~</span><span class="no">SQL</span><span class="sh">
+  SELECT * FROM (
+    SELECT DISTINCT ON(art.id)
+      art.name as artist,
+      u.name as attendee,
+      c.start_time as latest_attendance
+    FROM users u
+    INNER JOIN attendances a ON a.user_id = u.id
+    INNER JOIN concerts c ON c.id = a.concert_id
+    INNER JOIN artists art ON art.id = c.artist_id
+    ORDER BY art.id, latest_attendance DESC
+  ) inner_query
+  ORDER BY inner_query.latest_attendance DESC
+</span><span class="no">SQL</span>
+<span class="n">result</span> <span class="o">=</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">connection</span><span class="p">.</span><span class="nf">execute</span><span class="p">(</span><span class="n">raw_sql</span><span class="p">)</span>
+<span class="n">result</span> <span class="c1">#=&gt; #&lt;PG::Result:0x000000000db346a8 status=PGRES_TUPLES_OK ntuples=5 nfields=29 cmd_tuples=5&gt;</span></code></pre></figure>
+
+<p>PG::Result object’s are still pretty useful giving you access to a implementation of <code>#each</code>, <code>#values</code>, and <code>#to_a</code>. However, we’d like the  whole slew of ActiveRecord collection methods and helper available. Let’s fix that!</p>
+
+<h2 id="converting-this-back-into-activerecord">Converting this back into ActiveRecord</h2>
+
+<p>Making this work in ActiveRecord is hard. There isn’t a lot of clear guidance of how
+to accomplish this. I was able to dig through enough forums and documentation until I happened upon the following entry on <a href="https://apidock.com/rails/v4.0.2/ActiveRecord/QueryMethods/from">ActiveRecord from</a>.</p>
+
+<p>The <code>ActiveRecord</code> from method generally just specifies the table you
+are querying against. However, it also allows you to pass in built ActiveRecord collections and query from those. This is accomplishes by building the subquery and passing it into the <code>from</code> method on a valid ActiveRecord scope.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># This example builds equivalent SQL to the previous raw_sql example </span>
+<span class="c1"># with the SELECT * FROM (DISTINCT ON ...)</span>
+<span class="n">inner_query</span> <span class="o">=</span> <span class="no">User</span>
+  <span class="p">.</span><span class="nf">all</span>
+  <span class="p">.</span><span class="nf">joins</span><span class="p">(</span><span class="ss">attendances: </span><span class="p">{</span> <span class="ss">concert: :artist</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nf">select</span><span class="p">(</span><span class="s2">"DISTINCT ON(artists.id)
+    artists.name as artist,
+    users.name as attendee,
+    concerts.start_time as latest_time
+  "</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="s2">"
+    artists.id, 
+    latest_time DESC
+  "</span><span class="p">)</span>
+
+<span class="no">User</span>
+  <span class="p">.</span><span class="nf">unscoped</span>
+  <span class="p">.</span><span class="nf">select</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">from</span><span class="p">(</span><span class="n">inner_query</span><span class="p">,</span> <span class="ss">:inner_query</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">order</span><span class="p">(</span><span class="s2">"inner_query.latest_time DESC"</span><span class="p">)</span></code></pre></figure>
+
+<p>Note that in the above query we use the second argument in the from clause to specify
+the alias for the table <code>.from(inner_query, :inner_query)</code>. This allows us to more easily order by the latest_time in the order by clause.</p>
+
+<p>Additionally, the <code>unscoped</code> just gives us a basic
+ActiveRecord Association to use for querying. I used <code>User</code> as the starting
+point above but really you can use any model to achieve the same results. This is
+because we’re only querying from the data within the subquery and not the actual <code>User</code> model directly.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>And there you have it. We’ve fully moved our subquery into ActiveRecord and can now enjoy all the conveniences that it provides. It took a little tweaking to the built
+in ActiveRecord from clause by passing in a subquery but it works like a charm. Rock on!</p>
+
+<p><img src="/img/2018/subquery_concert.jpeg" alt="Rock on!" />
+<!-- Concert Image provided by Pexels.com https://www.pexels.com/photo/crowd-watching-show-inside-the-dark-stadium-761543/ --></p>
+
+<p>What did you think about this technique? Let me know by leaving a comment below and thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/overriding-activerecord-getters-with-the-same-attribute-name/" title="Override an ActiveRecord attribute value while using the same getter method">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/configure-puma-ssl-for-local-development-on-ubuntu/" title="Configure Puma SSL for local development on Ubuntu">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

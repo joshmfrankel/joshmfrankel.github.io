@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Guard fix for could not start Spork server for Rspec | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Guard fix for could not start Spork server for Rspec" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="While working through the expertly written &quot;The Ruby on Rails Tutorial&quot; by Michael Hartl, I ran into a small configuration issue. The issue I experienced was with Guard not properly starting a Spork server from the command line. My system was able to run Rspec, Spork, and Guard with no errors as long as Guard didn&#39;t try to load Spork. Here is what my terminal output looks like." />
+<meta property="og:description" content="While working through the expertly written &quot;The Ruby on Rails Tutorial&quot; by Michael Hartl, I ran into a small configuration issue. The issue I experienced was with Guard not properly starting a Spork server from the command line. My system was able to run Rspec, Spork, and Guard with no errors as long as Guard didn&#39;t try to load Spork. Here is what my terminal output looks like." />
+<link rel="canonical" href="http://joshfrankel.me/blog/how-to-fix-could-not-start-spork-server-for-rspec/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/how-to-fix-could-not-start-spork-server-for-rspec/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2014-06-07T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"While working through the expertly written &quot;The Ruby on Rails Tutorial&quot; by Michael Hartl, I ran into a small configuration issue. The issue I experienced was with Guard not properly starting a Spork server from the command line. My system was able to run Rspec, Spork, and Guard with no errors as long as Guard didn&#39;t try to load Spork. Here is what my terminal output looks like.","headline":"Guard fix for could not start Spork server for Rspec","dateModified":"2014-06-07T00:00:00+00:00","datePublished":"2014-06-07T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/how-to-fix-could-not-start-spork-server-for-rspec/"},"url":"http://joshfrankel.me/blog/how-to-fix-could-not-start-spork-server-for-rspec/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Guard fix for could not start Spork server for Rspec</h1>
+
+    
+      <p class="Banner-information">
+        <time>June 7, 2014</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>While working through the expertly written <a href="http://www.railstutorial.org/book">"The Ruby on Rails Tutorial"</a> by Michael Hartl, I ran into a small configuration issue.  The issue I experienced was with Guard not properly starting a Spork server from the command line.  My system was able to run Rspec, Spork, and Guard with no errors as long as Guard didn't try to load Spork.  Here is what my terminal output looks like.</p><!--excerpt-->
+
+<figure class="highlight"><pre><code class="language-console" data-lang="console"><span class="gp">josh@Josh-eOS:~/Web/Freelance/qstate$</span> guard
+<span class="go">15:28:49 - INFO - Guard is using Libnotify to send notifications.
+15:28:49 - INFO - Guard is using TerminalTitle to send notifications.
+15:28:49 - INFO - Starting Spork for RSpec, Test::Unit
+Couldn't find a supported test framework that begins with 'testunit'
+
+Supported test frameworks:
+( ) Cucumber
+(*) RSpec
+
+Legend: ( ) - not detected in project   (*) - detected
+Using RSpec, Rails
+Preloading Rails environment
+Loading Spork.prefork block...
+Spork is ready and listening on 8989!
+15:29:19 - ERROR - Could not start Spork server for RSpec, Test::Unit after 30 seconds. I will continue waiting for a further 60 seconds.</span></code></pre></figure>
+
+<p>I'm positive that others have experienced this same error.  The hint for the fix comes from the lines <code>15:28:49 - INFO - Starting Spork for RSpec, Test::Unit.  Couldn't find a supported test framework that begins with 'testunit'</code>.  This means that Guard was attempting to run tests using the testunit framework (which was not installed).  To fix this add <code>:test_unit => false</code> to your Guardfile's Spork block.  It should look something like this.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">guard</span> <span class="s1">'spork'</span><span class="p">,</span> <span class="ss">:test_unit</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:cucumber_env</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="s1">'RAILS_ENV'</span> <span class="o">=&gt;</span> <span class="s1">'test'</span> <span class="p">},</span> <span class="ss">:rspec_env</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="s1">'RAILS_ENV'</span> <span class="o">=&gt;</span> <span class="s1">'test'</span> <span class="p">}</span> <span class="k">do</span>
+<span class="o">...</span></code></pre></figure>
+
+<h2>Additional Issues</h2>
+<p>For troubleshooting surrounding Guard and Spork, take a look at the <a href="https://github.com/guard/guard-spork">github page</a> for guard-spork.  Here are a couple of the most basic things you can check.</p>
+
+<blockquote>
+    <ul>
+        <li>If you can start Spork manually but get the following error message when using Guard::Spork:</li>
+        <li>Starting Spork for RSpec ERROR: Could not start Spork for RSpec/Cucumber. Make sure you can use it manually first.</li>
+        <li>Try to increase the value of the :wait => 60 option before any further investigation. It's possible that this error is the result of an unnecessary /test directory in the root of your application. Removing the /test directory entirely may resolve this error.</li>
+    </ul>
+</blockquote>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/5-ways-to-improve-your-development-workflow/" title="5 Ways to improve your development workflow">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/How-to-configure-sublime-text-for-psr-standards/" title="How to configure Sublime Text for PSR Standards">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

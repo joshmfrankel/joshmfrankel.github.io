@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Grunt.js or How I learned to Stop Worrying and Automate Everything. | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Grunt.js or How I learned to Stop Worrying and Automate Everything." />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="There are a number of tools from the web development community that are designed to make your life a whole lot easier. One such type of tool are automation tools or task runners. The three biggest players I have come across are Guard, Gulp, and Grunt.js. We will be diving into Grunt.js for the remainder of this article." />
+<meta property="og:description" content="There are a number of tools from the web development community that are designed to make your life a whole lot easier. One such type of tool are automation tools or task runners. The three biggest players I have come across are Guard, Gulp, and Grunt.js. We will be diving into Grunt.js for the remainder of this article." />
+<link rel="canonical" href="http://joshfrankel.me/blog/gruntjs-or-how-i-learned-to-stop-worrying-and-automate-everything/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/gruntjs-or-how-i-learned-to-stop-worrying-and-automate-everything/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-02-18T00:00:00+00:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"There are a number of tools from the web development community that are designed to make your life a whole lot easier. One such type of tool are automation tools or task runners. The three biggest players I have come across are Guard, Gulp, and Grunt.js. We will be diving into Grunt.js for the remainder of this article.","headline":"Grunt.js or How I learned to Stop Worrying and Automate Everything.","dateModified":"2015-02-18T00:00:00+00:00","datePublished":"2015-02-18T00:00:00+00:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/gruntjs-or-how-i-learned-to-stop-worrying-and-automate-everything/"},"url":"http://joshfrankel.me/blog/gruntjs-or-how-i-learned-to-stop-worrying-and-automate-everything/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Grunt.js or How I learned to Stop Worrying and Automate Everything.</h1>
+
+    
+      <p class="Banner-information">
+        <time>February 18, 2015</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>There are a number of tools from the web development community that are designed to make your life a whole lot easier. One such type of tool are automation tools or task runners. The three biggest players I have come across are Guard, Gulp, and Grunt.js. We will be diving into Grunt.js for the remainder of this article.</p>
+<!--excerpt-->
+
+<div class="center-block image-holder-300">
+    <img src="/img/2015/grunt-logo.png" alt="Grunt.js Logo all rights reserved to http://gruntjs.com/" />
+    <p><small>Logo property of http://gruntjs.com/</small></p>
+</div>
+<h2>Build Tools</h2>
+<p>While I can't speak on behalf of Gulp, I have used both Guard and Grunt.js in my projects. In one of my earlier posts (<a href="http://joshfrankel.me/blog/leveling-up-css-with-sass-basics-setup-part-1/">Leveling up CSS with Sass</a>) I mentioned the usage of Guard for compiling Sass files. For this purpose it is really useful but I have found that Grunt.js is just a little easier for me. I still use Guard for Rails based projects though as it integrates well.</p>
+
+<p>Now before I begin to explain how to setup Grunt.js lets conceptualize what we wish to accomplish from the final configuration. We want a Grunt.js build system that has automatically loaded plugins, an easy way of maintaining tasks, and external plugin configurations. Over the next couple sections I will detail how we can get such a grunt setup working. Additionally, for developers new to Grunt this article will serve as a crash course into the world of task runners.</p>
+
+<div class="Post Post-series">
+  <h3>Sections</h3>
+  <nav>
+    <a href="#setup-node">Step 1: Setup Node.js</a>
+    <a href="#basic-gruntjs">Step 2: Basic Grunt.js Setup</a>
+    <a href="#gruntfile">Step 3: Configure the Gruntfile.js</a>
+    <a href="#optimize-structure">Step 4: Optimize Gruntfile.js with load-grunt-config</a>
+  </nav>
+</div>
+
+<h2 id="setup-node">Setup Node.js</h2>
+<p>Before we can begin using grunt you need to first make sure you have node installed so we can use <acronym title="Node Package Manager">npm</acronym>. NPM is like <a href="https://rubygems.org/" target="_blank">Ruby Gems</a>, <a href="https://getcomposer.org/" target="_blank">Composer</a>, or <a href="http://bower.io/" target="_blank">Bower</a>, in that it manages specific packages for your project.</p>
+<p>To install node, download the proper version based on your OS from <a href="http://nodejs.org/download/" title="Node Download Page" target="_blank">here</a>. Once installed run the following initialize command in the project directory from your terminal. <code>npm init</code></p>
+
+<p>This will walk you through creating a package.json file that contains all the necessary project information. Just use the defaults for the purposes of this article. Once completed you will be ready to move onto the next step.</p>
+
+<h2 id="basic-gruntjs">Basic Grunt.js Setup</h2>
+<p>Just like step one we need to install grunt, which is made trivial now that have npm installed. Run the following command to install grunt as a devDependency (--save-dev). <code>npm install grunt --save-dev</code>. If your system balks then try running the command as <code>sudo</code>. The format of <code>npm install [grunt-plugin] --save-dev</code> is generally the easiest way to install plugins. Additionally, a devDependency is just a way of letting npm know that the plugin or module is only required for the development environment.</p>
+<p>Install a few more plugins on your own for Grunt.js's usage. <strong>grunt-contrib-watch</strong>, <strong>grunt-notify</strong>, <strong>grunt-contrib-compass</strong>. Watch looks for file directory changes, notify displays growl like notifications to your OS, and compass compiles sass and adds compass features.</p>
+<p class='well'><strong>Note:</strong><br /> You will need to run the above plugins in the standard npm install [plugin-name] --save-dev format</p>
+<p>Next we will need to create a basic Gruntfile.js. Every Grunt.js project requires this file as well as the above package.json file. Here is a sample to copy/paste into your project. Name the file Gruntfile.js and place into your base directory</p>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="c1">// Project configuration.</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
+    <span class="na">pkg</span><span class="p">:</span> <span class="nx">grunt</span><span class="p">.</span><span class="nx">file</span><span class="p">.</span><span class="nx">readJSON</span><span class="p">(</span><span class="s1">'package.json'</span><span class="p">)</span>
+  <span class="p">});</span>
+
+  <span class="c1">// Loading of plugins</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-contrib-compass'</span><span class="p">);</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-contrib-watch'</span><span class="p">);</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-notify'</span><span class="p">);</span>
+
+  <span class="c1">// Default task(s).</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">'default'</span><span class="p">);</span>
+
+<span class="p">};</span></code></pre></figure>
+<h2 id="gruntfile">Configure the Gruntfile.js</h2>
+<p>There are three basic parts to each Gruntfile: loading plugins, task definitions, and configurations. Loading just places plugins into the grunt. Tasks are basically a chain of actions that can be called. And configurations set up external data and internal plugins.</p>
+<h3>Loading plugins</h3>
+<p>The loading of plugins is really quite simple. After install a plugin you just use the built in function loadNpmTasks to load the plugin into your grunt file for usage. If you are thinking to yourself, "There has got to be an easier way to load plugins", you would be correct. I will discuss an improved plugin loading method in <a href="#optimize-structure">Step 4</a>. Here is a sample of code from above showing this section.</p>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Loading of plugins</span>
+<span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-contrib-compass'</span><span class="p">);</span>
+<span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-contrib-watch'</span><span class="p">);</span>
+<span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-notify'</span><span class="p">);</span></code></pre></figure>
+
+<h3>Configurations</h3>
+<p>Configurations are the soldiers of Grunt.js. They do exactly as they are told and nothing else.</p>
+<p>The main configuration is created through the usage of the initConfig configuration object. This allows you to pass in external values and plugin configurations. For instance we placed <code>pkg: grunt.file.readJSON('package.json')</code> in the above code. This reads our package.json file created from <code>npm init</code> and places it into the config variable pkg.</p>
+
+<p>I've provided a simple configuration for notify, watch, and compass below. Take a close look at the notify configuration and you will notice the string <code>Hello there <%= pkg.name %></code>. This outputs, "Hello there test" in my case, we setup for pkg when we read in the package.json file. Pretty cool right?</p>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
+      <span class="na">pkg</span><span class="p">:</span> <span class="nx">grunt</span><span class="p">.</span><span class="nx">file</span><span class="p">.</span><span class="nx">readJSON</span><span class="p">(</span><span class="s1">'package.json'</span><span class="p">),</span>
+
+      <span class="c1">// Watch plugin config</span>
+      <span class="na">watch</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">compass</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">files</span><span class="p">:</span> <span class="s1">'**/*.scss'</span><span class="p">,</span>
+            <span class="na">tasks</span><span class="p">:</span> <span class="p">[</span><span class="s1">'compass:compile'</span><span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="c1">// Notify plugin config</span>
+      <span class="na">notify</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">welcome</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">title</span><span class="p">:</span> <span class="s2">"Hello there &lt;%= pkg.name %&gt;"</span><span class="p">,</span> <span class="c1">// Note we are outputting the package.json name variable here</span>
+                <span class="na">message</span><span class="p">:</span> <span class="s2">"My name is Grunt"</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="na">another</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">title</span><span class="p">:</span> <span class="s2">"Just another notify config"</span><span class="p">,</span>
+                <span class="na">message</span><span class="p">:</span> <span class="s2">"I will be important later on"</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="c1">// Compass plugin config</span>
+      <span class="na">compass</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">compile</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+                <span class="na">sassDir</span><span class="p">:</span> <span class="s1">'sass'</span><span class="p">,</span>
+                <span class="na">cssDir</span><span class="p">:</span> <span class="s1">'css'</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">});</span></code></pre></figure>
+<p>Configurations are setup by listing the task name, which is generally the plugin name like notify or watch, followed by the target and then the options. In the case of the grunt-notify plugin, notify is the task name (not to be confused with tasks coming up later), welcome is the target, and options are specific to the plugin and grunt. The task and target can actually be named whatever you want as long as the they are called correctly in the task definition.</p>
+<p>We can actually bring up terminal and run <code>grunt notify:welcome</code> and it will start grunt looking for a task name of notify with a target of welcome. Assuming grunt-notify is setup correctly (outside scope of this article) you should get something like this.</p>
+<img src="/img/2015/grunt-notify.png" alt="Grunt notify display" />
+<p>Congratulations, you have just run your very first grunt task, albeit somewhat lengthly and not really automated yet. Don't worry we will fix that soon.</p>
+<p class="well"><strong>Cool Trick:</strong><br /> Try running just <code>grunt notify</code> without the target. It will run both notify:welcome and notify:another. Essentially running any target under the notify task.</p>
+
+<h3>Tasks</h3>
+<p>The task is essentially an order the commander (you) gives. The order outlines which platoon (target configurations) should go to the battlefield to run their attack plans.</p>
+<p>In other words, a task is at its most basic a shortcut to run a list of configurations. Tasks are loaded by using the function <code>grunt.registerTask('shortcutName', ['runFirst', 'runSecond']);</code>. It includes the task name or as I like to call it the shortcut, followed by a list of tasks to run in a specific order.</p>
+<p>So how would we setup a task that would run the welcome target from notify and afterwards run the compile target for compass? It would probably look something like this.</p>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">'custom'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'notify:welcome'</span><span class="p">,</span> <span class="s1">'watch:compass'</span><span class="p">]);</span></code></pre></figure>
+<p>This code now lets us just run <code>grunt custom</code> and now it will fire off the list of tasks being notify:welcome first followed by watch:compass second. This is a simple example of chaining tasks together.</p>
+<p>Additionally, the registerTask function has a lot of power in it. It can run a callback method or anonymous function like so:</p>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">'custom'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'notify:welcome'</span><span class="p">,</span> <span class="s1">'watch:compass'</span><span class="p">],</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">grunt</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">'Just a simple debug to console command'</span><span class="p">);</span>
+<span class="p">});</span></code></pre></figure>
+<p>Allowing you to create some extra functionality where a task would be unnecessary. It is certainly helpful in debugging more advanced setups. At this point your Gruntfile should look like this.</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="c1">// Project configuration.</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
+    <span class="na">pkg</span><span class="p">:</span> <span class="nx">grunt</span><span class="p">.</span><span class="nx">file</span><span class="p">.</span><span class="nx">readJSON</span><span class="p">(</span><span class="s1">'package.json'</span><span class="p">),</span>
+
+    <span class="c1">// Watch plugin config</span>
+    <span class="na">watch</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">compass</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">files</span><span class="p">:</span> <span class="s1">'**/*.scss'</span><span class="p">,</span>
+          <span class="na">tasks</span><span class="p">:</span> <span class="p">[</span><span class="s1">'compass:compile'</span><span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="c1">// Notify plugin config</span>
+    <span class="na">notify</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">welcome</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">title</span><span class="p">:</span> <span class="s2">"Hello there &lt;%= pkg.name %&gt;"</span><span class="p">,</span> <span class="c1">// Note we are outputting the package.json name variable here</span>
+              <span class="na">message</span><span class="p">:</span> <span class="s2">"My name is Grunt"</span>
+          <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">another</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">title</span><span class="p">:</span> <span class="s2">"Just another notify config"</span><span class="p">,</span>
+              <span class="na">message</span><span class="p">:</span> <span class="s2">"I will be important later on"</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="c1">// Compass plugin config</span>
+    <span class="na">compass</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">compile</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">sassDir</span><span class="p">:</span> <span class="s1">'sass'</span><span class="p">,</span>
+              <span class="na">cssDir</span><span class="p">:</span> <span class="s1">'css'</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+
+  <span class="c1">// Loading of plugins</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-contrib-compass'</span><span class="p">);</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-contrib-watch'</span><span class="p">);</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">'grunt-notify'</span><span class="p">);</span>
+
+  <span class="c1">// Default task(s).</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">'default'</span><span class="p">);</span>
+
+  <span class="c1">// Our custom task with callback</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">'custom'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'notify:welcome'</span><span class="p">,</span> <span class="s1">'watch:compass'</span><span class="p">],</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">grunt</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">'Just a simple debug to console command'</span><span class="p">);</span>
+  <span class="p">});</span>
+
+<span class="p">};</span></code></pre></figure>
+<p>There is nothing wrong with this setup. It is actually totally functionally and usable at this point. However, say we were to add 3 or 4 more tasks and 3 or 4 more plugins. You can imagine that this file can get quite big in a hurry. This leads us to the next step which is to abstract some the logic to make it cleaner to manage multiple plugins and multiple tasks.</p>
+<h2 id="optimize-structure">Optimize Gruntfile.js with load-grunt-config</h2>
+<p>There are a number of popular plugins out there to help organize Gruntfile's. The one I always kept running into was <code>load-grunt-tasks</code>.</p>
+<p>Load grunt tasks automatically loads all of your plugins. So instead of typing grunt.loadNpmTasks('...'); half a hundred times you would just use a single line of code <code>require('load-grunt-tasks')(grunt);</code>. While this is really useful it unfortunately still leaves the configuration settings in the Gruntfile which is typically the bulk of the content.</p>
+<h3>Enter load-grunt-config</h3>
+<p>Load grunt config takes the awesome loading cabilities of load-grunt-tasks and adds the ability to abstract configurations and task defintions to external files. This makes managing your Grunt setup a lot easier. Run the following to install it <code>npm i --save-dev load-grunt-tasks</code>.</p>
+<p>We now can use a better folder structure for our grunt plugin configurations. Load-grunt-config enables the usage of a folder called grunt/ where you can now place files where the file name is actually the taskname.</p>
+<p>For example lets abstract the notify logic into its own file called <strong>notify.js</strong> inside the <strong>grunt/</strong> folder. It should look like this.</p>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1">// Variables, Custom tasks, Etc....</span>
+
+    <span class="c1">// Return the configurations</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="na">welcome</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">title</span><span class="p">:</span> <span class="s2">"Hello there &lt;%= pkg.name %&gt;"</span><span class="p">,</span> <span class="c1">// Note we are outputting the package.json name variable here</span>
+              <span class="na">message</span><span class="p">:</span> <span class="s2">"My name is Grunt"</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="na">another</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+              <span class="na">title</span><span class="p">:</span> <span class="s2">"Just another notify config"</span><span class="p">,</span>
+              <span class="na">message</span><span class="p">:</span> <span class="s2">"I will be important later on"</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">};</span></code></pre></figure>
+<p>As you can see we have now removed the configuration logic from the main Gruntfile into a plugin specific file. Now it is much easier to maintain plugin options and settings without having to search for them.</p>
+<p>Next we can abstract task definitions into a special file within the grunt folder called <strong>aliases.yaml</strong>. This file allows you to easily define task lists.</p>
+<p class="well"><strong>Quick Tip:</strong><br />
+The aliases file also support js, json, coffee as well as the above yaml.
+</p>
+<p>Lets take a look at what our aliases file should look like after abstracting out our tasks. It should look pretty simple in comparison.</p>
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="na">default</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s1">'</span><span class="s">notify:welcome'</span>
+
+<span class="na">custom</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s1">'</span><span class="s">notify:welcome'</span>
+    <span class="pi">-</span> <span class="s1">'</span><span class="s">watch:compass'</span></code></pre></figure>
+<h2>Conclusion</h2>
+<p>So lets see what we have accomplished so far. We have setup node as well as grunt. There were a number of grunt plugins installed as devDependencies. All grunt plugins are automatically loaded via load-grunt-config. And finally we have abstracted our plugin configurations and task definitions into separate files.</p>
+<p>We now have a highly efficient grunt setup configured. Adding new tasks and/or plugins should be a breeze from here on forward. I highly suggest looking more into <a href="https://github.com/firstandthird/load-grunt-config" target="_blank">load-grunt-config</a> as there are a number of features to making your life easier in the world of task runners.</p>
+<p>Did I miss something? Have a favorite grunt plugin? I would love to hear your feedback and comments.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev" href="/blog/leveling-up-css-with-sass-advanced-techniques-part-2/" title="Advanced Techniques - Part 2">&#171; Previous Post</a>
+    
+    
+      <a class="Post-actions--next" href="/blog/getting-up-and-running-with-minitest-guard-sass-bootstrap-for-ruby-on-rails-development/" title="Getting up and Running with Minitest, Guard, Sass, and Bootstrap for Ruby on Rails Development">Next Post &#187;</a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

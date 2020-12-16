@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Page 2 of 8 for Development Simplified | A blog about ruby, sql, performance, and patterns. By Josh Frankel.</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Development Simplified" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A blog about ruby, sql, performance, and patterns. By Josh Frankel." />
+<meta property="og:description" content="A blog about ruby, sql, performance, and patterns. By Josh Frankel." />
+<link rel="canonical" href="http://joshfrankel.me/blog/page2/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/page2/" />
+<meta property="og:site_name" content="Development Simplified" />
+<link rel="prev" href="http://joshfrankel.me/blog/" />
+<link rel="next" href="http://joshfrankel.me/blog/page3/" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"description":"A blog about ruby, sql, performance, and patterns. By Josh Frankel.","headline":"Development Simplified","@type":"WebPage","url":"http://joshfrankel.me/blog/page2/","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin">
+
+  <a href="/" class="Logo-container">
+    <img src="/img/layout/josh-frankel-author.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Development Simplified</h1>
+
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <div class="w-100">
+  <section class="Listing">
+  <!-- This loops through the paginated posts -->
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/modifying-strong-parameter-values-after-a-request/">Modifying strong parameter values after a request</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-09-03">September 3, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Strong parameters are a great way of guarding against unexpected request params. They allow you to specify the names
+of keys that are accepted from a given request. I’ve found working between a JavaScript
+front-end and Rails back-end sometimes you need to adjust request values (especially when at an
+intermediary step during a refactor). However, strong parameter values can’t be modified which
+makes this a bit more complex.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#Ruby on Rails">#Ruby on Rails</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/recursively-validate-application-requests-with-rack/">Recursively validate application requests with Rack</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#articles">articles</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-07-16">July 16, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Previously, I described a process of using Rack to validate request objects
+for malicious formats (specifically null bytes). However, request params come
+in many different formats from arrays to hashes to arrays containing hashes, there
+are a lot of different cases to cover. Fortunately using recursion allows for
+an elegant solution that covers each scenario.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#Rack">#Rack</a>
+        
+          <a href="/blog/tags#Ruby">#Ruby</a>
+        
+          <a href="/blog/tags#RSpec">#RSpec</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/don-t-let-the-null-bytes-bite/">Don't let the null bytes bite</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#articles">articles</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-06-28">June 28, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Have you ever encountered <code class="highlighter-rouge">Argument error "string contains null byte"</code>? What
+this means is that a null byte character <code class="highlighter-rouge">\u0000</code> was sent as a part of the request
+body. This can indicate a malicious request from someone trying to probe your
+application for vulnerabilities. So how can you avoid the stinging byte of
+invalid characters? Rack to the rescue!</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#Rack">#Rack</a>
+        
+          <a href="/blog/tags#Ruby">#Ruby</a>
+        
+          <a href="/blog/tags#RSpec">#RSpec</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/signing-commits-for-github-and-sublime-merge/">Signing commits for Github and Sublime Merge</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#tutorials">tutorials</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-06-02">June 2, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Signing commits is a great way to add additional level of confidence to your code.
+This is especially important if you are an open source contributor. By
+signing your commit you’re saying that it originated from a verified author.
+This is accomplished by using GPG which is a free encryption and signing tool.</p>
+
+<p>Github has taken this one step farther and now shows signed commit authors with
+a verified badge. Not only is this a great way to see at a glance if code comes
+from a trusted source, but the verified badge looks slick.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#Git">#Git</a>
+        
+          <a href="/blog/tags#Github">#Github</a>
+        
+          <a href="/blog/tags#Sublime Merge">#Sublime Merge</a>
+        
+          <a href="/blog/tags#GPG">#GPG</a>
+        
+          <a href="/blog/tags#Linux">#Linux</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/testing-request-specs-for-invalid-formats-pundit-authorization-and-activerecord-failures/">Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#articles">articles</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-05-22">May 22, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Request formats should match their endpoints. Authorization adds a split between authorized and unauthorized requests. ActiveRecord means we’re at times making an unnecessary database calls (which I like to avoid). One way to minimize such calls is to stub interactions between objects using stubbing.</p>
+
+<p>For the remainder of this post, we’re going to dig into how to properly test invalid request formats, authorization logic, and ActiveRecord failures. Let’s get to it!</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby on rails">#ruby on rails</a>
+        
+          <a href="/blog/tags#RSpec">#RSpec</a>
+        
+          <a href="/blog/tags#ActiveRecord">#ActiveRecord</a>
+        
+          <a href="/blog/tags#Pundit">#Pundit</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/using-request-based-constraints-to-only-accept-json-formats-for-endpoints/">Using request-based constraints to only accept JSON formats for endpoints</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-04-22">April 22, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>I prefer doing things The Rails Way<sup>tm</sup> whenever possible. Oftentimes when you are working
+with web requests, your controllers expect to respond to specific content formats. Formats that are
+outside of this expected format are generally handled within the controller
+layer. There’s nothing wrong with this approach BUT we can do better here by using 
+request-based constraints in the Routing layer.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby on rails">#ruby on rails</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/prevent-css-transitions-on-page-load-with-es6/">Prevent CSS transitions on page load with ES6</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#articles">articles</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-04-11">April 11, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>I recently noticed on my blog that sometimes the CSS hover transitions for <code class="highlighter-rouge">font-size</code>, <code class="highlighter-rouge">border-color</code>, and
+<code class="highlighter-rouge">color</code> animate on page load. While this doesn’t impact the final design, it does make the
+initial page load a bit of a stylistic mess.</p>
+
+<p itemprop="description">I stumbled upon a <a href="https://css-tricks.com/transitions-only-after-page-load/">great post on css-tricks</a> that outlined a fix for this issue using <strong>jQuery</strong>. However, my goal for this site has always been keeping it as lean as possible. That's why I use Jekyll for static pages and minimal scripting (outside Disqus and Google Analytics). So of course I dug into how we can skip <strong>jQuery</strong> and just use <strong>ES6</strong>.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#JavaScript">#JavaScript</a>
+        
+          <a href="/blog/tags#CSS">#CSS</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/using-a-foreign-key-with-a-custom-named-association-without-using-add-reference-or-add-foreign-key/">Adding a foreign key with a custom named association without using add_reference or add_foreign_key</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#series">series</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-03-18">March 18, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p itemprop="description">Using custom association names in Rails
+  can be a great way of increasing understanding throughout an application. For example, it can allow for using a column called owner_id that references a User record. Let's dig into getting this setup for a migration.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby on rails">#ruby on rails</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/fix-selenium-webdriver-error-unknownerror-for-capybara-chromedriver/">Fix Selenium::WebDriver::Error::UnknownError for Capybara chromedriver-helper</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-03-05">March 5, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Do you use the chromedriver-helper gem? How about Capybara? Have you seen 
+this error <code class="highlighter-rouge">Selenium::WebDriver::Error::UnknownError: unknown error: call function result missing</code>?
+If so then keep reading for how I fixed it for my local development.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#Capybara">#Capybara</a>
+        
+          <a href="/blog/tags#Chrome">#Chrome</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/calculating-frequency-distribution-in-postgresql/">Calculating Frequency Distribution in PostgreSQL</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#tutorials">tutorials</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2019-02-27">February 27, 2019</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>I’ve always loved statistics. Being a software engineer has allowed me a lot of opportunities
+to solve complex statistical problems in SQL. With programming, we want to consider the current state of data which
+means running calculations on demand. Recently, I had the opportunity to calculate
+frequency distribution in SQL and wanted to share what I’ve learned with you.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#PostgreSQL">#PostgreSQL</a>
+        
+          <a href="/blog/tags#Statistics">#Statistics</a>
+        
+      </div>
+    </article>
+  
+</section>
+
+<!-- Pagination links -->
+<section class="Pagination">
+  
+    
+      <li >
+        <a href="/blog/index.html" title="Development Simplified">1</a>
+      </li>
+    
+      <li class="selected">
+        <a href="/blog/page2/index.html" title="Development Simplified">2</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page3/index.html" title="Development Simplified">3</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page4/index.html" title="Development Simplified">4</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page5/index.html" title="Development Simplified">5</a>
+      </li>
+    
+  
+</section>
+
+
+</div>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+
+    <section class="Footer-social flex-right">
+      <a href="http://joshfrankel.me/feed" aria-label="Subscribe to my Blog" title="Subscribe to my Blog" target="_blank"><i class="fas fa-rss-square" aria-hidden="true"></i></a>
+      <a href="https://github.com/joshmfrankel" aria-label="My Github profile" title="My Github profile"><i class="fab fa-github-alt" aria-hidden="true"></i></a>
+      <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/" aria-label="My Ruby on Rails Slack account" title="My Ruby on Rails Slack account"><i class="fab fa-slack-hash" aria-hidden="true"></i></a>
+      <a href="https://stackoverflow.com/users/906974/josh-frankel" aria-label="My StackOverflow profile" title="My StackOverflow profile"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+      <a href="https://twitter.com/Joshmfrankel" aria-label="My Twitter profile" title="My Twitter profile"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.linkedin.com/in/joshmfrankel/" aria-label="My LinkedIn profile" title="My LinkedIn profile"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <section>
+        <h3>Latest Posts</h3>
+        <nav>
+          
+            <a href="/blog/ordinal-abbreviations-for-dates-in-rails/">Ordinal abbreviations for dates in Rails</a>
+          
+            <a href="/blog/a-guide-for-upgrading-to-rails-6/">A Guide for Upgrading to Rails 6</a>
+          
+            <a href="/blog/a-journey-into-writing-union-queries-with-active-record/">A Journey into Writing Union queries with Active Record</a>
+          
+        </nav>
+      </section>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2020+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>
