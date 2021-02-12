@@ -23,24 +23,47 @@ This started as a joke in a Slack thread and quickly became a fun little hack I 
 ## Finding a sound effect
 First off, you'll have to download some sound effects. You can find these online by searching YouTube or other soundboard sites and then downloading the files. Once found, save them somewhere you'll remember.
 
-## Play sound effects in Ruby
+## Playing sound effects in Ruby
 
-How do you play a sound effect in Ruby? Well, Ruby doesn't have any knowledge of audio but by using `system(...)` it can shell out to your operating system's primary audio player. For OSX this meant using `afplay [audio-file]`.
+How do you play a sound effect in Ruby? Well, Ruby doesn't have any knowledge of audio but by using `system(...)` it can shell out to your operating system's primary audio player. For OSX this meant using `afplay [audio-file]`. There's a downside here though. Using `system` makes the ruby program wait until the system call is finished. So if you had say a 30 second sound effect, you'd have to wait the spec runtime plus 30 seconds before the script would finish running.
 
-## Add your sound effects into your test suite
+We can do better here. Much better.
+
+Using `fork` we can tell Ruby to fork a process in the background to run our shell command. This combined with
+`exec` allows us to run our sound effect in parallel of the script meaning that the sound effect will play as the script runs. No more waiting! This is what it looks like `fork { exec("...") }`
+
+## Adding sound effects to your test suite
 
 Now for the RSpec hack. Within your `RSpec.configure do |config|` block, we'll need to add an `after(:suite)` hook. Next we dig into the RSpec::Core::Reporter to count the number of failed examples. Finally we can put it all together in our RSpec configuration.
 
 ``` ruby
   config.after(:suite) do
     if config.reporter.failed_examples.size == 0
-      system("afplay ~/Music/okurrrt.mp3")
+      fork { exec("afplay ~/Music/okurrrt.mp3") }
     else
-      system("afplay ~/Music/eowwww.mp3")
+      fork { exec("afplay ~/Music/eowwww.mp3") }
+    end
+  end
+```
+
+If you want to get even fancier you can add some variety and randomness to the sound effect played. We can add randomization by using Ruby's **array#sample**. For variety, I'll add clips of #SELFIE from
+The Chainsmokers and DJ Khaled _another one_ to the list. Why not?
+
+``` ruby
+  config.after(:suite) do
+    if config.reporter.failed_examples.size == 0
+      success = [
+        "~/Music/okurrrt.mp3",
+        "~/Music/selfie.mp3"
+        "~/Music/another_one.mp3"
+      ]
+      fork { exec("afplay #{success.sample}") }
+    else
+      fork { exec("afplay ~/Music/eowwww.mp3") }
     end
   end
 ```
 
 ![Cardi B okurrrt](/img/2021/okurrrt.gif)
 
-With the above, I can _okurrrt_ my way to a green testing suite. Want to hear some more of Cardi B? [Check out this YouTube video.](https://youtu.be/YplKPH_qcRw?t=154){:target="_blank"}
+With the above, I can _okurrrt_ and _#selfie_ my way to a green testing suite. Want to hear some more of Cardi B? [Check out this YouTube video.](https://youtu.be/YplKPH_qcRw?t=154){:target="_blank"}
