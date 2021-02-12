@@ -46,9 +46,10 @@ jobs:
 
       - name: Deployment
         run: |
-          git checkout gh-pages
+          [ -z "$(git show-ref gh-pages)" ] && git checkout -b gh-pages || git checkout gh-pages
           git add ./_site
-
+          git commit -m "Deployment - $(date +"%A %b %d, %Y at %I:%M %p")"
+          git push origin gh-pages
 
       # - uses: helaili/jekyll-action@v2
       #   with:
