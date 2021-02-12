@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: HTML Proofer
+name: Jekyll Deployment
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the source branch
@@ -39,11 +39,8 @@ jobs:
       - name: Build Site
         run: JEKYLL_ENV=production bundle exec jekyll build
 
-      - name: List
-        run: ls -la
-
       - name: Run HTMLProofer
-        run: bundle exec htmlproofer "./_site" --check-opengraph --check-favicon --http_status_ignore "999" --typhoeus-config "{\"ssl_verifypeer\":false}" --url-ignore "/globalnerdy.com.*|http:\/\/joshfrankel.me\/blog\/.*$/"
+        run: bundle exec htmlproofer "./_site" --check-opengraph --check-favicon --http_status_ignore "999" --typhoeus-config "{\"ssl_verifypeer\":false}" --url-ignore "/twitter\.com.*|quickleft\.com.*|globalnerdy.com.*|http:\/\/joshfrankel.me\/blog\/.*$/"
 
       - uses: helaili/jekyll-action@v2
         with:
