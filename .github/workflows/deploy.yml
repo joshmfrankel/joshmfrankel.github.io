@@ -44,11 +44,17 @@ jobs:
       - name: Run HTMLProofer
         run: bundle exec htmlproofer "./_site" --check-opengraph --check-favicon --http_status_ignore "999" --typhoeus-config "{\"ssl_verifypeer\":false}" --url-ignore "/twitter\.com.*|quickleft\.com.*|globalnerdy.com.*|http:\/\/joshfrankel.me\/blog\/.*$/"
 
-      - uses: helaili/jekyll-action@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target_branch: 'gh-pages'
-          jekyll_src: 'site'
+      - name: Deployment
+        run: |
+          git checkout gh-pages
+          git add ./_site
+
+
+      # - uses: helaili/jekyll-action@v2
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     target_branch: 'gh-pages'
+      #     jekyll_src: 'site'
 
       # Runs a single command using the runners shell
       # - name: Run Rakefile
