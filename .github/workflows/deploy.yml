@@ -20,11 +20,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.6.5
-
       - uses: actions/cache@v2
         with:
           path: vendor/bundle
@@ -34,7 +29,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          bundle install --jobs 4 --retry 3
+          gem install jekyll bundler
+          bundle install
 
       - name: Build Site
         run: JEKYLL_ENV=production bundle exec jekyll build
