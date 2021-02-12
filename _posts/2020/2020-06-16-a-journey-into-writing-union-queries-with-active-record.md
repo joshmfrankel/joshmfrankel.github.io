@@ -10,7 +10,7 @@ tags:
 
 Active record has a multitude of features and niceties. From merging scopes to performing complex joins. However, sometimes it falls short. One shortcoming is a Union query.
 
-When I've got a roadblock with active record, I reach for either raw SQL or Arel Tables. Both of these work well but tend to produce verbose code. That's why it's nice to stœay in Active record for readability. Ok, so let's actually look at how to accomplish this.
+When I've got a roadblock with active record, I reach for either raw SQL or Arel Tables. Both of these work well but tend to produce verbose code. That's why it's nice to to stay in Active record for readability. Ok, so let's actually look at how to accomplish this.
 <!--excerpt-->
 
 ## Potential solutions
@@ -456,7 +456,7 @@ Unfortunately, our code current produces the following SQL exception.
 
 ```
 PG::DuplicateAlias: ERROR:  table name "posts" specified more than once
- : 
+ :
  SELECT "users".*
 FROM (
   (
