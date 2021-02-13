@@ -51,15 +51,12 @@ jobs:
       # Remove all cached history
       # Relocate .git tracking to publishable folder
       # Navigate into publishable folder
-      - name: Prepare Site for Deployment
+      - name: Deployment
         run: |
           git checkout --orphan gh-pages
           git rm -rf --cached .
           mv .git ./_site
           cd ./_site
-
-      - name: Deployment
-        run: |
           git add .
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
