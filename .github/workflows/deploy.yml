@@ -22,8 +22,6 @@ jobs:
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.6.5
 
       - uses: actions/cache@v2
         with:
@@ -43,6 +41,11 @@ jobs:
 
       - name: Run HTMLProofer
         run: bundle exec htmlproofer "./_site" --check-opengraph --check-favicon --http_status_ignore "999" --typhoeus-config "{\"ssl_verifypeer\":false}" --url-ignore "/twitter\.com.*|quickleft\.com.*|globalnerdy.com.*|http:\/\/joshfrankel.me\/blog\/.*$/"
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
 
       - name: Deployment
         run: |
