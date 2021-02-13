@@ -54,17 +54,18 @@ jobs:
         run: |
           mv .git ./_site
           cd ./_site
-          git fetch origin
+          git fetch origin gh-pages
+
           if [[ $(git show-ref gh-pages) ]]
           then
             echo "Branch exists"
-            git add .
+            git stash push
             git checkout gh-pages
+            git stash pop
           else
             echo "Branch doesn't"
             git checkout --orphan gh-pages
             git rm -rf --cached .
-            git add .
           fi
 
 
