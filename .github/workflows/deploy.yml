@@ -56,8 +56,10 @@ jobs:
           cd ./_site
           if [[ $(git show-ref gh-pages) ]]
           then
+            echo "Branch exists"
             git checkout gh-pages
           else
+            echo "Branch doesn't"
             git checkout --orphan gh-pages
             git rm -rf --cached .
           fi
