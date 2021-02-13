@@ -54,7 +54,7 @@ jobs:
         run: |
           mv .git ./_site
           cd ./_site
-
+          git fetch origin
           if [[ $(git show-ref gh-pages) ]]
           then
             echo "Branch exists"
