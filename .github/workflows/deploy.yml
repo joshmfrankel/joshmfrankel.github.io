@@ -47,22 +47,19 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
 
-      - name: Deployment
+      # Start new branch without history
+      # Remove all cached history
+      # Relocate .git tracking to publishable folder
+      # Navigate into publishable folder
+      - name: Prepare Site for Deployment
         run: |
           git checkout --orphan gh-pages
           git rm -rf --cached .
           mv .git ./_site
           cd ./_site
+
+      - name: Deployment
+        run: |
           git add .
-          git commit -m "Deployment - $(date +"%A %b %d, %Y at %I:%M %p")"
+          git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
-
-      # - uses: helaili/jekyll-action@v2
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     target_branch: 'gh-pages'
-      #     jekyll_src: 'site'
-
-      # Runs a single command using the runners shell
-      # - name: Run Rakefile
-      #   run: bundle exec rake
