@@ -54,8 +54,17 @@ jobs:
         run: |
           mv .git ./_site
           cd ./_site
-          git checkout --orphan gh-pages
-          git rm -rf --cached .
+
+          if [[ $(git show-ref gh-pages) ]]
+          then
+            echo "Branch exists"
+            git checkout gh-pages
+          else
+            echo "Branch doesn't"
+            git checkout --orphan gh-pages
+            git rm -rf --cached .
+          fi
+
           git add .
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
