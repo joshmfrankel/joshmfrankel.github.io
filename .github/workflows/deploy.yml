@@ -58,13 +58,15 @@ jobs:
           if [[ $(git show-ref gh-pages) ]]
           then
             echo "Branch exists"
+            git add .
             git checkout gh-pages
           else
             echo "Branch doesn't"
             git checkout --orphan gh-pages
             git rm -rf --cached .
+            git add .
           fi
 
-          git add .
+
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
