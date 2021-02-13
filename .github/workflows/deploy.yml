@@ -51,6 +51,7 @@ jobs:
         run: |
           git checkout --orphan gh-pages
           git rm -rf --cached .
+          mv .git ./_site
           cd ./_site
           git add .
           git commit -m "Deployment - $(date +"%A %b %d, %Y at %I:%M %p")"
