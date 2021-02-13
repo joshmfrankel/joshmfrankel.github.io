@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/joshmfrankel/joshmfrankel.github.io.svg?branch=source)](https://travis-ci.org/joshmfrankel/joshmfrankel.github.io)
+![Jekyll Deployment](https://github.com/joshmfrankel/joshmfrankel.github.io/workflows/Jekyll%20Deployment/badge.svg?branch=source)
 
 # Development Simplified
 

@@ -26,7 +26,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-gems-
 
@@ -49,8 +49,9 @@ jobs:
 
       - name: Deployment
         run: |
-          [ -z "$(git show-ref gh-pages)" ] && git checkout -b gh-pages || git checkout gh-pages
-          git add ./_site
+          git checkout --orphan gh-pages
+          cd ./_site
+          git add .
           git commit -m "Deployment - $(date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
 
