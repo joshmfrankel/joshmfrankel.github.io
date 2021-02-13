@@ -33,7 +33,6 @@ jobs:
       - name: Install Dependencies
         run: |
           bundle config path vendor/bundle
-          bundle update --bundler
           bundle install --jobs 4 --retry 3
 
       - name: Build Site
@@ -55,8 +54,13 @@ jobs:
         run: |
           mv .git ./_site
           cd ./_site
-          git checkout --orphan gh-pages
-          git rm -rf --cached .
+          if [[ $(git show-ref gh-pages) ]]
+          then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf --cached .
+          fi
           git add .
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
