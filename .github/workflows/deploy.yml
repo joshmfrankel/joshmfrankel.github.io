@@ -59,6 +59,7 @@ jobs:
           if [[ $(git show-ref gh-pages) ]]
           then
             echo "Branch exists"
+            git add .
             git stash push
             git checkout gh-pages
             git stash pop
