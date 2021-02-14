@@ -39,7 +39,7 @@ jobs:
         run: JEKYLL_ENV=production bundle exec jekyll build -d docs
 
       - name: Run HTMLProofer
-        run: bundle exec htmlproofer "./_site" --check-opengraph --check-favicon --http_status_ignore "999" --typhoeus-config "{\"ssl_verifypeer\":false}" --url-ignore "/twitter\.com.*|quickleft\.com.*|globalnerdy.com.*|http:\/\/joshfrankel.me\/blog\/.*$/"
+        run: bundle exec htmlproofer "./docs" --check-opengraph --check-favicon --http_status_ignore "999" --typhoeus-config "{\"ssl_verifypeer\":false}" --url-ignore "/twitter\.com.*|quickleft\.com.*|globalnerdy.com.*|http:\/\/joshfrankel.me\/blog\/.*$/"
 
       - name: Configure Git
         run: |
