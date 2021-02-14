@@ -36,7 +36,7 @@ jobs:
           bundle install --jobs 4 --retry 3
 
       - name: Build Site
-        run: JEKYLL_ENV=production bundle exec jekyll build
+        run: JEKYLL_ENV=production bundle exec jekyll build -d docs
 
       - name: Run HTMLProofer
         run: bundle exec htmlproofer "./_site" --check-opengraph --check-favicon --http_status_ignore "999" --typhoeus-config "{\"ssl_verifypeer\":false}" --url-ignore "/twitter\.com.*|quickleft\.com.*|globalnerdy.com.*|http:\/\/joshfrankel.me\/blog\/.*$/"
@@ -52,23 +52,7 @@ jobs:
       # Navigate into publishable folder
       - name: Deployment
         run: |
-          mv .git ./_site
-          cd ./_site
-          git fetch origin gh-pages
-
-          if [[ $(git show-ref gh-pages) ]]
-          then
-            echo "Branch exists"
-            git add .
-            git stash push
-            git checkout gh-pages
-            git stash pop
-          else
-            echo "Branch doesn't"
-            git checkout --orphan gh-pages
-            git rm -rf --cached .
-          fi
-
-
+          git checkout -b gh-pages
+          git add docs/
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
