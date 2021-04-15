@@ -54,7 +54,7 @@ The Chainsmokers and DJ Khaled _another one_ to the list. Why not?
     if config.reporter.failed_examples.size == 0
       success = [
         "~/Music/okurrrt.mp3",
-        "~/Music/selfie.mp3"
+        "~/Music/selfie.mp3",
         "~/Music/another_one.mp3"
       ]
       fork { exec("afplay #{success.sample}") }
