@@ -53,7 +53,7 @@ jobs:
       - name: Deployment
         run: |
           [ -z "$(git show-ref gh-pages)" ] && git checkout -b gh-pages || git checkout gh-pages
-          git pull
+          git pull origin gh-pages
           git add docs/
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
