@@ -15,6 +15,8 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    env:
+      BUNDLE_JOBS: 4
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -22,18 +24,8 @@ jobs:
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
-
-      - uses: actions/cache@v2
         with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - name: Install Dependencies
-        run: |
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
+          bundler-cache: true
 
       - name: Build Site
         run: JEKYLL_ENV=production bundle exec jekyll build -d docs
@@ -55,5 +47,4 @@ jobs:
           [ -z "$(git show-ref gh-pages)" ] && git checkout -b gh-pages || git checkout gh-pages
           git add docs/
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
-          git pull --rebase origin gh-pages
           git push origin gh-pages
