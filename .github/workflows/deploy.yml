@@ -44,7 +44,7 @@ jobs:
       # Navigate into publishable folder
       - name: Deployment
         run: |
-          git checkout origin gh-pages
+          git checkout origin/gh-pages
           git add docs/
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
           git push origin gh-pages
