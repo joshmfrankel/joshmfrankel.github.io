@@ -44,9 +44,7 @@ jobs:
       # Navigate into publishable folder
       - name: Deployment
         run: |
-          [ -z "$(git show-ref gh-pages)" ] && git checkout -b gh-pages || git checkout gh-pages
+          git checkout origin gh-pages
           git add docs/
           git commit -m "Deployment - $(TZ=":US/Eastern" date +"%A %b %d, %Y at %I:%M %p")"
-          git pull --rebase origin gh-pages
-          git status
           git push origin gh-pages
