@@ -130,7 +130,7 @@ describe ValidateRequestParams do
 ```
 
 I've used the `set_cookie` method above to prefill the cookie's value before the
-request is made. [Here's the documentation on it](https://www.rubydoc.info/github/brynary/rack-test/Rack%2FMockSession:set_cookie). Basically it merges changes into the existing cookie jar.
+request is made. [Here's the documentation on it](https://www.rubydoc.info/gems/rack-test/Rack/MockSession#set_cookie-instance_method). Basically it merges changes into the existing cookie jar.
 
 In the first context, I've appended a null byte onto the end of
 the value to ensure the request is invalid. This simulates making a request that
