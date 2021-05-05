@@ -17,12 +17,9 @@ $margin-spacing: 20px;
   }
 
   &--full {
-    // margin-left: -33.3%;
-    // width: 100%;
-    // padding-left: 33%;
-    // padding-right: 33%;
-    padding-top: 40px;
-    padding-bottom: 40px;
+    margin-left: -33.33%;
+    margin-right: -33.33%;
+    padding: 40px 33.33%;
     font-style: italic;
     font-family: 'Lato';
     font-size: 24px;

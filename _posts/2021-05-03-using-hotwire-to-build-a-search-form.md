@@ -441,6 +441,15 @@ And with that we've got a fully functional search form which is bookmarkable.
 ![Full example of search using Hotwire](/img/2021/hotwire-stimulus-full.gif)
 
 
+## Where's Strada?
+
+At the writing of this article, Strada has yet to be released. Sounds like sometime
+this year we'll see it become part of the Hotwire approach.
+
+{% include blockquote.html quote="[Strada] standardizes the way that web and native parts of a mobile hybrid application talk to each other via HTML bridge attributes. This makes it easy to progressively level-up web interactions with native replacements." source_text="Hotwire" source_link="https://hotwire.dev/" %}
+
+## Conclusion
+
 We used minmal JavaScript and relied primarily on Turbo to make it dynamic. Really this is just the tip of the iceberg into what can be accomplished with Hotwire. Have you used Hotwire on a project? What techniques did you find useful? Hit me up in the comments below as I'd love to discuss.
 
 As always thanks for reading and happy coding.
