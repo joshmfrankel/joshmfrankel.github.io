@@ -1,4 +1,6 @@
 <blockquote class="Info Info--full">
   <p><i class="fas fa-quote-left"></i>{{ include.quote }}</p>
-  <a href="{{ include.source_link}}">{{ include.source_text}}</a>
+  {% if include.source_text and include.source_link %}
+    <a href="{{ include.source_link }}">{{ include.source_text }}</a>
+  {% endif %}
 </blockquote>
