@@ -1,0 +1,97 @@
+/**
+ * JSX
+ */
+import React from 'react';
+import './index.scss';
+
+class Drawer extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      active: false,
+      contentHeight: 0,
+    };
+
+    this.contentRef = React.createRef();
+  }
+
+  handleTitleClick = () => {
+    const contentHeight = this.contentRef.current.scrollHeight;
+    this.setState(prevState => ({ active: !prevState.active, contentHeight: !prevState.active ? contentHeight : 0 }));
+  };
+
+  render() {
+    const { title, children } = this.props;
+    const drawerStyles = this.state.active ? 'is-expanded' : '';
+
+    return (
+      <div className={`Drawer ${drawerStyles}`}>
+        <button
+          className="Drawer-title"
+          onClick={this.handleTitleClick}
+        >
+          <span className="Drawer-titleText">{title}</span>
+          <div className="Drawer-arrow Drawer--rightArrow" />
+        </button>
+        <div className="Drawer-content" ref={this.contentRef} style={{ height: this.state.contentHeight }}>
+          {children}
+        </div>
+      </div>
+    );
+  }
+}
+
+export default Drawer;
+
+/**
+ * SCSS
+ */
+.Drawer {
+  $arrowSize: 5px;
+
+  width: 300px;
+  display: inline-block;
+
+  &-title {
+    padding: 16px;
+    border: 1px solid;
+    background: #efefef;
+    cursor: pointer;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+  }
+
+  &-titleText {
+    flex: 1;
+  }
+
+  &-arrow {
+    border-top: $arrowSize solid transparent;
+    border-bottom: $arrowSize solid transparent;
+    border-left: $arrowSize solid #454545;
+
+    width: 0;
+    height: 0;
+    transition: all .5s ease;
+    align-self: center;
+  }
+
+  &.is-expanded {
+    .Drawer-arrow {
+      transform: rotate(90deg);
+    }
+  }
+
+  &-content {
+    background: #ddd;
+    border-left: 1px solid;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    height: 0;
+    overflow: hidden;
+    transition: height .5s ease;
+  }
+}
