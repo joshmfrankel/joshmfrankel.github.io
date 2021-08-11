@@ -74,10 +74,9 @@ render() {
   );
 }
 ```
-<blockquote class="Info Info-right">
-"The destructuring assignment syntax is a JavaScript expression that makes it possible to unpack values from arrays, or properties from objects, into distinct variables."
-<cite><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">- developer.mozilla.org</a></cite>
-</blockquote>
+
+{% include blockquote.html quote="The destructuring assignment syntax is a JavaScript expression that makes it possible to unpack values from arrays, or properties from objects, into distinct variables." source_link="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment" source_text="developer.mozilla.org" %}
+
 Sprinkle in some assignment destructuring and we can make this even simpler.
 
 ``` jsx
@@ -151,12 +150,9 @@ render() {
 }
 ```
 
-<blockquote class="Info Info-right">
-"setState() does not always immediately update the component. It may batch or defer the update until later. This makes reading this.state right after calling setState() a potential pitfall."
-<cite><a href="https://reactjs.org/docs/react-component.html#setstate">- reactjs.org</a></cite>
-</blockquote>
-
 There's a minor stumbling block at this point with the above setting of state. We're using a negated form of the previous state `!this.state.active` to inform the current state what its value is. The problem is that state updates are batched meaning you can't rely on them being immediate. To fix this we need to explictly use the previous state within the `setState` function.
+
+{% include blockquote.html quote="setState() does not always immediately update the component. It may batch or defer the update until later. This makes reading this.state right after calling setState() a potential pitfall." source_link="https://reactjs.org/docs/react-component.html#setstate" source_text="reactjs.org" %}
 
 We'll use an arrow function here to select the previous state into a variable named `prevState`. This will allow us to be confident that the state change will be accurate.
 
@@ -181,10 +177,8 @@ constructor(props) {
   this.handleTitleClick = this.handleTitleClick.bind(this);
 }
 ```
-<blockquote class="Info Info-right">
-  "If you are using the experimental public class fields syntax, you can use class fields to correctly bind callbacks"
-  <cite>- <a href="https://reactjs.org/docs/handling-events.html">reactjs.org</a></cite>
-</blockquote>
+
+{% include blockquote.html quote="If you are using the experimental public class fields syntax, you can use class fields to correctly bind callbacks" source_link="https://reactjs.org/docs/handling-events.html" source_text="reactjs.org" %}
 
 While this currently works, we can clean this up by taking it one step further using the **public class fields syntax**.
 
@@ -340,13 +334,9 @@ We're looking directly at our third requirement here which was, **Screen reader 
 </div>
 ```
 
-<blockquote class="Info Info-right">
-  The eslint plugin jsx-a11y has some great documentation on the subject of non-semantic
-  elements having an onClick handler.
-  <cite><a href="https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/click-events-have-key-events.md" target="_blank">ESlint jsx-a11y</a></cite>
-</blockquote>
-
 The above allows the browser to focus on the element making it the current element to receive keyboard events. However, the keyboard events for enter and spacebar don't activate our `onClick` handler. Major bummer. We could try to add an `onKeyPress` event and capture the spacebar and enter key, but why do more than we need to when there is a perfectly semantic approach. The `<button>` element.
+
+{% include blockquote.html quote="The eslint plugin jsx-a11y has some great documentation on the subject of non-semantic elements having an onClick handler." source_link="https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/click-events-have-key-events.md" source_text="ESlint jsx-a11y" %}
 
 So let's fix this back in our `render()` method.
 
@@ -518,11 +508,9 @@ handleTitleClick = (event) => {
   const contentHeight = event.target.nextSibling.scrollHeight;
 ```
 
-<blockquote class="Info Info-right">"The Element.scrollHeight read-only property is a measurement of the height of an element's content, including content not visible on the screen due to overflow."
-<cite>- <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight" target="_blank">mozilla.org</a></cite>
-</blockquote>
-
 We added a new argument `event` that comes from the the click event. Using this we can check its `target` which returns the button's DOM element. `nextSibling` grabs the next related DOM element which in our case is the `Drawer-content` div. `scrollHeight` gives us the element's height and works with elements that are hidden via overflow.
+
+{% include blockquote.html quote="The Element.scrollHeight read-only property is a measurement of the height of an element's content, including content not visible on the screen due to overflow." source_link="https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight" source_text="mozilla.org" %}
 
 Next we modify our current `setState` call to accept a callback function. Using a callback function ensures that our first call to `this.setState` has finished meaning we can rely directly on any effected state variables again. We do this immediately to toggle our hidden content's height via a ternary clause.
 
@@ -605,10 +593,7 @@ We can fix this by using React Refs.
 
 ## Using Refs for accuracy
 
-<blockquote class="Info Info-right">
-  "Refs provide a way to access DOM nodes or React elements created in the render method."
-  <cite>- <a href="https://reactjs.org/docs/refs-and-the-dom.html">reactjs.org</a></cite>
-</blockquote>
+{% include blockquote.html quote="Refs provide a way to access DOM nodes or React elements created in the render method." source_link="https://reactjs.org/docs/refs-and-the-dom.html" source_text="reactjs.org" %}
 
 Refs allow us to accurately target specific DOM element within the `render()` function. In our
 case, being able to target the content div via a ref is going provide greater flexibility to future changes and will be less brittle. Here's how you would implement it:

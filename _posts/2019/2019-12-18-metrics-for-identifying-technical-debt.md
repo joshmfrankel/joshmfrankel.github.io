@@ -23,8 +23,7 @@ that is prone to failure, resistant to change, and difficult to build upon.
 
 Martin Fowler defines technical debt with the following quote:
 
-> Software systems are prone to the build up of cruft - deficiencies in internal quality that make it harder than it would ideally be to modify and extend the system further. Technical Debt is a metaphor, coined by Ward Cunningham, that frames how to think about dealing with this cruft, thinking of it like a financial debt. The extra effort that it takes to add new features is the interest paid on the debt.
-> <cite><a href="https://martinfowler.com/bliki/TechnicalDebt.html" target="_blank">- Martin Fowler</a></cite>
+{% include blockquote.html quote="Software systems are prone to the build up of cruft - deficiencies in internal quality that make it harder than it would ideally be to modify and extend the system further. Technical Debt is a metaphor, coined by Ward Cunningham, that frames how to think about dealing with this cruft, thinking of it like a financial debt. The extra effort that it takes to add new features is the interest paid on the debt." source_link="https://martinfowler.com/bliki/TechnicalDebt.html" source_text="Martin Fowler" %}
 
 Cruft is a great vocabularly word to describe technical debt.
 

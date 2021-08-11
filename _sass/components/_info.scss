@@ -36,9 +36,14 @@ $margin-spacing: 20px;
 
     p {
       color: $lightest-gray;
-      font: 300 italic 24px/1.5 $lato, sans-serif;
+      font: 300 italic 2rem/1.6 $lato, sans-serif;
       margin: 0;
     }
+  }
+
+  &__title {
+    color: $lightest-gray;
+    margin-top: 0;
   }
 
   &::before,

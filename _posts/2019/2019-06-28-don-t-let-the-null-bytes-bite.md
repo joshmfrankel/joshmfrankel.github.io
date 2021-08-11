@@ -136,13 +136,10 @@ some tests.
 
 ## Rack-test
 
-<blockquote class="Info Info-right">
-  "Rack::Test is a small, simple testing API for Rack apps. It can be used on its own or as a reusable starting point for Web frameworks and testing libraries to build on."
-  <cite><a href="https://github.com/rack-test/rack-test">https://github.com/rack-test/rack-test</a></cite>
-</blockquote>
-
 Rack-test provides a way to test the Rack layer of an application. It's pretty 
 similar to a controller or request spec in RSpec.
+
+{% include blockquote.html quote="Rack::Test is a small, simple testing API for Rack apps. It can be used on its own or as a reusable starting point for Web frameworks and testing libraries to build on." source_link="https://github.com/rack-test/rack-test" source_text="Rack-test" %}
 
 Assuming we have an endpoint for creating users **post "/users"** we can use it to
 send invalid characters in the request payload for testing.

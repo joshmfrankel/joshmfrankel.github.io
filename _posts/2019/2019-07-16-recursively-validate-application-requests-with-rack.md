@@ -222,10 +222,7 @@ That's it! Each needs to determine its lowest level string value to compare to o
 Recursion is when you define a method that calls itself until a stop condition is
 reached. Essentially, its an infinite loop with a conditional return at some point.
 
-<blockquote class="Info Info-right">
-"The Fibonacci sequence [consists of a sequence where] each number is the sum of the two preceding ones, starting from 0 and 1"
-<cite><a href="https://en.wikipedia.org/wiki/Fibonacci_number">- Wikipedia</a></cite>
-</blockquote>
+{% include blockquote.html quote="The Fibonacci sequence [consists of a sequence where] each number is the sum of the two preceding ones, starting from 0 and 1" source_link="https://en.wikipedia.org/wiki/Fibonacci_number" source_text="Wikipedia" %}
 
 A classic example of a problem easily solved by recursion is determine the nth number
 in the Fibonacci sequence. The sequence goes like: 0 + 1 = 1 + 1 = 2 + 1 = 3 + 2 = 5. So if we wanted to know the 10th number in the sequence we can write a recursive method that stops after 10 iterations.

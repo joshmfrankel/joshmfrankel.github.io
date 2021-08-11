@@ -66,13 +66,10 @@ def permit(*filters)
   # more implementation code
 ```
 
+{% include blockquote.html quote="If #require is used without #permit you can modify strong parameters directly" %}
+
 So modifying strong parameters directly will never work if there is a call to `#permit`
 anywhere in the chain. Ok, so now we understand why this is happening we need to side step the issue.
-
-<blockquote class="Info Info-right">
-  <strong>Note:</strong> If <code>#require</code> is being used WITHOUT <code>#permit</code> you CAN modify
-strong parameters directly.
-</blockquote>
 
 ## How to modify Strong Parameters
 

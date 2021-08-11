@@ -124,10 +124,7 @@ SELECT table_b.column_1, table_b.column_2
 FROM table_b
 ```
 
-<blockquote class="Info Info-right">
-"UNION removes duplicate rows but UNION ALL does not remove duplicate rows. UNION ALL just merges all the rows that satisfy all the conditions."
-<cite><a href="https://kb.objectrocket.com/postgresql/postgresql-union-vs-union-all-534">- Object Rocket</a></cite>
-</blockquote>
+{% include blockquote.html quote="UNION removes duplicate rows but UNION ALL does not remove duplicate rows. UNION ALL just merges all the rows that satisfy all the conditions." source_link="https://kb.objectrocket.com/postgresql/postgresql-union-vs-union-all-534" source_text="Object Rocket" %}
 
 The requirements of a **UNION** say that each side of the union selects the same number of columns with the same names. This also means that any aliased columns must also match. Along with **UNION** there is also **UNION ALL**. The difference between these two is that **UNION** returns distinct results while **UNION ALL** returns duplicates.
 
@@ -207,11 +204,7 @@ end
 ActiveRecord::Base.send(:include, ActiveRecordUnion)
 ```
 
-<blockquote class="Info Info-right"><strong>Watch the database calls</strong><br>
-  ActiveRecord doesn't execute SQL until right before it it used. We leverage this
-  optimization by calling `.to_sql` on relations which DOES NOT make a database call.
-  Rather it deciphers the underlying Arel representation of final SQL.
-</blockquote>
+{% include blockquote.html quote="ActiveRecord doesn't execute SQL until right before it it used. We leverage this optimization by calling `.to_sql` on relations which DOES NOT make a database call. Rather it deciphers the underlying Arel representation of final SQL." title="Watch the database calls" %}
 
 First off we specify that the method definition accepts a splatted parameter `union(*relations)`. This allows us to pass in an infinite number of relations with
 each separated by a a comma: `User.union(n1, n2, n3, ...)`. Useful for variable number of relations to add to the union.

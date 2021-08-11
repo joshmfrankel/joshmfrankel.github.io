@@ -70,11 +70,9 @@ First things first. Having a good test suite gives confidence to upgrading.
 
 ## 1. Have a good test suite
 
-<blockquote class="Info Info-right">
-    <strong>Having test coverage that covers the critical paths will be important to ensure that regressions failures are avoided during the upgrade process.</strong>
-</blockquote>
-
 Before I start a new Rails upgrade, I first stop off at the test suite. I'll take a quick look through it and determine if there are any parts that don't have coverage. Later on when working with specific gems or code I'll double check that it has code coverage when updating it. It's important to lean on your tests to ensure that your application works both in the current version as well as the new version. Having test coverage that covers the critical paths will be important to ensure that regressions failures are avoided during the upgrade process. This doesn't necessarily mean you hit a certain coverage percentage just rather that your core offering for your product is properly exercised by tests.
+
+{% include blockquote.html quote="Having test coverage that covers the critical paths will be important to ensure that regressions failures are avoided during the upgrade process." %}
 
 There are other things you can invest in such as automated testing or continuous integration. While these make everything much easier they aren't necessary for an upgrade process. That being said you do want to make sure you can run your entire test suite fast enough to inform your work. In case it doesn't then you should spend the energy setting up automated testing and speeding up your test suite. This will be a great tool for discovering bugs and incompatibilities in the new Rails version. Many times I've pushed up a change to CI in order to watch the logs that are generated from the test runner. This helps in finding bugs and/or upcoming deprecations. I recommend CodeShip and TravisCI as potential providers.
 
@@ -95,9 +93,7 @@ ActiveRecord, ActiveModel, and ActiveSupport. The version release notes give gre
 
 If you look at the above screenshot, you'll notice that specific gems within Rails (such as Action Cable) have been broken out into sections. The sections titled **Removals** is especially important as it lists out breaking changes in the new version. **Deprecations** give you a heads up that functionality is going to soon be removed in the next version released which gives you time to plan for transitioning to the new standard. **Notable changes** gives you a detailed view of specific changes that may or may not effect your implementation. Each of these is useful in their own domain.
 
-<blockquote class="Info Info-right">
-    <strong>Looking at tagged versions of a gem allows you to see code at a specific point in time.</strong>
-</blockquote>
+{% include blockquote.html quote="Looking at tagged versions of a gem allows you to see code at a specific point in time." %}
 
 Finally, if the version release notes don't have enough information you can go directly to the changelogs [from the main
 repository](https://github.com/rails/rails). Notice that there are folders in Github for `activemodel`, `activerecord`, and others. These
@@ -182,11 +178,9 @@ Two options here: We can read the gem's changelog to see if a specific version c
 
 Now we know that one of our Gem Upgrade category tasks will be _Upgrade rails-controller-testing to 1.0.3_. Like I mentioned above this will become a single pull request change.
 
-<blockquote class="Info Info-right">
-    <strong>Using the --conservative flag with bundle is really useful for minimizing changesets as well as avoiding upgrading things that you don't need to upgrade.</strong>
-</blockquote>
-
 From what we now know above about this gem, we can run the following command on our frankenbranch `bundle update rails-controller-testing --conservative`. The **--conservative** flag says when updating this gem do no update any of its dependencies. Using the **--conservative** flag with bundle is really useful for minimizing changesets as well as avoiding upgrading things that you don't need to upgrade.
+
+{% include blockquote.html quote="Using the --conservative flag with bundle is really useful for minimizing changesets as well as avoiding upgrading things that you don't need to upgrade" %}
 
 ### Fixing removed functionality
 

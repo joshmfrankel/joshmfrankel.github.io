@@ -104,8 +104,7 @@ returned but it still isn't working because `this.state.currentUserId` is null. 
 I first encountered this it had me scratching my head. Until I read the following
 on [reactjs.org](https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous){:target="_blank"}.
 
-> React may batch multiple setState() calls into a single update for performance.<br /><br />
-> Because this.props and this.state may be updated asynchronously, you should not rely on their values for calculating the next state.
+{% include blockquote.html quote="React may batch multiple setState() calls into a single update for performance. Because this.props and this.state may be updated asynchronously, you should not rely on their values for calculating the next state." %}
 
 So, calling `setState` and then directly relying on this.state variables is going to lead
 to frustration. Luckily, `setState` allows for callback functions to be supplied which is where our

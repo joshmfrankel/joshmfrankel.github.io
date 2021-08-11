@@ -33,10 +33,7 @@ updated this tutorial for both Linux Debian and MacOSX.
 
 ## Making sure GPG is installed
 
-<blockquote class="Info Info-right"><strong>GPG (GNU Privacy Guard)</strong><br>
-  "GnuPG allows you to encrypt and sign your data and communications; it features a versatile key management system, along with access modules for all kinds of public key directories."
-  <cite>https://gnupg.org/</cite>
-</blockquote>
+{% include blockquote.html quote="GnuPG allows you to encrypt and sign your data and communications; it features a versatile key management system, along with access modules for all kinds of public key directories." title="GPG (GNU Privacy Guard)" source_link="https://gnupg.org/" %}
 
 Most variants of Debian should have <acronym title="GNU Privacy Guard">GPG</acronym>
 installed by default. You can check this by running `which gpg` which should return
@@ -114,12 +111,9 @@ from the Real Name, Comment and Email Address in this form:
 Real name: Josh Frankel
 ```
 
-<blockquote class="Info Info-right">
-  "When asked to enter your email address, ensure that you enter the verified email
+{% include blockquote.html quote="When asked to enter your email address, ensure that you enter the verified email
 address for your GitHub account. To keep your email address private, use your
-GitHub-provided no-reply email address."
-<cite><a href="https://help.github.com/en/articles/generating-a-new-gpg-key">Github</a></cite>
-</blockquote>
+GitHub-provided no-reply email address." source_link="https://help.github.com/en/articles/generating-a-new-gpg-key" source_text="Github" %}
 
 Next you'll need to **use the same email address that you use for Github**. This is
 really important to ensure that your GPG signature matches the username. I believe
@@ -229,17 +223,10 @@ sec   4096R/3AA5C34371567BD2 2019-06-01
 uid                          Josh Frankel <josh@tutorial.com>
 ssb   4096R/42B317FD4BA89E7A 2019-06-01
 ```
-
-<blockquote class="Info Info-right"><strong>ASCII mode</strong><br>
-  "Since PGP can operate both in ASCII mode and “raw” mode, it’s important to understand when to use which one.<br><br>
-
-  When sending something that will be viewed as text (i.e. an email), you should use ASCII mode. On the other hand, when sending a file, you can (and should, it will make the encrypted file smaller) use the default non-ASCII mode.<br><br>
-
-  To operate in ASCII mode, use the --armor (or -a) switch."
-  <cite>The Privacy Guide https://theprivacyguide.org/tutorials/gpg.html</cite>
-</blockquote>
-
 Now, we need to export our GPG key to be used on Github via the command: `gpg --armor --export <key-id>`
+
+{% include blockquote.html quote="Since PGP can operate both in ASCII mode and “raw” mode, it’s important to understand when to use which one. When sending something that will be viewed as text (i.e. an email), you should use ASCII mode. On the other hand, when sending a file, you can (and should, it will make the encrypted file smaller) use the default non-ASCII mode. To operate in ASCII mode, use the --armor (or -a) switch." title="ASCII vs Raw mode" source_link="https://theprivacyguide.org/tutorials/gpg.html" source_text="The Privacy Guide" %}
+
 
 First, grab the key id which can be found on the `sec` line after the keysize specification
 of `4096R`. In our case that means using **3AA5C34371567BD2** from above.
