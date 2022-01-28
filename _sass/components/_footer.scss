@@ -1,9 +1,10 @@
+$smallWidth: 790px;
 .Footer {
   background: $lightest-gray;
   border-top: 1px solid $lightest-gray-border;
 
   .Container {
-    @media screen and (max-width: 697px) {
+    @media screen and (max-width: #{$smallWidth}) {
       flex-direction: column;
     }
   }
@@ -26,7 +27,7 @@
   &-social {
     display: flex;
 
-    @media screen and (max-width: 697px) {
+    @media screen and (max-width: #{$smallWidth}) {
       margin-left: 0;
       align-self: initial;
       margin-top: 15px;
@@ -58,7 +59,6 @@
 
           color: $pale-night-text;
           font-size: 1.9rem;
-          padding: 5px 0;
           display: block;
 
           &:hover {
@@ -79,5 +79,41 @@
       }
     }
   }
+}
+.FooterActions {
+  display: flex;
+  @media screen and (max-width: #{$smallWidth}) {
+    flex-direction: column;
+  }
+  a {
+    margin: 15px 0;
+  }
+  &-title {
+    color: $pale-slighty-lighter-gray;
+    margin-bottom: 5px;
+  }
+  &-posts,
+  &-contact {
+    display: flex;
+    flex-direction: column;
+  }
+  &-posts {
+    flex: 1;
+    padding-right: 100px;
+  }
+  &-contact {
+    nav {
+      margin-left: 5px;
+    }
+    a {
+      border: none;
+      color: $pale-night-text;
+      font-size: 1.8rem;
+      display: block;
 
+      &:hover {
+        color: lighten($pale-night-text, 10%);
+      }
+    }
+  }
 }
