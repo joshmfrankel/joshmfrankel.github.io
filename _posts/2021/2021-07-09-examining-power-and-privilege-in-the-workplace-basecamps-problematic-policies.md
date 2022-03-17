@@ -8,8 +8,8 @@ categories:
 Before I go any further, I'd like to acknowledge my own privilege. I am white, cisgender, straight and male. My goal is to be an ally for oppressed communities and to support systemic change that addresses discrimination. My personal experience of discrimination is limited by my own privilege. I am open to learning from others whose personal experience may be different from my own and hearing other viewpoints.
 
 I’ve been a fan of Basecamp for a long time. Recently, Basecamp made a decision
-to ban political and societal discussion in the workplace along with disbanding
-their Diversity & Inclusion committee. These decisions have caused me to assess how I use Basecamps products and how I want to continue using them.
+to ban political and societal discussion in the workplace, along with disbanding
+their Diversity & Inclusion committee. These decisions have caused me to assess how I use Basecamp's products and how I want to continue using them.
 
 <!--excerpt-->
 
