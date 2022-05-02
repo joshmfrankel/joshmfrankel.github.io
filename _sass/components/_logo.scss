@@ -1,37 +1,56 @@
 .Logo-container {
   @extend .flex-container;
-  border-bottom: none;
-
-  &:hover {
-    border-bottom:none;
-
-    .Logo-avatar {
-      border: 3px solid $accent-color;
-    }
-  }
+  transition: none;
+  align-items: center;
+  border: none;
 
   &:hover * {
     color: $darker-gray-hover;
   }
+
+  &:hover {
+    border-bottom: none;
+
+    .Logo-avatar {
+      opacity: 0;
+      display: none;
+    }
+    .Logo-avatarHover {
+      opacity: 1;
+      display: block;
+    }
+    .Logo-avatarContainer {
+      border: 3px solid $accent-color;
+    }
+  }
 }
 .Logo {
   @extend .flex-column;
-  @include transition($default-transition, color);
 
   color: transparent;
   font: 32px/1 $lato;
 
-  &-avatar {
-    @include transition($default-transition, border-color);
+  &-avatarContainer {
     @extend .circular-image;
-
     border: 3px solid $white;
     box-shadow: 0 0 0 1px $lighter-gray;
-    align-self: center;
+    overflow: hidden;
+    box-sizing: border-box;
   }
+
+  &-avatar {
+   opacity: 1;
+   display: block;
+   transition: 300ms opacity;
+  }
+  &-avatarHover {
+    opacity: 0;
+    display: none;
+  }
+
   &-logo {
-    align-self: center;
     margin: 0 15px;
+    border: none;
   }
   &-first-name {
     color: $lighter-gray;
