@@ -180,7 +180,7 @@ RSpec.configure do |config|
   end
 
   def connect_to_available_databases
-    EXTERNAL_DATABASE_CONNECTIONS.push(Core::Database).each do |db_connection|
+    EXTERNAL_DATABASE_CONNECTIONS.concat(Core::Database).each do |db_connection|
       ActiveRecord::Base.establish_connection db_connection
       yield
     end
@@ -192,7 +192,7 @@ From the above we've defined a new array to contain all available external
 database connections (`EXTERNAL_DATABASE_CONNECTIONS`).
 
 Next, we have a new method `#connect_to_available_databases` which takes the
-array and pushes the core (or default application) database onto the end of the
+array and concatenates the core (or default application) database onto the end of the
 array to ensure it it loaded last.
 
 We then establish_connection directly to ActiveRecord::Base like we've been doing.
