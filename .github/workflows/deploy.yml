@@ -31,7 +31,7 @@ jobs:
         run: JEKYLL_ENV=production bundle exec jekyll build -d docs
 
       - name: Run HTMLProofer
-        run: bundle exec htmlproofer "./docs" --check-opengraph --check-favicon --http_status_ignore "999" --typhoeus-config "{\"ssl_verifypeer\":false}" --disable-external
+        run: bundle exec htmlproofer "./docs" --ignore_status_codes "999" --typhoeus "{\"ssl_verifypeer\":false}" --disable-external --no-enforce-https --checks "Links,Favicon,Images"
 
       - name: Configure Git
         run: |

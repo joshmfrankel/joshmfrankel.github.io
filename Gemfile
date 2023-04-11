@@ -3,7 +3,7 @@ ruby RUBY_VERSION
 
 gem "rake", "~> 12"
 gem "jekyll"
-gem "html-proofer", "~> 3.9"
+gem "html-proofer", "~> 5"
 gem "kramdown-parser-gfm"
 gem "webrick"
 
