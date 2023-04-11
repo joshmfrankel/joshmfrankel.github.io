@@ -2,8 +2,10 @@ source "https://rubygems.org"
 ruby RUBY_VERSION
 
 gem "rake", "~> 12"
-gem "jekyll", "~> 3.8"
+gem "jekyll"
 gem "html-proofer", "~> 3.9"
+gem "kramdown-parser-gfm"
+gem "webrick"
 
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
