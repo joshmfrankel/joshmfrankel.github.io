@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Jedi or Sith Lord: Ruby’s inject method | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Jedi or Sith Lord: Ruby’s inject method" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="&quot;Remember, a Jedi&#39;s strength flows from the Force.&quot; The ruby inject method is a powerful ally in a jedi (ruby) master&#39;s arsenal. It is wielded easily to those who train with it and mastered by a jedi with both knowledge of the light and dark side of the force. The light side of inject involves the different usages for the method as well as the basic format of it. The dark side involves inject&#39;s power using symbol#to_proc shortcut methods." />
+<meta property="og:description" content="&quot;Remember, a Jedi&#39;s strength flows from the Force.&quot; The ruby inject method is a powerful ally in a jedi (ruby) master&#39;s arsenal. It is wielded easily to those who train with it and mastered by a jedi with both knowledge of the light and dark side of the force. The light side of inject involves the different usages for the method as well as the basic format of it. The dark side involves inject&#39;s power using symbol#to_proc shortcut methods." />
+<link rel="canonical" href="http://joshfrankel.me/blog/jedi-or-sith-lord-rubys-inject-method/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/jedi-or-sith-lord-rubys-inject-method/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-04-03T13:55:57+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2016-04-03T13:55:57+00:00","dateModified":"2016-04-03T13:55:57+00:00","headline":"Jedi or Sith Lord: Ruby’s inject method","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/jedi-or-sith-lord-rubys-inject-method/"},"url":"http://joshfrankel.me/blog/jedi-or-sith-lord-rubys-inject-method/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"&quot;Remember, a Jedi&#39;s strength flows from the Force.&quot; The ruby inject method is a powerful ally in a jedi (ruby) master&#39;s arsenal. It is wielded easily to those who train with it and mastered by a jedi with both knowledge of the light and dark side of the force. The light side of inject involves the different usages for the method as well as the basic format of it. The dark side involves inject&#39;s power using symbol#to_proc shortcut methods.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Jedi or Sith Lord&#58; Ruby's inject method</h1>
+
+    
+      <p class="Banner-information">
+        <time>April 3, 2016</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>"Remember, a Jedi's strength flows from the Force."</p>
+<p itemprop="description">The ruby inject method is a powerful ally in a jedi (ruby) master's arsenal. It is wielded easily to those who train with it and mastered by a jedi with both knowledge of the light and dark side of the force. The light side of inject involves the different usages for the method as well as the basic format of it. The dark side involves inject's power using symbol#to_proc shortcut methods.</p>
+<!--excerpt-->
+<h2>Inject <small>a.k.a. Reduce</small></h2>
+
+<p>The inject method in ruby is a powerful method for reducing (or folding) all the elements of a collection, into a single value. It is commonly known as the reduce or fold method in other programming languages. Ruby provides an alias to reduce via inject.</p>
+<p>Let's walk through a typical use case for the inject method in ruby. I originally thought of this idea after reading <a href="http://www.globalnerdy.com/2008/09/03/enumerating-enumerable-a-cute-trick-for-explaining-inject-reduce-fold/" target="_blank">this awesome post</a>, by Joey Devilla. He uses folding paper to demonstrate how inject works. Rather than recreate his post, I've decided to use playing cards to demonstrate another type of explanation.</p>
+
+<div class="article-image" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+  <img src="/img/2016/inject/post-intro-1.jpg" alt="The darkside collection" />
+  <meta itemprop="url" content="/img/2016/inject/post-intro-1.jpg" />
+  <meta itemprop="width" content="700" />
+  <meta itemprop="height" content="560" />
+</div>
+
+
+<p>Thought I was done with the Star Wars theme, eh? Not quite.</p>
+<p>If you look at the above picture, I've grabbed five cards out of the deck. For now just assign them number values: 1 for ace, 2 for 2, and so on. Our goal is to calculate the total number of points that we hold in our hand. The cards directly represent our ruby collection that is passed into the block.</p>
+<p>The inject method works by taking values and injecting, or folding, them into themselves. For instance the following code is an example of calculating the sum for the above collection using the inject method.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">sum</span><span class="p">,</span> <span class="n">n</span><span class="o">|</span> <span class="n">sum</span> <span class="o">+</span> <span class="n">n</span> <span class="p">}</span>
+<span class="c1"># =&gt; 15</span></code></pre></figure>
+<p>Using our smaller deck of cards above, I'll show you exactly what is happening step-by-step. First we take our first card (Ace or 1) and combine with the second card that we drew (2) from the deck.</p>
+<div class="card-container">
+  <div class="card-drawn">
+    <h3>Drawn</h3>
+    <img src="/img/2016/inject/Card-2.jpg" alt="2">
+  </div>
+  <div class="card-collection">
+    <h3>In Hand</h3>
+    <div class="card-collection-in-hand">
+      <img src="/img/2016/inject/Card-A.jpg" alt="Ace">
+    </div>
+  </div>
+</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Inject, or fold, 2 into the starting sum of 1</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">|</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">}</span> <span class="c1"># =&gt; 3</span></code></pre></figure>
+<p>The inject method takes the first two indexes from the cards in our hand, or the collection, and applies them to the block. Essentially, 1 becomes the <strong>sum</strong> and 2 becomes <strong>n</strong>. This is the typical implementation of inject.</p>
+
+<p>Next, drawing a new card from the deck we recieve 3.</p>
+<div class="card-container">
+  <div class="card-drawn">
+    <h3>Drawn</h3>
+    <img src="/img/2016/inject/Card-3.jpg" alt="2">
+  </div>
+  <div class="card-collection">
+    <h3>In Hand</h3>
+    <div class="card-collection-in-hand">
+      <img src="/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="/img/2016/inject/Card-2.jpg" alt="2">
+    </div>
+  </div>
+</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Inject 3 into the sum</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="o">|</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">3</span> <span class="p">}</span> <span class="c1"># =&gt; 6</span></code></pre></figure>
+<p>Note that on this iteration of the inject method we already have the cards, ace and 2, in our hand. Therefore, the current sum is 3 and n, or the current drawn card is also 3. This gives us a resulting sum of 6.</p>
+
+<p>Let's draw another card from the deck.</p>
+<div class="card-container">
+  <div class="card-drawn">
+    <h3>Drawn</h3>
+    <img src="/img/2016/inject/Card-4.jpg" alt="4">
+  </div>
+  <div class="card-collection">
+    <h3>In Hand</h3>
+    <div class="card-collection-in-hand">
+      <img src="/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="/img/2016/inject/Card-3.jpg" alt="3">
+    </div>
+  </div>
+</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Inject 4 into the sum</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="o">|</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">4</span> <span class="p">}</span> <span class="c1"># =&gt; 10</span></code></pre></figure>
+<p>Sensing a pattern here? The previous sum is 6 and the new card is 4 giving us a current sum of 10.</p>
+
+<p>Draw the last card</p>
+<div class="card-container">
+  <div class="card-drawn fix-md">
+    <h3>Drawn</h3>
+    <img src="/img/2016/inject/Card-5.jpg" alt="5">
+  </div>
+  <div class="card-collection">
+    <h3>In Hand</h3>
+    <div class="card-collection-in-hand">
+      <img src="/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="/img/2016/inject/Card-3.jpg" alt="3">
+      <img src="/img/2016/inject/Card-4.jpg" alt="4">
+    </div>
+  </div>
+</div>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Inject 4 into the sum</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="o">|</span> <span class="mi">10</span> <span class="o">+</span> <span class="mi">5</span> <span class="p">}</span> <span class="c1"># =&gt; 15</span></code></pre></figure>
+<p>Finally, our last card (5) gets added to the total for a grand total of 15 points for our hand.</p>
+<div class="card-container">
+  <div class="card-collection">
+    <h3>In Hand</h3>
+    <div class="card-collection-in-hand">
+      <img src="/img/2016/inject/Card-A.jpg" alt="Ace">
+      <img src="/img/2016/inject/Card-2.jpg" alt="2">
+      <img src="/img/2016/inject/Card-3.jpg" alt="3">
+      <img src="/img/2016/inject/Card-4.jpg" alt="4">
+      <img src="/img/2016/inject/Card-5.jpg" alt="5">
+    </div>
+  </div>
+</div>
+
+
+<p>This is the power of inject in that it can reduce a collection down to a single value. All in a single line of code no less!</p>
+<p>Here are some alternative formats for accomplishing the same thing.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="mi">5</span><span class="p">).</span><span class="nf">inject</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span> <span class="c1"># =&gt; 15, Whoa! We'll talk about (:+) a little later.</span>
+<span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="mi">5</span><span class="p">).</span><span class="nf">reduce</span> <span class="p">{</span> <span class="o">|</span><span class="n">sum</span><span class="p">,</span> <span class="n">n</span><span class="o">|</span> <span class="n">sum</span> <span class="o">+</span> <span class="n">n</span> <span class="p">}</span> <span class="c1"># =&gt; 15, reduce is an alias to inject</span></code></pre></figure>
+
+<h2>If you only knew the power of Ruby's inject method!</h2>
+<img src="/img/2016/inject/power-of-darkside.gif" alt="You dont know the power of the darkside - From http://heavy-metal-aesthetic.tumblr.com/">
+<p>The inject method has a couple of tricks up its sleeve (card pun). Here are several of the formats that you can utilize. These are taken straight from the ruby docs.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">inject</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">sym</span><span class="p">)</span> <span class="err">→</span> <span class="n">obj</span>
+<span class="n">inject</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span> <span class="err">→</span> <span class="n">obj</span>
+<span class="n">inject</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">memo</span><span class="p">,</span> <span class="n">obj</span><span class="o">|</span> <span class="n">block</span> <span class="p">}</span> <span class="err">→</span> <span class="n">obj</span>
+<span class="n">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">memo</span><span class="p">,</span> <span class="n">obj</span><span class="o">|</span> <span class="n">block</span> <span class="p">}</span> <span class="err">→</span> <span class="n">obj</span></code></pre></figure>
+<h3>inject(initial) { |memo, obj| block } → obj</h3>
+<p>This format of inject allows the developer to pass in an optional initial value to be used as the first element. Other than that this format is exactly the same as <code>inject { |memo, obj| block } → obj</code>.</p>
+<p>Looking at our above example we essentially could say the initial value of the block is the ace (1), or our first card. Inject assumes the first index as your initial value unless you specify it using the <code>inject(initial)</code> optional format. This is what would happen if instead of using the ace we had drawn another 5 before the other cards.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nf">inject</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">sum</span><span class="p">,</span> <span class="n">n</span><span class="o">|</span> <span class="n">sum</span> <span class="o">+</span> <span class="n">n</span> <span class="p">}</span> <span class="c1"># =&gt; 20</span></code></pre></figure>
+<p>Now our first iteration of the loop yields <code>{ |5, 1| 5 + 1 }</code> and increases the ending sum by 5 making it 20. This can come in handy if you have an existing collection and need to use a different starting point.</p>
+
+<h3>Staying on target in the real world <small>with an example</small></h3>
+<img src="/img/2016/inject/stay-on-target.gif" alt="From giphy.com" />
+<p>Let's take a look at a real world example. Say we had a forum for asking questions on our website between buyers and sellers. The buyer creates questions that can be shared between multiple projects. On these projects, the seller answers the required questions.</p>
+<p>Now the project requirement is to lock the buyer out of editing a question, if that particular question is used on more than one project or location in the app. We need to make sure that we have a starting value of 0 in this example which is where our initial value comes into play.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">[</span><span class="n">seller</span><span class="p">.</span><span class="nf">projects</span><span class="p">.</span><span class="nf">questions</span><span class="p">,</span> <span class="n">seller</span><span class="p">.</span><span class="nf">other_locations</span><span class="p">.</span><span class="nf">questions</span><span class="p">].</span><span class="nf">inject</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">sum</span><span class="p">,</span> <span class="n">n</span><span class="o">|</span>
+  <span class="k">break</span> <span class="n">sum</span> <span class="k">if</span> <span class="n">sum</span> <span class="o">&gt;</span> <span class="mi">1</span>
+  <span class="n">sum</span> <span class="o">+</span> <span class="n">n</span><span class="p">.</span><span class="nf">size</span>
+<span class="k">end</span></code></pre></figure>
+
+<blockquote class="Info Info-right" cite="https://en.wikipedia.org/wiki/Lazy_evaluation"><div class="page-header">Lazy Evaluation</div>
+"...lazy evaluation, or call-by-need is an evaluation strategy which delays the evaluation of an expression until its value is needed (non-strict evaluation) and which also avoids repeated evaluations..."
+<p>- Wikipedia</blockquote>
+
+<p>The above code will check the size of the collection within the array (e.g. seller.projects.questions), and add its size to the sum.</p>
+<p>Then by adding a stop condition to the inject statement <code>break sum if sum > 1;</code>, the inject iteration will stop once we determine that a question is in use elsewhere in the app. This utilizes a technique called <strong>lazy evaluation</strong> to essentially not do any more work than is necessary.</p>
+<p>Now that we have an understanding into the inner workings of inject, we'll now take look at the darkside of the force with Symbol#to_proc.</p>
+
+
+<h2>It’s true. All of it. Enumerables, Symbol#to_proc. They’re real.</h2>
+<img src="/img/2016/inject/Its_true_all_of_it.gif" alt="From polygon.com" />
+
+<p>Do you remember seeing this example above? <code>(0..5).inject(:+) #=> 15</code>. This format is known as Symbol#to_proc or <code>inject(sym) → obj</code>. This is also known as using some of Ruby's built-in syntactical sugar.</p>
+<h3>inject(sym) → obj</h3>
+<p>In more simple terms, <code>inject(sym)</code>, allows you to pass in a symbol which is then executed against the collection. For instance <code>:+</code>, would take the elements from the collection and add them to each other one at a time.</p><p>
+Some addtional examples of valid symbols include: <code>:+</code>, <code>:-</code>, <code>:*</code>, and <code>:/</code>.</p>
+<p>Let's take a look at the two bits of code that accomplish the exact same thing.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nf">inject</span> <span class="p">{</span> <span class="o">|</span><span class="n">sum</span><span class="p">,</span> <span class="n">n</span><span class="o">|</span> <span class="n">sum</span> <span class="o">+</span> <span class="n">n</span> <span class="p">}</span> <span class="c1">#=&gt; 15</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nf">inject</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="mi">15</span>
+<span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="mi">5</span><span class="p">).</span><span class="nf">reduce</span><span class="p">(:</span><span class="o">+</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="mi">15</span><span class="p">,</span> <span class="n">this</span> <span class="n">is</span> <span class="n">the</span> <span class="n">same</span> <span class="n">thing</span> <span class="n">again</span> <span class="n">just</span> <span class="n">different</span> <span class="nb">format</span></code></pre></figure>
+<p>This can be quite handy for quickly implementing basic logic against a collection. Additionally, just like above the <code>inject(sym) → obj</code> format can also accept an initial value in the following format <code>inject(initial, sym) → obj</code>
+<img src="/img/2016/inject/yoda-strength.jpg" alt="Yoda inspirational quote">
+<p>Pretty awesome, no?</p>
+<div class="well floated"><p><strong>Symbol confusion</strong></p><p>There two different symbol formats you may encounter online. Up until Ruby 1.8.7, the inject method required that you prepend symbols with an ampersand (<code>&:+</code>) to convert them to a Proc so that inject could understand them. With 1.8.7 the inject method will accept both <code>:+</code> and <code>&:+</code> as valid symbols.</p></div>
+<p>Now before you go applying <code>:+</code> and <code>:*</code> to other enumerable methods such as <code>(0..5).map</code>, keep in mind that these require the usage of the ampersand to convert them to proc. Only inject and reduce have this functionality of current.</p>
+<p>In the next Enumerables series post, we'll take a look at the map method. So keep reading to learn more about how powerful Ruby's enumerable methods really are.</p>
+<p>Got a method you'd like to see analyzed? Leave me a comment below.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/a-development-roadmap-for-2016/" alt="A development roadmap for 2016">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">A development roadmap for 2016</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/avoiding-destructive-criticism-by-critiquing-in-love/" alt="Avoiding destructive criticism by Critiquing in Love">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Avoiding destructive criticism by Critiquing in Love</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

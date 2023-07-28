@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Lemme pencil you in: Using iCalendar and Rails to sync calendar events | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Lemme pencil you in: Using iCalendar and Rails to sync calendar events" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="If you’ve worked with calendars, then you know the frustration of having two systems not keep events in sync. There are essentially three levels to keeping events in sync. The first is integration with every email provider you wish to support. Not a light initiative. The second is to find a product which aggregates multiple providers into a single API interface. Better solution, but open your wallet. Lastly, build a lightweight system that relies on the iCalendar standard. This last option is the focus of the article. Throughout the remainder of this post, we’ll explore pushing an event to an external provider’s calendar and keeping it in sync across systems without writing a single API request or integration." />
+<meta property="og:description" content="If you’ve worked with calendars, then you know the frustration of having two systems not keep events in sync. There are essentially three levels to keeping events in sync. The first is integration with every email provider you wish to support. Not a light initiative. The second is to find a product which aggregates multiple providers into a single API interface. Better solution, but open your wallet. Lastly, build a lightweight system that relies on the iCalendar standard. This last option is the focus of the article. Throughout the remainder of this post, we’ll explore pushing an event to an external provider’s calendar and keeping it in sync across systems without writing a single API request or integration." />
+<link rel="canonical" href="http://joshfrankel.me/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-09T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-05-09T00:00:00+00:00","dateModified":"2022-05-09T00:00:00+00:00","headline":"Lemme pencil you in: Using iCalendar and Rails to sync calendar events","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/"},"url":"http://joshfrankel.me/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"If you’ve worked with calendars, then you know the frustration of having two systems not keep events in sync. There are essentially three levels to keeping events in sync. The first is integration with every email provider you wish to support. Not a light initiative. The second is to find a product which aggregates multiple providers into a single API interface. Better solution, but open your wallet. Lastly, build a lightweight system that relies on the iCalendar standard. This last option is the focus of the article. Throughout the remainder of this post, we’ll explore pushing an event to an external provider’s calendar and keeping it in sync across systems without writing a single API request or integration.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</h1>
+
+    
+      <p class="Banner-information">
+        <time>May 9, 2022</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>If you’ve worked with calendars, then you know the frustration of having two systems not keep events in sync. There are essentially three levels to keeping events in sync. The first is integration with every email provider you wish to support. Not a light initiative. The second is to find a product which aggregates multiple providers into a single API interface. Better solution, but open your wallet. Lastly, build a lightweight system that relies on the iCalendar standard. This last option is the focus of the article. Throughout the remainder of this post, we’ll explore pushing an event to an external provider’s calendar and keeping it in sync across systems without writing a single API request or integration.
+<!--excerpt--></p>
+
+<h2 id="what-were-building">What we’re building</h2>
+
+<p>To start, let’s say we want an application that stores a calendar event as a database record. What is the easiest way to ensure that the event stays in sync between the database and an attendee’s personal calendar?</p>
+
+<p>Let’s add some guardrails to this project. This way we can avoid scope creep.</p>
+
+<ol>
+  <li>Creating a new calendar event adds it to an attendee’s external calendar application</li>
+  <li>Updating or cancelling event effect the attendee’s event details</li>
+  <li>Event organizers receive attendee RSVP status updates</li>
+</ol>
+
+<h2 id="how-this-works">How this works</h2>
+
+<p>Here’s a basic sequence diagram of the various layers to this process. Looks like a lot, but most of this is implemented by the provider email account, such as Gmail or Outlook.</p>
+
+<p><img src="/img/2022/icalendar-workflow-example.png" alt="Basic iCalendar workflow for adding calendar events" /></p>
+
+<ol>
+  <li>Organizer creates an event</li>
+  <li>Our application generates an iCalendar attachment and sends the attendee an email</li>
+  <li>Attendee’s mail client parses incoming email and adds valid iCalendar attachments to their connected Calendar</li>
+  <li>Attendee changes their RSVP status, which sends email to Organizer</li>
+</ol>
+
+<p>Really, the only thing we can control is steps 1 and 2. Step 3 and 4 are entirely in the hands of whatever the mail client is. This is a good time to call out a caveat with this approach, which is we are at the mercy of how the mail client parses incoming mail and iCalendar files. That being said, iCalendar is a widely accepted standard.</p>
+
+<p>The above sequence diagram illustrates how we’ll accomplish a zero-integration strategy for placing calendar events on attendee calendars. This works by following the <abbr title="Internet Calendaring and Scheduling Core Object Specification">iCalendar</abbr> standard for attaching calendar events to emails. For Mail Clients that have connected calendars (e.g. Gmail &amp; Google Calendar), they parse incoming emails. When the email contains a valid iCalendar file, it is automatically added to the attendee’s calendar.</p>
+
+<p>Pretty slick right?</p>
+
+<p>The documentation regarding iCalendar is thorough and useful when working with calendar event attachments. <a href="https://datatracker.ietf.org/doc/html/rfc5545">Check it out here</a>.</p>
+
+<p>Now, there are a couple caveats with using this approach.</p>
+
+<ol>
+  <li>Updating an event in your external calendar will not update it in the application</li>
+  <li>The organizer won’t have the event on their calendar unless they are also added as an attendee</li>
+  <li>Relies on iCalendar specification while standard, is up to the provider to implement correctly</li>
+</ol>
+
+<p>With that out of the way, let’s build ourselves a basic Rails application to work with.</p>
+
+<h2 id="creating-a-new-application">Creating a new application</h2>
+
+<p>We’ll need to generate a new sample application for this functionality.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rails new ics_demo <span class="nt">--skip-javascript</span> <span class="nt">--skip-helpers</span>
+
+<span class="c"># Setup ActionMailbox</span>
+rails action_mailbox:install
+rails db:migrate
+</code></pre></div></div>
+
+<p>Add <code class="language-plaintext highlighter-rouge">gem 'icalendar'</code> to your Gemfile. This gem implements the iCalendar standard within Ruby, making it dead simple to craft calendar attachments.</p>
+
+<p>Next we’ll need a mailer for which our attachments will be placed on. Run <code class="language-plaintext highlighter-rouge">rails generate mailer EventInvitation event_create event_update event_cancel</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rails generate mailer EventInvitation event_create event_update event_cancel
+      create  app/mailers/event_invitation_mailer.rb
+      invoke  erb
+      create    app/views/event_invitation_mailer
+      invoke  test_unit
+      create    <span class="nb">test</span>/mailers/event_invitation_mailer_test.rb
+      create    <span class="nb">test</span>/mailers/previews/event_invitation_mailer_preview.rb
+</code></pre></div></div>
+
+<p>Change the receiver email address to an email you can access. You’ll want this to be different from your primary Gmail address (more on this later).</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EventInvitationMailer</span> <span class="o">&lt;</span> <span class="no">ApplicationMailer</span>
+  <span class="k">def</span> <span class="nf">event_create</span>
+    <span class="vi">@greeting</span> <span class="o">=</span> <span class="s2">"Event created"</span>
+
+    <span class="n">mail</span> <span class="ss">to: </span><span class="s2">"[your_email]@gmail.com"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">event_update</span>
+    <span class="vi">@greeting</span> <span class="o">=</span> <span class="s2">"Event Updated"</span>
+
+    <span class="n">mail</span> <span class="ss">to: </span><span class="s2">"[your_email]@gmail.com"</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">event_cancel</span>
+    <span class="vi">@greeting</span> <span class="o">=</span> <span class="s2">"Event Cancelled"</span>
+
+    <span class="n">mail</span> <span class="ss">to: </span><span class="s2">"[your_email]@gmail.com"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># event_invitation_mailer.html.erb</span>
+<span class="o">&lt;</span><span class="sx">%= @greeting %&gt;
+</span></code></pre></div></div>
+
+<p>Change delivery error setting in development.rb for easier debugging</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">config</span><span class="p">.</span><span class="nf">action_mailer</span><span class="p">.</span><span class="nf">raise_delivery_errors</span> <span class="o">=</span> <span class="kp">true</span>
+</code></pre></div></div>
+
+<p>Now, in order to test this we’ll need a reliable way to send emails in development. Google Apps to the rescue!</p>
+
+<h3 id="google-app-password-for-development">Google App Password for development</h3>
+
+<p>First we need to create new app password for your Google account: <a href="https://myaccount.google.com/apppasswords">https://myaccount.google.com/apppasswords</a>. The reason we use an app password is it allows us to provide an authorized SMTP setup without having to deal with two-factor authentication.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Make sure that the receiver address is different from your email used for the Google App password, or else you won't be able
+to associate calendar events correctly.
+  </p>
+
+  
+</blockquote>
+
+<p>Select <code class="language-plaintext highlighter-rouge">Mail</code> for app and <code class="language-plaintext highlighter-rouge">Other</code> for device. Name the app Rails Mailer or what you like. Make sure to save the app password.</p>
+
+<p>Add the <a href="https://github.com/bkeepers/dotenv">dotenv</a> gem to your gemfile. <code class="language-plaintext highlighter-rouge">gem 'dotenv-rails', groups: [:development, :test]</code>. This allows us to create a root level <code class="language-plaintext highlighter-rouge">.env</code> file which contains environment variables. Make sure to re-bundle.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># .env</span>
+<span class="nv">GMAIL_USERNAME</span><span class="o">=</span><span class="s2">"your_email@gmail.com"</span>
+<span class="nv">GMAIL_PASSWORD</span><span class="o">=</span><span class="s2">"XXXX-your-app-password"</span>
+</code></pre></div></div>
+
+<p>Following the <a href="https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration-for-gmail">Rails guide for setting up Gmail as an ActionMailer provider</a>, you’ll end up with the following:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># development.rb</span>
+<span class="n">config</span><span class="p">.</span><span class="nf">action_mailer</span><span class="p">.</span><span class="nf">delivery_method</span> <span class="o">=</span> <span class="ss">:smtp</span>
+<span class="n">config</span><span class="p">.</span><span class="nf">action_mailer</span><span class="p">.</span><span class="nf">smtp_settings</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="ss">address:              </span><span class="s1">'smtp.gmail.com'</span><span class="p">,</span>
+  <span class="ss">port:                 </span><span class="mi">587</span><span class="p">,</span>
+  <span class="ss">domain:               </span><span class="s1">'example.com'</span><span class="p">,</span>
+  <span class="ss">user_name:            </span><span class="no">ENV</span><span class="p">[</span><span class="s2">"GMAIL_USERNAME"</span><span class="p">],</span>
+  <span class="ss">password:             </span><span class="no">ENV</span><span class="p">[</span><span class="s2">"GMAIL_PASWWORD"</span><span class="p">],</span>
+  <span class="ss">authentication:       </span><span class="s1">'plain'</span><span class="p">,</span>
+  <span class="ss">enable_starttls_auto: </span><span class="kp">true</span> 
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Emails can be sent from development by running the following code in your <code class="language-plaintext highlighter-rouge">rails console</code></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">EventInvitationMailer</span><span class="p">.</span><span class="nf">event_create</span><span class="p">.</span><span class="nf">deliver_now</span>
+</code></pre></div></div>
+
+<p>Check your inbox to confirm you’ve received the message. Time to see those events popping up on your calendar. Check your spam or filters if you don’t see the message appear.</p>
+
+<p><img src="/img/2022/icalendar-basic-example.png" alt="Basic email sent via Google App" /></p>
+
+<h2 id="attaching-an-icalendar-event-to-an-email">Attaching an iCalendar event to an email</h2>
+
+<p>Now that we’ve configured our basic application for mail delivery, we should start sending
+calendar events out as email attachments. Add the following to the body of your mailer’s <strong>rsvp</strong> method:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">event_create</span>
+  <span class="n">ical</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Calendar</span><span class="p">.</span><span class="nf">new</span>
+
+  <span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">dtstart</span> <span class="o">=</span> <span class="mi">1</span><span class="p">.</span><span class="nf">hour</span><span class="p">.</span><span class="nf">from_now</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">dtend</span> <span class="o">=</span> <span class="mi">2</span><span class="p">.</span><span class="nf">hours</span><span class="p">.</span><span class="nf">from_now</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">sequence</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="k">end</span>
+
+  <span class="n">ical</span><span class="p">.</span><span class="nf">ip_method</span> <span class="o">=</span> <span class="s2">"REQUEST"</span>
+
+  <span class="n">attachments</span><span class="p">[</span><span class="s2">"invite.ics"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="ss">mime_type: </span><span class="s2">"text/calendar; method=REQUEST"</span><span class="p">,</span>
+    <span class="ss">content: </span><span class="n">ical</span><span class="p">.</span><span class="nf">to_ical</span>
+  <span class="p">}</span>
+
+  <span class="n">mail</span> <span class="ss">to: </span><span class="s2">"different_address@gmail.com"</span><span class="p">,</span> <span class="ss">subject: </span><span class="s2">"My First Event"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p><strong>dtstart</strong> indicates the starting time of the event and is required. <strong>dtend</strong> indicates the ending time and is required.</p>
+
+<p><strong>Sequence</strong> is the order in which an iCalendar file is received in. It determines which action should take place. Additionally, it prevents out-of-sequence updates (e.g. updating an event before it is created).</p>
+
+<p>Try sending yourself an email. You should see it come through along with the
+calendar event being placed on your associated calendar. Again, make sure that the email address you are sending to is different than the address you used for the Google App password.</p>
+
+<p><img src="/img/2022/icalendar-auto-event-in-mail.png" alt="Basic ics Attachment" /></p>
+
+<p>The new event looks pretty nice in our mailbox. If you hover over the email in
+Gmail’s listing view there is also now a new button called RSVP with some quick
+actions.</p>
+
+<p><img src="/img/2022/icalendar-rsvp-from-inbox.png" alt="Rsvp from inbox" /></p>
+
+<p>Super handy!</p>
+
+<p>Now the above is the absolute minimum to enable this process and will only create events currently. Updating or Canceling an event take different request
+parameters which we’ll investigate next. But, before we dig into updating and canceling, we need a
+mechanism for telling external systems that the event we’re updating or cancelling refers to the
+same event we created. This is where the <code class="language-plaintext highlighter-rouge">event.uid</code> property comes in handy.</p>
+
+<h2 id="tying-events-together">Tying events together</h2>
+
+<p><strong>Event uid</strong> is the unique identifier for the event. Think about this like a primary key for the calendar event. It allows multiple iCalendar files to be sent through email and will associate them to the same uid. Useful for if the same event gets sent multiple times or updated. This way it won’t keep adding new ones to your calendar. We can utilize the built-in iCalendar gem method <code class="language-plaintext highlighter-rouge">new_uid</code> to generate a new uid.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ical</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Calendar</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">uid</span> <span class="o">=</span> <span class="n">ical</span><span class="p">.</span><span class="nf">new_uid</span>
+
+<span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+  <span class="o">...</span>
+  <span class="n">event</span><span class="p">.</span><span class="nf">uid</span> <span class="o">=</span> <span class="n">uid</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Alternatively, if you have a uuid on your database record which is associated with the calendar event, you can utilize that to ensure
+stability between your system and the external calendar. I prefer this approach in the long-run.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Creating a record that represents the calendar event</span>
+<span class="n">some_record</span> <span class="o">=</span> <span class="no">Event</span><span class="p">.</span><span class="nf">new</span> <span class="c1">#=&gt; &lt;Event uid="1c4bd300-ab99-425a-82fd-1e2720d23cdb"&gt;</span>
+
+<span class="n">ical</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Calendar</span><span class="p">.</span><span class="nf">new</span>
+
+<span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+  <span class="o">...</span>
+  <span class="n">event</span><span class="p">.</span><span class="nf">uid</span> <span class="o">=</span> <span class="n">some_record</span><span class="p">.</span><span class="nf">uid</span> <span class="c1"># Use the record to map the icalendar files uid</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Onto updating and cancelling events.</p>
+
+<h2 id="updating-an-event">Updating an Event</h2>
+
+<p>In order to update the calendar event, the only real change to our <strong>event_create</strong> method is to specify the
+sequence number and ensure the uid matches the original event. Sequence number maps to the order in which iCalendar files
+were recieved in. If you notice the creating of an event example above, I used
+<code class="language-plaintext highlighter-rouge">event.sequence = 1</code>. That’s because when an event is first created it will
+always be the first.</p>
+
+<p>Now for updating an event we need sequence to be greater than 1.
+However, do we really want to manage the number for how many updates were made? Probably, not.
+This is why I came up with a nifty little trick using the integer representation of Time. Seen
+below as <code class="language-plaintext highlighter-rouge">event.sequence = Time.now.to_i</code>. Using this will ensure that the order in which
+updates are made always stays accurate with the upside of us not having to care about saving
+the current sequence number.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">event_update</span>
+  <span class="n">ical</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Calendar</span><span class="p">.</span><span class="nf">new</span>
+
+  <span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+    <span class="o">...</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">dtstart</span> <span class="o">=</span> <span class="mi">1</span><span class="p">.</span><span class="nf">hour</span><span class="p">.</span><span class="nf">from_now</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">dtend</span> <span class="o">=</span> <span class="mi">2</span><span class="p">.</span><span class="nf">hours</span><span class="p">.</span><span class="nf">from_now</span>
+
+    <span class="c1"># Now we don't need to store which sequence number we're on</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">sequence</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">to_i</span>
+
+    <span class="c1"># This should be the equal to the id used when the event was created</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">uid</span> <span class="o">=</span> <span class="n">some_record</span><span class="p">.</span><span class="nf">uid</span>
+  <span class="k">end</span>
+
+  <span class="n">ical</span><span class="p">.</span><span class="nf">ip_method</span> <span class="o">=</span> <span class="s2">"REQUEST"</span>
+
+  <span class="n">attachments</span><span class="p">[</span><span class="s2">"invite.ics"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="ss">mime_type: </span><span class="s2">"text/calendar; method=REQUEST"</span><span class="p">,</span>
+    <span class="ss">content: </span><span class="n">ical</span><span class="p">.</span><span class="nf">to_ical</span>
+  <span class="p">}</span>
+
+  <span class="n">mail</span> <span class="ss">to: </span><span class="s2">"different_address@gmail.com"</span><span class="p">,</span> <span class="ss">subject: </span><span class="s2">"My Test Email"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Now if you have your Calendar open you can watch in real-time as the event’s time changes. You can test this out in your console with:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">EventInvitationMailer</span><span class="p">.</span><span class="nf">event_update</span><span class="p">.</span><span class="nf">deliver_now</span>
+</code></pre></div></div>
+
+<p><img src="/img/2022/auto-update-demo.gif" alt="Auto update calendar event" /></p>
+
+<h2 id="cancelling-an-event">Cancelling an Event</h2>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Surprisingly, the dtstart property is required for cancelling an event
+  </p>
+
+  
+</blockquote>
+
+<p>Like updating event you’ll need to maintain the same <strong>uid</strong> and ensure that the <strong>sequence</strong> is further along than previous calendar events. The important change here
+is the addition of the <strong>status</strong> property with value “CANCELLED”. This tell’s the
+calendar that the event has been cancelled by the organizer and therefore should
+be removed from attendee’s calendars.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">event_cancel</span>
+  <span class="n">ical</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Calendar</span><span class="p">.</span><span class="nf">new</span>
+
+  <span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+
+    <span class="c1"># Suprisingly, dtstart is required in order to properly cancel an event</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">dtstart</span> <span class="o">=</span> <span class="mi">1</span><span class="p">.</span><span class="nf">hour</span><span class="p">.</span><span class="nf">from_now</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">sequence</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">to_i</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">uid</span> <span class="o">=</span> <span class="n">uid</span>
+    <span class="n">event</span><span class="p">.</span><span class="nf">status</span> <span class="o">=</span> <span class="s2">"CANCELLED"</span> <span class="c1"># Required</span>
+  <span class="k">end</span>
+
+  <span class="n">ical</span><span class="p">.</span><span class="nf">ip_method</span> <span class="o">=</span> <span class="s2">"REQUEST"</span> <span class="c1"># "CANCEL" also seems valid</span>
+
+  <span class="n">attachments</span><span class="p">[</span><span class="s2">"invite.ics"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="ss">mime_type: </span><span class="s2">"text/calendar; method=REQUEST"</span><span class="p">,</span> <span class="c1"># "CANCEL" also seems valid</span>
+    <span class="ss">content: </span><span class="n">ical</span><span class="p">.</span><span class="nf">to_ical</span>
+  <span class="p">}</span>
+
+  <span class="n">mail</span> <span class="ss">to: </span><span class="s2">"different_address@gmail.com"</span><span class="p">,</span> <span class="ss">subject: </span><span class="s2">"My Test Email"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>If done correctly, you’ll receive an email with a header that states the event
+was cancelled.</p>
+
+<p><img src="/img/2022/event-cancelled.png" alt="Cancelled event in inbox" /></p>
+
+<p>Additionally, you can watch the calendar event disappear from your Google calendar.</p>
+
+<p><img src="/img/2022/cancel-event-demo.gif" alt="Cancel event demo in Calendar" /></p>
+
+<p>There’s the basics of using iCalendar with external systems. Now, we’ve really only scratched the surface of what is possible here. We also haven’t solved our third goal, “3. Event organizers receive attendee RSVP status updates”. Let’s dig into solving that, along with some settings I recommend making your events more robust.</p>
+
+<h2 id="recommended-settings">Recommended settings</h2>
+
+<p>I’ve compiled my own recommendations to help make iCalendar events
+more detailed and useful. Each of these adds more context to the calendar event, which is helpful
+to inform prospective attendees.</p>
+
+<h3 id="organizer">Organizer</h3>
+
+<p>This is whoever created the event. RSVPing to the event should send the organizer an email. <strong>CN</strong> stands for displayable name. This is a great way to make invites
+look more personal for both organizers and attendees. Adding this also satisfies our third goal, hooray!</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">event</span><span class="p">.</span><span class="nf">organizer</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Values</span><span class="o">::</span><span class="no">CalAddress</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span>
+  <span class="s2">"MAILTO:organizer@gmail.com"</span><span class="p">,</span>
+  <span class="ss">cn: </span><span class="s2">"</span><span class="se">\"</span><span class="s2">Josh F</span><span class="se">\"</span><span class="s2">"</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    A gotcha with receiving rsvp status changes as an organizer is that if you use a Gmail address, it must be verified as also the event's creator. I was able to test this locally by instead using an outlook.com address
+  </p>
+
+  
+</blockquote>
+
+<p><img src="/img/2022/organizer-rsvp-receipt.png" alt="Organizer rsvp receipt" /></p>
+
+<p>Without this, your event will display “Unknown Organizer”. Additionally, if RSVPing to the event sends an email within your Calendar client, without a valid email address you’ll receive a bounce back saying the mail failed to deliver. You can disable this functionality by specifying an <code class="language-plaintext highlighter-rouge">rsvp</code> value for the <code class="language-plaintext highlighter-rouge">attendee</code> of false, like so:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">event</span><span class="p">.</span><span class="nf">attendee</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Values</span><span class="o">::</span><span class="no">CalAddress</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span>
+  <span class="s2">"mailto:different_address@gmail.com"</span><span class="p">,</span>
+  <span class="ss">rsvp: </span><span class="s2">"FALSE"</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>If you utilize organizer, you’ll also need to specify it when you <strong>cancel</strong> an event, or else the calendar system will not remove the event as it will think you’re trying to change organizers.</p>
+
+<h3 id="summary">Summary</h3>
+
+<p>This is the title of the Event placed on the calendar. Without this, your
+events will display “No title”. Useful information to show your event attendees. <a href="https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.12">See documentation</a></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+  <span class="o">...</span>
+  <span class="n">event</span><span class="p">.</span><span class="nf">summary</span> <span class="o">=</span> <span class="s2">"Test Event 15"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="description">Description</h3>
+
+<p>This is the body of the calendar event. This contains a more detailed
+message regarding the nature of the event itself. <a href="https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.5">See documentation</a></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+  <span class="o">...</span>
+  <span class="n">event</span><span class="p">.</span><span class="nf">description</span> <span class="o">=</span> <span class="s2">"This is the description"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="sequence">Sequence</h3>
+
+<p>This is the order in which an iCalendar file is received in. It determines which action should take place. Additionally, it prevents out-of-sequence updates (e.g. updating an event before it is created). <a href="https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.7.4">See documentation</a></p>
+
+<p>A trick you can do here is to use the current time as an integer value to ensure that the sequence is always increasing without having the burden of managing the next number in the sequence.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ical</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Calendar</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span>
+  <span class="n">event</span><span class="p">.</span><span class="nf">sequence</span> <span class="o">=</span> <span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">to_i</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="location">Location</h3>
+
+<p>This is the physical location where an event is taking place at. Both Gmail and Outlook display this as part of the calendar invite. <a href="https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.7">See documentation</a></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+  <span class="o">...</span>
+  <span class="n">event</span><span class="p">.</span><span class="nf">location</span> <span class="o">=</span> <span class="s2">"201 E Randolph St, Chicago, IL 60602"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Below is an example of what a calendar event looks like when you fill out all its details:</p>
+
+<p><img src="/img/2022/event-details.png" alt="Example of event details" /></p>
+
+<h3 id="attendee-automatically-planned-attendance">Attendee automatically planned attendance</h3>
+
+<p>In addition to having the event on your calendar, you can also specify an attendee’s initial rsvp status. This allows you to automatically RSVP attenee’s as planning to attend. In order to activate this, we need to provide additional details about the attendee for the event. Add the following to your ical.event block:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ical</span><span class="p">.</span><span class="nf">event</span> <span class="k">do</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span>
+  <span class="o">...</span>
+  <span class="n">event</span><span class="p">.</span><span class="nf">attendee</span> <span class="o">=</span> <span class="no">Icalendar</span><span class="o">::</span><span class="no">Values</span><span class="o">::</span><span class="no">CalAddress</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span>
+    <span class="s2">"mailto:different_address@gmail.com"</span><span class="p">,</span>
+    <span class="ss">partstat: </span><span class="s2">"accepted"</span>
+  <span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p><strong>partstat</strong> refers to the attendee’s participation status. In our case, marking it as
+<strong>accepted</strong> sets the attendee as planning on coming as well as making it visible on their calendar.</p>
+
+<p><img src="/img/2022/auto-calendar-event.gif" alt="Auto calendar event demo" /></p>
+
+<p>There are several other properties that can be added to CalAddress which <a href="https://datatracker.ietf.org/doc/html/rfc5545#section-3.2">can be found here</a></p>
+
+<h2 id="wrapping-up">Wrapping up</h2>
+
+<p>Now we have a basic no-integration method for adding events to attendee’s calendar application. Like mentioned earlier, there is a lot more that can be done here. I’m actually working
+on a potential tech spike which incorporates ActionMailbox. Stay tuned for more.</p>
+
+<p>Was this helpful for your calendar event system? Did you have any tips for working
+with iCalendar? I’d love to hear about them in the comments below. Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/" alt="Introducing SimpleCov+ Action: A Github action for ensuring test coverage">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/creating-blurred-background-images-with-overlay-text-in-css/" alt="Creating blurred background images with overlay text in CSS">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Creating blurred background images with overlay text in CSS</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

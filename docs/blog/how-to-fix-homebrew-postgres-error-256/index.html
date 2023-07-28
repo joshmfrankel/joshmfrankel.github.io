@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>How to fix homebrew postgres error 256 | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="How to fix homebrew postgres error 256" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="At home, I’m a Linux user but at work most companies use Mac for engineers. It’s been a couple years since I’ve used Mac so I’m learning my way back around it along with Homebrew. One issue I ran into the other day was postgresql service not starting sucessfully. No amount of brew services restart postgresql would fix it. Turns out to be a pretty simple fix." />
+<meta property="og:description" content="At home, I’m a Linux user but at work most companies use Mac for engineers. It’s been a couple years since I’ve used Mac so I’m learning my way back around it along with Homebrew. One issue I ran into the other day was postgresql service not starting sucessfully. No amount of brew services restart postgresql would fix it. Turns out to be a pretty simple fix." />
+<link rel="canonical" href="http://joshfrankel.me/blog/how-to-fix-homebrew-postgres-error-256/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/how-to-fix-homebrew-postgres-error-256/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-07-20T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2023-07-20T00:00:00+00:00","dateModified":"2023-07-20T00:00:00+00:00","headline":"How to fix homebrew postgres error 256","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/how-to-fix-homebrew-postgres-error-256/"},"url":"http://joshfrankel.me/blog/how-to-fix-homebrew-postgres-error-256/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"At home, I’m a Linux user but at work most companies use Mac for engineers. It’s been a couple years since I’ve used Mac so I’m learning my way back around it along with Homebrew. One issue I ran into the other day was postgresql service not starting sucessfully. No amount of brew services restart postgresql would fix it. Turns out to be a pretty simple fix.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">How to fix homebrew postgres error 256</h1>
+
+    
+      <p class="Banner-information">
+        <time>July 20, 2023</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>At home, I’m a Linux user but at work most companies use Mac for engineers. It’s been
+a couple years since I’ve used Mac so I’m learning my way back around it along with
+Homebrew. One issue I ran into the other day was postgresql service not starting
+sucessfully. No amount of <code class="language-plaintext highlighter-rouge">brew services restart postgresql</code> would fix it. Turns
+out to be a pretty simple fix.</p>
+
+<!--excerpt-->
+
+<p>I first noticed the issue when trying to run a Ruby on Rails server locally. The response
+from running <code class="language-plaintext highlighter-rouge">rails s</code> looked something like:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>psql: could not connect to server: No such file or directory
+    Is the server running locally and accepting
+    connections on Unix domain socket <span class="s2">"/tmp/.s.PGSQL.5432"</span>?
+</code></pre></div></div>
+
+<p>Alright, so this is saying the server isn’t running or listening to requests. Checking
+<code class="language-plaintext highlighter-rouge">brew services list</code> to see the output rendered:</p>
+
+<p><img src="/img/2023/brew-service-list.png" alt="Brew services list output" /></p>
+
+<p>Next was looking up what a 256 error which led me to an excellent <a href="https://stackoverflow.com/questions/39710384/cannot-connect-to-postgres-server-running-through-brew-services">StackOverflow post</a>.
+Following the post suggested three step process of: stopping the service, removing the pid file, and restarting the service.</p>
+
+<p><img src="/img/2023/brew-services-stop.png" alt="Brew services stop output" /></p>
+
+<p>The pid file can be found in one of two locations:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">/usr/local/var/postgres/postmaster.pid</code></li>
+  <li><code class="language-plaintext highlighter-rouge">/opt/homebrew/var/postgresql/postmaster.pid</code> (Apple M1)</li>
+</ul>
+
+<p>I found mine within the <code class="language-plaintext highlighter-rouge">/opt/</code> directory. Last was just restarting the service.</p>
+
+<p><img src="/img/2023/brew-services-start.png" alt="Brew services start output" /></p>
+
+<p>After this running <code class="language-plaintext highlighter-rouge">rails s</code> worked as expected.</p>
+
+<p>Thanks for reading it was a quick one.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/dont-slack-on-site-reliability/" alt="Don't Slack on Site Reliability">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Don't Slack on Site Reliability</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/" alt="When is an Array an Array? Strategies for checking Array equality in Ruby">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">When is an Array an Array? Strategies for checking Array equality in Ruby</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

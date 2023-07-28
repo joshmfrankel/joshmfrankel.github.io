@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Invalidate requests when a user session contains null bytes in the Rack layer | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Invalidate requests when a user session contains null bytes in the Rack layer" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In addition to request params being sent with malicious characters, a user’s session can also contain them. If your website relies on session data (and most do) to determine if a user is logged in, then you may experience the pain of seeing ArgumentError: string contains null byte appear in your logs. Luckily, building on the previous two posts we can quickly craft a mechanism to check a users session and invalidate the request if necessary." />
+<meta property="og:description" content="In addition to request params being sent with malicious characters, a user’s session can also contain them. If your website relies on session data (and most do) to determine if a user is logged in, then you may experience the pain of seeing ArgumentError: string contains null byte appear in your logs. Luckily, building on the previous two posts we can quickly craft a mechanism to check a users session and invalidate the request if necessary." />
+<link rel="canonical" href="http://joshfrankel.me/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-11-06T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2019-11-06T00:00:00+00:00","dateModified":"2019-11-06T00:00:00+00:00","headline":"Invalidate requests when a user session contains null bytes in the Rack layer","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/"},"url":"http://joshfrankel.me/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"In addition to request params being sent with malicious characters, a user’s session can also contain them. If your website relies on session data (and most do) to determine if a user is logged in, then you may experience the pain of seeing ArgumentError: string contains null byte appear in your logs. Luckily, building on the previous two posts we can quickly craft a mechanism to check a users session and invalidate the request if necessary.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Invalidate requests when a user session contains null bytes in the Rack layer</h1>
+
+    
+      <p class="Banner-information">
+        <time>November 6, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+  
+
+  
+    <section class="Series Series-section">
+      <h2>This post is part 3 of a 3 part series</h2>
+
+      <ul class="Series-listing">
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+            <li>
+              
+                (1) <a href="/blog/don-t-let-the-null-bytes-bite/">Don't let the null bytes bite</a>
+              
+            </li>
+          
+        
+          
+            
+            <li>
+              
+                (2) <a href="/blog/recursively-validate-application-requests-with-rack/">Recursively validate application requests with Rack</a>
+              
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+            <li>
+              
+                <strong>(Current post)</strong> Invalidate requests when a user session contains null bytes in the Rack layer
+              
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </section>
+  
+
+
+
+  <p>In addition to request params being sent with malicious characters, a user’s session
+can also contain them. If your website relies on session data (and most do) to determine
+if a user is logged in, then you may experience the pain of seeing <code class="language-plaintext highlighter-rouge">ArgumentError: string contains null byte</code> appear in your logs. Luckily, building on the previous two posts we can quickly craft a mechanism to
+check a users session and invalidate the request if necessary.
+<!--excerpt--></p>
+
+<h2 id="first-a-rewind">First a rewind</h2>
+
+<p>Looking over our current implementation we’ve handled the validation processing of <code class="language-plaintext highlighter-rouge">request.params</code> efficiently using recursion:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ValidateRequestParams</span>
+  <span class="no">INVALID_CHARACTERS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"</span><span class="se">\u</span><span class="s2">0000"</span> <span class="c1"># null bytes</span>
+  <span class="p">].</span><span class="nf">freeze</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+    <span class="vi">@app</span> <span class="o">=</span> <span class="n">app</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">has_invalid_character?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">params</span><span class="p">.</span><span class="nf">values</span><span class="p">)</span>
+      <span class="k">return</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="p">{},</span> <span class="p">[</span><span class="s2">"Bad Request"</span><span class="p">]]</span>
+    <span class="k">end</span>
+
+    <span class="vi">@app</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">has_invalid_character?</span><span class="p">(</span><span class="n">param_values</span><span class="p">)</span>
+    <span class="n">param_values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+      <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kp">false</span> <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="mi">2</span>
+
+    <span class="n">depth</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:match</span><span class="p">)</span>
+      <span class="n">string_contains_invalid_character?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">respond_to?</span><span class="p">(</span><span class="ss">:values</span><span class="p">)</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">values</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">hash_value</span><span class="o">|</span>
+        <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">hash_value</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">elsif</span> <span class="n">value</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">Array</span><span class="p">)</span>
+      <span class="n">value</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">array_value</span><span class="o">|</span>
+        <span class="n">check_for_invalid_characters_recursively</span><span class="p">(</span><span class="n">array_value</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">string_contains_invalid_character?</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="n">invalid_characters_regex</span> <span class="o">=</span> <span class="no">Regexp</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="no">INVALID_CHARACTERS</span><span class="p">)</span>
+
+    <span class="n">string</span><span class="p">.</span><span class="nf">match?</span><span class="p">(</span><span class="n">invalid_characters_regex</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>This handles cases where nested data structures (arrays and hashes) containing
+invalid characters like null bytes are invalidated at the Rack layer. We also
+want to do this for user sessions. Since the infrastructure above is fairly flexible, we
+can easily hook into this.</p>
+
+<p>First though we’ll need to access the user’s session. Then we’ll want to check it for
+invalid characters. Finally like before return a <code class="language-plaintext highlighter-rouge">400 BadRequest</code> because hackers don’t need any additional information.</p>
+
+<h2 id="setting-a-users-session-in-racktest">Setting a user’s session in Rack::Test</h2>
+
+<p>A user’s session is somewhat of a misleading phrase. This is because the concept
+of session is something your framework provides. So what is a user session?</p>
+
+<p>Using Rails as an example, a user session is built from existing cookies.
+The cookies are then interpretting by your framework (Rails) or stored within an environment variable then translated to a session. <a href="https://www.justinweiss.com/articles/how-rails-sessions-work/" target="_blank">Justin Weiss has a superb article on the topic
+that is definitely worth a read.</a></p>
+
+<p>For the purpose of this article, we’ll say that our cookie for storing a user’s session
+is called <code class="language-plaintext highlighter-rouge">my_session</code>. Using this we can write some tests that set a user’s cookie
+contain invalid characters:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"spec_helper"</span>
+<span class="nb">require</span> <span class="s2">"rack/test"</span>
+
+<span class="n">describe</span> <span class="no">ValidateRequestParams</span> <span class="k">do</span>
+  <span class="kp">include</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Test</span><span class="o">::</span><span class="no">Methods</span>
+
+  <span class="n">let</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="p">{</span> <span class="no">MyApplication</span><span class="o">::</span><span class="no">Application</span> <span class="p">}</span>
+
+  <span class="n">context</span> <span class="s2">"WITH invalid characters in `my_session` cookie"</span> <span class="k">do</span>
+    <span class="n">let</span><span class="p">(</span><span class="ss">:null_byte</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"%00"</span> <span class="p">}</span>
+
+    <span class="n">it</span> <span class="s2">"responds with 400 BadRequest"</span> <span class="k">do</span>
+      <span class="n">set_cookie</span> <span class="s2">"my_session=adfec7as9413db963b5</span><span class="si">#{</span><span class="n">null_byte</span><span class="si">}</span><span class="s2">"</span>
+
+      <span class="n">get</span> <span class="s2">"/login"</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">bad_request?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">context</span> <span class="s2">"WITH valid characters in `my_session` cookie"</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s2">"responds with a 200 ok"</span> <span class="k">do</span>
+      <span class="n">set_cookie</span> <span class="s2">"my_session=adfec7as9413db963b5"</span>
+
+      <span class="n">get</span> <span class="s2">"/login"</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">last_response</span><span class="p">.</span><span class="nf">ok?</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="kp">true</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># All of our this series previous tests</span>
+</code></pre></div></div>
+
+<p>I’ve used the <code class="language-plaintext highlighter-rouge">set_cookie</code> method above to prefill the cookie’s value before the
+request is made. <a href="https://www.rubydoc.info/gems/rack-test/Rack/MockSession#set_cookie-instance_method">Here’s the documentation on it</a>. Basically it merges changes into the existing cookie jar.</p>
+
+<p>In the first context, I’ve appended a null byte onto the end of
+the value to ensure the request is invalid. This simulates making a request that
+contains bad data.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">context</span> <span class="s2">"WITH invalid characters in `my_session` cookie"</span> <span class="k">do</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:null_byte</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"%00"</span> <span class="p">}</span>
+
+  <span class="n">it</span> <span class="s2">"responds with 400 BadRequest"</span> <span class="k">do</span>
+    <span class="n">set_cookie</span> <span class="s2">"my_session=adfec7as9413db963b5</span><span class="si">#{</span><span class="n">null_byte</span><span class="si">}</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<p>As expected it fails since we haven’t written the supporting code for it. Let’s do
+that now.</p>
+
+<h2 id="accessing-cookies-at-the-rack-middleware-layer">Accessing cookies at the Rack middleware layer</h2>
+
+<p>Back in our <strong>ValidateRequestParams</strong> middleware, we can tap into our existing <code class="language-plaintext highlighter-rouge">#call</code> method
+as an entry point for checking a user’s cookie. Since we’re already taking the current <strong>env</strong> and loading up the <strong>Rack::Request</strong> with <code class="language-plaintext highlighter-rouge">request = Rack::Request.new(env)</code>, most of the work is already done for us. <strong>request</strong> contains a method called <strong>cookies</strong> which does exactly what we need by listing out all available cookies. From this it’s as easy as using the existing <code class="language-plaintext highlighter-rouge">#string_contains_invalid_character?</code> method to check the cookie’s value against our accepted values regular expression.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+  <span class="n">request</span> <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Request</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">has_invalid_character?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">params</span><span class="p">.</span><span class="nf">values</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="p">{},</span> <span class="p">[</span><span class="s2">"Bad Request"</span><span class="p">]]</span>
+  <span class="k">end</span>
+
+  <span class="k">if</span> <span class="n">request</span><span class="p">.</span><span class="nf">cookies</span><span class="p">[</span><span class="s2">"my_session"</span><span class="p">].</span><span class="nf">present?</span> <span class="o">&amp;&amp;</span> <span class="n">string_contains_invalid_characters?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">cookies</span><span class="p">[</span><span class="s2">"my_session"</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="p">{},</span> <span class="p">[</span><span class="s2">"Bad Request"</span><span class="p">]]</span>
+  <span class="k">end</span>
+
+  <span class="vi">@app</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Then end result above has us passing the cookie into our string validation check with:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">string_contains_invalid_characters?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">cookies</span><span class="p">[</span><span class="s2">"my_session"</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>We’re also checking to ensure that the session is present before passing it into the regex matching method. Other than
+that this does the trick in preventing malicious cookie values from causing exceptions.</p>
+
+<h2 id="wrap-up">Wrap up</h2>
+
+<p>And that’s it! We’ve set a cookie value for test coverage of the failing case, accessed a cookie via <strong>Rack::Request</strong>, and
+returned a 400 BadRequest when a null byte is in the cookie’s value.</p>
+
+<p>What did you like about the above approach? Dislike? I’d love to discuss in the below comments and as always
+thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/building-a-drawer-component-in-react/" alt="Building a Drawer component in React">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Building a Drawer component in React</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/metrics-for-identifying-technical-debt/" alt="Metrics for identifying technical debt">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Metrics for identifying technical debt</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

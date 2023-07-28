@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Don’t Slack on Site Reliability | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Don’t Slack on Site Reliability" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Alright, bit of a clickbait title but if you know me you’ll know my love for bad puns. Ensuring a healthy running application is an important part of your infrastructure reliability. Site Reliabiltiy is an entire discipline by itself as there are a wealth of topics and concepts associated with it. That being said having really solid Site Reliability as a start-up isn’t always the first priority. This article details some of the steps I’ve taken to have basic application monitoring in place easily and cheaply." />
+<meta property="og:description" content="Alright, bit of a clickbait title but if you know me you’ll know my love for bad puns. Ensuring a healthy running application is an important part of your infrastructure reliability. Site Reliabiltiy is an entire discipline by itself as there are a wealth of topics and concepts associated with it. That being said having really solid Site Reliability as a start-up isn’t always the first priority. This article details some of the steps I’ve taken to have basic application monitoring in place easily and cheaply." />
+<link rel="canonical" href="http://joshfrankel.me/blog/dont-slack-on-site-reliability/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/dont-slack-on-site-reliability/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-01-17T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2023-01-17T00:00:00+00:00","dateModified":"2023-01-17T00:00:00+00:00","headline":"Don’t Slack on Site Reliability","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/dont-slack-on-site-reliability/"},"url":"http://joshfrankel.me/blog/dont-slack-on-site-reliability/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Alright, bit of a clickbait title but if you know me you’ll know my love for bad puns. Ensuring a healthy running application is an important part of your infrastructure reliability. Site Reliabiltiy is an entire discipline by itself as there are a wealth of topics and concepts associated with it. That being said having really solid Site Reliability as a start-up isn’t always the first priority. This article details some of the steps I’ve taken to have basic application monitoring in place easily and cheaply.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Don't Slack on Site Reliability</h1>
+
+    
+      <p class="Banner-information">
+        <time>January 17, 2023</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Alright, bit of a clickbait title but if you know me you’ll know my love for
+bad puns. Ensuring a healthy running application is an important part of your
+infrastructure reliability. Site Reliabiltiy is an entire discipline by itself as there
+are a wealth of topics and concepts associated with it. That being said having
+really solid Site Reliability as a start-up isn’t always the first priority.
+This article details some of the steps I’ve taken to have basic application
+monitoring in place easily and cheaply.</p>
+
+<!--excerpt-->
+
+<p>Going into this article I’ll assume you have an error reporting service tracking
+application errors, <a href="https://www.honeybadger.io/">I use Honeybadger</a>, along with
+a communication platform, such as Slack.</p>
+
+<p><img src="/img/2023/dangerous-to-go-alone.jpg" alt="Its dangerous to go alone. Take this. Honeybadger and Slack" /></p>
+
+<h1 id="site-reliability-and-start-up-life">Site Reliability and Start-up life</h1>
+
+<p>Start-ups are scrappy little things that move fast and break things. This mentality
+really resonates with me as you can get a lot done if you practice “good enough” programming. However,
+we still need a way to ensure if (more like when) we break things we are able to recover and track them.
+With that said here are the goals we’re looking to gain greater visibility with:</p>
+
+<ol>
+  <li>Error Reporting</li>
+  <li>Application uptime</li>
+  <li>Infrastructure &amp; Service outtages</li>
+</ol>
+
+<p>Slack happens to be a great tool for ensuring communication stays open between contributors
+within an organization. I find myself nowadays using it almost exclusively over Email.
+Given how often I’m in there I wanted to also consolidate my application notifications there as well.
+This helps avoid context switching between external services, email, etc.</p>
+
+<p>With that in mind let’s dig into making a foundational site reliability layer for our application.</p>
+
+<h1 id="errors-in-realtime">Errors in realtime</h1>
+
+<p>First off we’ll need some new channels in Slack to monitor application statuses. You can name these however you want. I
+personally used the following: <code class="language-plaintext highlighter-rouge">devops</code> and <code class="language-plaintext highlighter-rouge">devops-staging</code> to denote production and staging environments.</p>
+
+<p>In your Error Reporting service of choice (again we’ll be using Honeybadger), there should be some way of
+setting up and integration for Slack. Honeybadger’s is <strong>located under Settings -&gt; Alerts &amp; Integrations</strong>.</p>
+
+<p><img src="/img/2023/honeybadger-integration.png" alt="Honeybadger create integration" /></p>
+
+<p>This will send you through an Oauth process and ask permission from Slack to post to a specific
+channel on behalf of the Honeybadger bot.</p>
+
+<p><img src="/img/2023/honeybadger-oauth.png" alt="Slack authorizing Honeybadger OAuth" /></p>
+
+<p>From this point you can decide what types of Error messaging is sent to your Slack channel. Additionally,
+you can specify environment to monitor. This is super useful for our first channel <code class="language-plaintext highlighter-rouge">devops</code> as it can focus
+on production and demo environments which are high-impact to customers. <code class="language-plaintext highlighter-rouge">devops-staging</code> can instead specify
+staging and review environments while still important can be moved to a seperate channel. It’s a good idea
+to expose errors in both your production and staging environments, as staging can give you early warning to
+an issue that is about to be deployed to production.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    It's a good idea
+to expose errors in both your production and staging environments, as staging can give you early warning to
+an issue that is about to be deployed to production.
+  </p>
+
+  
+</blockquote>
+
+<p>With this in place, you’ll begin seeing errors appear in real-time within Slack. A tip with managing Error Reporting
+services, is to always ensure the total number of unresolved errors is zero. As errors emerge they should be immediately
+remediated either through code or leaving comments on them within the Error Reporting service.</p>
+
+<p><img src="/img/2023/honeybadger-slack-error.png" alt="Slack displaying Honeybadger error" /></p>
+
+<p>Conviently having your errors within Slack allows fast notification as well as helpful actions that can be taken
+directly from Slack.</p>
+
+<h1 id="application-uptime">Application uptime</h1>
+
+<p>In addition to error reporting, we also want to know if the application stops responding to web requests. This is known
+as application uptime. When this occurs it should be resolved immediately to reduce service disruption.
+Honeybadger still has our back here as there is a specific page for uptime checks.</p>
+
+<p><img src="/img/2023/honeybadger-uptime-setup.png" alt="Honeybadger uptime setup page" /></p>
+
+<p>Using your production application’s url, will allow Honeybadger to periodically check to ensure a 200 success is received. If at
+any point the check fails (or a redirect occurs), it will notify the Honeybadger service. In order to put this into Slack
+as well we’ll need to modify the previously created Slack integration (reminder: Settings -&gt; Alerts &amp; Integrations). On the
+integration setup page there is a section down the page which allows for us to attach configured uptime checks to the Slack
+integration</p>
+
+<p><img src="/img/2023/honeybadger-uptime-integration.png" alt="Honeybadger uptime integration setup" /></p>
+
+<p>If you look on the right side of the above picture, you’ll see Uptime Sites “marketing site”. I find it useful if you
+are running an application which has both a marketing url and application url if both are monitored through your Slack
+notifications. With this in place we’ll start receiving alerts for application outtages.</p>
+
+<p><img src="/img/2023/slack-honeybadger-uptime-alert.png" alt="Slack notification from Honeybadger on application uptime" /></p>
+
+<h1 id="infrastructure--service-outtages">Infrastructure &amp; Service outtages</h1>
+
+<p>Similiar to Application Uptime, we have external services which our application relies on but which we have little
+to no control over. Such services as Heroku, Github, AWS, and others which power web applications. We’d like to be aware
+of these in case customers (and internal team members) experience issues that we can describe the underlying issue with
+clarity.</p>
+
+<p>We still want to see these outtages within Slack. So how do we accomplish that? There are definitely some plugins (most paid)
+which allow for setting up uptime alerts but there’s a free and simple way to get these. Slack gives access to the <code class="language-plaintext highlighter-rouge">/feed</code>
+command which allows a specific channel to subscribe to an RSS or atom news feed. Given that most services have status pages
+with subscription options we can leverage that to add these to a feed listing.</p>
+
+<p>Often services use the naming convention of <code class="language-plaintext highlighter-rouge">status.service-name.com</code> for their status page. Generally these contain
+methods for subscribing to the raw feed url. Sometimes these urls are hidden or require subscribing with an email. Heroku’s
+for instance is in a drop-down menu under their RSS icon labeled “Heroku Status”.</p>
+
+<p><img src="/img/2023/heroku-status-feed.png" alt="Heroku status feed" /></p>
+
+<p>Mailgun on the other hand is much easier to find being under the subscribe menu’s rss icon.</p>
+
+<p><img src="/img/2023/mailgun-rss.png" alt="Mailgun status feed" /></p>
+
+<p>Once you’ve discovered the feed urls for your services, you can easily add them to a Slack channel using <code class="language-plaintext highlighter-rouge">/feed subscribe url-to-feed</code>.
+I’d recommend these are added to a seperate channel than <code class="language-plaintext highlighter-rouge">devops</code> or <code class="language-plaintext highlighter-rouge">devops-staging</code>. Personally I used <code class="language-plaintext highlighter-rouge">vendor-status</code>. With this
+in place you’ll begin to see notifications for infrastructure service disruptions.</p>
+
+<p><img src="/img/2023/github-status-feed.png" alt="Github service disruption Slack message" /></p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>With the above in place, we have a basic level of monitoring in place for our early application. This allows for application
+status to be communicated through Slack giving greater visibility and faster remediation response times.</p>
+
+<p>Like I’ve mentioned before this is geared towards a start-up application. That is an early application. This is not meant
+to be a in-depth or full harness for monitoring an application. Merely this is a way to keep a pulse on application health
+while at the beginning stages of a new product.</p>
+
+<p>What’d you think of moving application status into Slack? Got a tip that could be added to this article? I’d love
+to discuss in the comments below.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/creating-blurred-background-images-with-overlay-text-in-css/" alt="Creating blurred background images with overlay text in CSS">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Creating blurred background images with overlay text in CSS</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/how-to-fix-homebrew-postgres-error-256/" alt="How to fix homebrew postgres error 256">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">How to fix homebrew postgres error 256</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

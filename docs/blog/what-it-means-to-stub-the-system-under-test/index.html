@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>What It Means to Stub the System Under Test | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="What It Means to Stub the System Under Test" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Has anyone else felt confused by the phrase stubbing the system under test? I&#39;ve felt like the phrases that we use in the dev community to label concepts are designed for the sole purpose to obfuscate the truth." />
+<meta property="og:description" content="Has anyone else felt confused by the phrase stubbing the system under test? I&#39;ve felt like the phrases that we use in the dev community to label concepts are designed for the sole purpose to obfuscate the truth." />
+<link rel="canonical" href="http://joshfrankel.me/blog/what-it-means-to-stub-the-system-under-test/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/what-it-means-to-stub-the-system-under-test/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-02-09T19:34:02+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2017-02-09T19:34:02+00:00","dateModified":"2017-02-09T19:34:02+00:00","headline":"What It Means to Stub the System Under Test","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/what-it-means-to-stub-the-system-under-test/"},"url":"http://joshfrankel.me/blog/what-it-means-to-stub-the-system-under-test/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Has anyone else felt confused by the phrase stubbing the system under test? I&#39;ve felt like the phrases that we use in the dev community to label concepts are designed for the sole purpose to obfuscate the truth.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">What It Means to Stub the System Under Test</h1>
+
+    
+      <p class="Banner-information">
+        <time>February 9, 2017</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p itemprop="description">Has anyone else felt confused by the phrase stubbing the system under test? I've felt like the phrases that we use in the dev community to label concepts are designed for the sole purpose to obfuscate the truth.</p>
+<!--excerpt-->
+<p>Obfuscate, see what I did there?</p>
+
+<p>There's a popular quote that I always keep in the back of my mind when I use terminology or jargon.</p>
+
+<blockquote>"If you can't explain it simply, you don't understand it well enough."</blockquote>
+
+<p>It isn't just enough to tell developer not to stub the system under test, you have to define and explain it (preferably with an example). Because if you don't understand the underlying concept or terminology how on earth can you stop introducing it to your code.</p>
+
+<p>Short answer, you can't</p>
+
+<p>So let's properly define and explain (simply) what exactly it means to stub the system under test.</p>
+
+<h2>What is a stub?</h2>
+
+<blockquote class="Info Info-right"><div class="page-header">Stubs vs Mocks</div>A stub defines specific behavior for an object's method. A mock acts as a stand-in object for another. The double keyword in RSpec creates a pseudo-mock object.</blockquote>
+
+<p>To stub a method means to define its behavior. When you stub in a test you are basically saying, "For an object that calls a specific method return this result". There is also another term called <strong>mocks</strong> which are sometimes used interchangeably but are fundamentally different.</p>
+
+<p>For example, let's say that you have a simple User model that defines name and role attributes for each record.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+</pre></td><td class="code"><pre><span class="c1"># app/models/user.rb</span>
+<span class="k">class</span> <span class="nc">User</span>
+  <span class="n">validates</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">prescense: </span><span class="kp">true</span>
+  <span class="n">validates</span> <span class="ss">:role</span><span class="p">,</span> <span class="ss">prescence: </span><span class="kp">true</span>
+
+  <span class="c1"># We will focus on testing this method</span>
+  <span class="k">def</span> <span class="nf">welcome_message</span>
+    <span class="k">if</span> <span class="n">admin?</span>
+      <span class="s2">"Welcome, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">. You can find admin actions under the settings menu"</span>
+    <span class="k">else</span>
+      <span class="s2">"Welcome, guest"</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">admin?</span>
+    <span class="n">role</span> <span class="o">==</span> <span class="s2">"admin"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># db/migrate/2017_create_users.rb</span>
+<span class="k">class</span> <span class="nc">CreateUsers</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">create_table</span> <span class="ss">:users</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">string</span>   <span class="ss">:name</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">string</span>   <span class="ss">:role</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">timestamps</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>Now for your corresponding spec we'd like to test the <code>#welcome_message</code> method and through it the <code>#admin?</code> method as well.</p>
+
+<p>Here's the updated spec:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">  <span class="n">let</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"Christian Bale"</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">describe</span> <span class="s2">"#welcome_message"</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s2">"returns true for user's of role 'admin'"</span> <span class="k">do</span>
+      <span class="n">allow</span><span class="p">(</span><span class="n">user</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:admin?</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="nf">welcome_message</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="s2">"Welcome, </span><span class="si">#{</span><span class="n">user</span><span class="p">.</span><span class="nf">name</span><span class="si">}</span><span class="s2">. You can find admin actions under the settings menu"</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="s2">"returns guest message for user's not of type 'admin'"</span> <span class="k">do</span>
+      <span class="n">expect</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="nf">welcome_message</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="s2">"Welcome, guest"</span>
+    <span class="k">end</span>
+  <span class="k">end</span></code></pre></figure>
+
+<p>Everything is green and passing.</p>
+
+<p>But there is a slight problem with the code above. What happens when the client asks for a slight change for when the admin welcome message displays. Specifically, they only want users whom are admin and have been created in the last 3 months to recieve the message.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">  <span class="k">def</span> <span class="nf">admin?</span>
+    <span class="c1"># User has to be of role admin</span>
+    <span class="c1"># and created in the last 3 months</span>
+    <span class="n">role</span> <span class="o">==</span> <span class="s2">"admin"</span> <span class="o">&amp;&amp;</span> <span class="n">created_at</span> <span class="o">&gt;</span> <span class="p">(</span><span class="no">DateTime</span><span class="p">.</span><span class="nf">current</span> <span class="o">-</span> <span class="mi">3</span><span class="p">.</span><span class="nf">months</span><span class="p">)</span>
+  <span class="k">end</span></code></pre></figure>
+
+<p>Does our test suite still pass?</p>
+
+<p>It actually does and with flying colors, but why? Well, because in the early step we allows user to accept the message admin? and return the value true, now in the context of that test the #admin? method now always returns true.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">    <span class="n">it</span> <span class="s2">"returns true for user's of role 'admin'"</span> <span class="k">do</span>
+      <span class="n">allow</span><span class="p">(</span><span class="n">user</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:admin?</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span> <span class="c1"># Stubbing the system under test</span>
+
+      <span class="n">expect</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="nf">welcome_message</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="s2">"Welcome, </span><span class="si">#{</span><span class="n">user</span><span class="p">.</span><span class="nf">name</span><span class="si">}</span><span class="s2">. You can find admin actions under the settings menu"</span>
+    <span class="k">end</span></code></pre></figure>
+
+<blockquote class="Info Info-right"><div class="page-header">Private methods</div>Something to keep in mind is that the #admin? method is listed as private. I'm paraphrasing Sandi Metz here, messages that we send to self (current class) aren't things that we care about testing since they don't effect other parts of our system.</blockquote>
+
+<p>The test above, while a farily contrived example, shows how stubbing the <code>#admin?</code> method's response to true can hide our codes actual intent. This produces an unreliable testing suite that over time becomes hard to trust and maintain.</p>
+
+<p>Here's how I would test the above scenario including the guest branch, the admin that was created recently branch, and the admin that was created in the past branch.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">  <span class="n">let</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"Christian Bale"</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">describe</span> <span class="s2">"#welcome_message"</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s2">"when admin"</span> <span class="k">do</span>
+      <span class="n">let</span><span class="p">(</span><span class="ss">:current_time</span><span class="p">)</span> <span class="p">{</span> <span class="no">DateTime</span><span class="p">.</span><span class="nf">current</span> <span class="p">}</span>
+      <span class="n">let</span><span class="p">(</span><span class="ss">:the_past</span><span class="p">)</span> <span class="p">{</span> <span class="n">current_time</span> <span class="o">-</span> <span class="mi">5</span><span class="p">.</span><span class="nf">months</span> <span class="p">}</span>
+      <span class="n">let</span><span class="p">(</span><span class="ss">:admin</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"Nic Cage"</span><span class="p">,</span> <span class="ss">role: </span><span class="s2">"admin"</span><span class="p">)</span>
+
+      <span class="n">context</span> <span class="s2">"and created recently"</span> <span class="k">do</span>
+        <span class="n">before</span> <span class="k">do</span>
+          <span class="n">admin</span><span class="p">.</span><span class="nf">created_at</span> <span class="o">=</span> <span class="n">current_time</span>
+          <span class="n">admin</span><span class="p">.</span><span class="nf">save</span>
+        <span class="k">end</span>
+
+        <span class="n">it</span> <span class="s2">"returns the welcome message with instructions"</span> <span class="k">do</span>
+          <span class="n">expect</span><span class="p">(</span><span class="n">admin</span><span class="p">.</span><span class="nf">welcome_message</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="s2">"Welcome, </span><span class="si">#{</span><span class="n">user</span><span class="p">.</span><span class="nf">name</span><span class="si">}</span><span class="s2">. You can find admin actions under the settings menu"</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">context</span> <span class="s2">"and created in the far past"</span> <span class="k">do</span>
+        <span class="n">before</span> <span class="k">do</span>
+          <span class="n">admin</span><span class="p">.</span><span class="nf">created_at</span> <span class="o">=</span> <span class="n">the_past</span>
+          <span class="n">admin</span><span class="p">.</span><span class="nf">save</span>
+        <span class="k">end</span>
+
+        <span class="n">it</span> <span class="s2">"returns the guest message"</span> <span class="k">do</span>
+          <span class="n">expect</span><span class="p">(</span><span class="n">admin</span><span class="p">.</span><span class="nf">welcome_message</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="s2">"Welcome, guest"</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="n">context</span> <span class="s2">"when basic user"</span> <span class="k">do</span>
+      <span class="n">let</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"Christian Bale"</span><span class="p">)</span> <span class="p">}</span>
+
+      <span class="n">it</span> <span class="s2">"returns the guest message"</span> <span class="k">do</span>
+        <span class="n">expect</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="nf">welcome_message</span><span class="p">).</span><span class="nf">to</span> <span class="n">eq</span> <span class="s2">"Welcome, guest"</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span></code></pre></figure>
+
+<p>Now future changes to the <code>#admin?</code> method are able to effect the <code>#welcome_message</code> method and we're covered against tests that pass when in reality they are broken.  This is the basic premise behind not stubbing the system under test.</p>
+
+<h2>What does system refer to?</h2>
+
+<div class="article-image" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+  <img src="/img/2017/morpheus-specs.jpg" alt="Morpheus quote modified from the Matrix" />
+  <meta itemprop="url" content="/img/2017/morpheus-specs.jpg" />
+  <meta itemprop="width" content="500" />
+  <meta itemprop="height" content="303" />
+</div>
+
+
+<p>This one stumped me for some time.</p>
+
+<p>"the system" refers to the current class or logic that you are attempting to harness and test. No it isn't what they talk about in The Matrix, though I always have this thought when I hear the phrase. Think of it more like your application logic or flow. You want to ensure that they are functioning as you intend and more importantly how the code is written. When you stub over functionality in your tests you get the all satisfying green but in reality your test isn't worth much.</p>
+
+<p>For the example above the system under test is specifically the User model. Our goal is to directly test its functionality in the corresponding spec.</p>
+
+<p>So when do you stub? Well, this is something that is constantly evolving for me but here are a few general guidelines I think about when I start the reach for stubbing.</p>
+
+<h2 id="what-to-stub">What to stub?</h2>
+
+<h3>Third-party services and apis</h3>
+<p>Essentially, anything that you don't have direct control over fits this category. You can use stubs to ensure your system appropriately handles both error cases and happy path cases. This also improves test suite performance by avoiding waiting on the third-party service to respond(~100ms every request will start to add up).</p>
+
+<h3>Outgoing messages that you expect to send</h3>
+<p>Controllers that call service objects are a good example of this. In a hypothetical controller test you wouldn't want to unit test the service class as well. Ideally, it would be properly tested in isolation within its own spec.</p>
+<p>With that being said we still want to ensure that it is being sent a message (essentially being called) in the controller spec context.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">  <span class="c1"># Example controller #index action</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="no">CreateUserService</span><span class="p">.</span><span class="nf">perform</span><span class="p">(</span><span class="ss">params: </span><span class="n">params</span><span class="p">)</span>
+  <span class="k">rescue</span> <span class="no">StandardError</span> <span class="o">=&gt;</span> <span class="n">e</span>
+    <span class="n">head</span> <span class="ss">:bad_request</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Example test ensuring a message is sent</span>
+  <span class="n">it</span> <span class="s2">"ensures message is sent to CreateUserService"</span> <span class="k">do</span>
+    <span class="n">expect</span><span class="p">(</span><span class="no">CreateUserService</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:perform</span><span class="p">).</span><span class="nf">with</span><span class="p">(</span><span class="ss">params: </span><span class="n">params</span><span class="p">)</span>
+
+    <span class="n">get</span> <span class="ss">:index</span>
+  <span class="k">end</span></code></pre></figure>
+<p>This spec says, "Given the #index action for the controller, ensure that the CreateUserService receives the message of perform with the arguments of params: params"</p>
+<p>We aren't directly testing the CreateUserService here because it already has its own associated unit test (not shown here) which ensures that it is functioning as expected. Not stubbing the service class above is just duplicating testing effort.</p>
+
+<h3>Minimizing database interactions</h3>
+<p>If you have a model with a scope that returns its active users (we'll call is :active) which already has unit tests ensuring that it functions as expected, then anytime you have to use the same scope elsewhere you could stub out the response.</p>
+<p>This avoids having to hit the database in the test which greatly speeds up the test suite. Be warned though if you are writing tests specific to database interactions it is probably wise to over-test rather than under-test. Minimizing database interactions is a delicate balancing act between performance and confidence.</p>
+
+<h2>What to avoid stubbing?</h2>
+
+<h3>Private methods (messages to self)</h3>
+<p>Like I mentioned above, these tend to directly deal with the current class that you are testing (system under test). You want to make sure that they are working as you expect and stubbing over the implementation is going to lead to unreliable results.</p>
+
+<h3>Integration Tests</h3>
+<p>This is end-to-end testing and as such you want to ensure that all steps along the path are in working order. I would also argue that it is ok for these specs to be a little slower at the great benefit of higher confidence.</p>
+
+<h2>Conclusion</h2>
+<p>As with all programming, knowing when to stub and when not to can be fairly opionated. There is always room for breaking the rules in certain situations and as such its important to remain flexible with your approach to testing. Using your best judgement to decide what to directly test and what to stub is something that takes a lot of practice (I'm still learning this as well).</p>
+<p>I took loads of inspiration from Sandi Metz's talk about Magic Tricks of Testing, which is an excellent in-depth discussion of what to test and what not to. I highly recommend <a href="https://www.youtube.com/watch?v=URSWYvyc42M">watching it</a> and following along with the slides on <a href="https://speakerdeck.com/skmetz/magic-tricks-of-testing-railsconf">SpeakerDeck</a>.</p>
+
+<p>Did I miss something that should be stubbed? How about something else not to stub? I'd love to add to the above list based on your comments below.</p>
+
+<p>Thanks for reading</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/fast-reports-exporting-to-csv-in-rails/" alt="Fast Reports: Exporting to a CSV in Ruby">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Fast Reports: Exporting to a CSV in Ruby</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/saving-script-output-from-heroku-to-a-local-file/" alt="Saving Script Output From Heroku to a Local File">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Saving Script Output From Heroku to a Local File</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

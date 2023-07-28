@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Configuring Letter Opener for Hanami development environment | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Configuring Letter Opener for Hanami development environment" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Recently, I’ve really dug into the Hanami framework. Coming from a Rails background it is really fascinating to see what a Ruby framework looks like in a post-Rails world. One of the first things I setup with new Rails projects is a process by which I can test mailers in development. The letter_opener gem is perfect for this purpose and luckily has a non-Rails setup guide." />
+<meta property="og:description" content="Recently, I’ve really dug into the Hanami framework. Coming from a Rails background it is really fascinating to see what a Ruby framework looks like in a post-Rails world. One of the first things I setup with new Rails projects is a process by which I can test mailers in development. The letter_opener gem is perfect for this purpose and luckily has a non-Rails setup guide." />
+<link rel="canonical" href="http://joshfrankel.me/blog/configuring-letter-opener-for-hanami-development-environment/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/configuring-letter-opener-for-hanami-development-environment/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-01-11T00:50:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2020-01-11T00:50:00+00:00","dateModified":"2020-01-11T00:50:00+00:00","headline":"Configuring Letter Opener for Hanami development environment","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/configuring-letter-opener-for-hanami-development-environment/"},"url":"http://joshfrankel.me/blog/configuring-letter-opener-for-hanami-development-environment/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Recently, I’ve really dug into the Hanami framework. Coming from a Rails background it is really fascinating to see what a Ruby framework looks like in a post-Rails world. One of the first things I setup with new Rails projects is a process by which I can test mailers in development. The letter_opener gem is perfect for this purpose and luckily has a non-Rails setup guide.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Configuring Letter Opener for Hanami development environment</h1>
+
+    
+      <p class="Banner-information">
+        <time>January 11, 2020</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Recently, I’ve really dug into the Hanami framework. Coming from a Rails background
+it is really fascinating to see what a Ruby framework looks like in a post-Rails world.
+One of the first things I setup with new Rails projects is a process by which I can
+test mailers in development. The letter_opener gem is perfect
+for this purpose and luckily has a non-Rails setup guide.
+<!--excerpt--></p>
+
+<h2 id="installing-the-letter-opener-gem">Installing the Letter Opener gem</h2>
+
+<p>First and foremost we need to add the <strong>letter_opener</strong> gem to our <strong>Gemfile</strong>. Version 1.7.0 is the current latest as of writing this. I use <code class="language-plaintext highlighter-rouge">~&gt; 1.7</code> to limit the version number to be between <code class="language-plaintext highlighter-rouge">&gt;= 1.7.0 and &lt; 1.8.0</code>. This ensures any minor version changes aren’t installed without this value being updated.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'letter_opener'</span><span class="p">,</span> <span class="s1">'~&gt; 1.7'</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Next you’ll want to bundle the new gem by running <code class="language-plaintext highlighter-rouge">bundle install</code> on the command line.</p>
+
+<p>Now that we’ve installed the gem in our project, we can begin setting up Hanami to start using it in the development environment.</p>
+
+<h2 id="configure-hanami-to-use-letter-opener">Configure Hanami to use Letter Opener</h2>
+
+<p>Hanami is a great lightweight Ruby framework. If you’re unfamiliar with it, there is a great tutorial and documentation over at <a href="https://hanamirb.org/" target="_blank">https://hanamirb.org/</a>. Assuming you’re familiar or have read the guide let’s move onto configuration.</p>
+
+<p>Reading the letter_opener guide on <a href="https://github.com/ryanb/letter_opener#non-rails-setup" target="_blank">Non-Rails Setup</a>, you’ll see the following configuration:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nb">require</span> <span class="s2">"letter_opener"</span>
+  <span class="no">Mail</span><span class="p">.</span><span class="nf">defaults</span> <span class="k">do</span>
+    <span class="n">delivery_method</span> <span class="no">LetterOpener</span><span class="o">::</span><span class="no">DeliveryMethod</span><span class="p">,</span> <span class="ss">:location</span> <span class="o">=&gt;</span> <span class="no">File</span><span class="p">.</span><span class="nf">expand_path</span><span class="p">(</span><span class="s1">'../tmp/letter_opener'</span><span class="p">,</span> <span class="kp">__FILE__</span><span class="p">)</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>This is really close to how we’ll configure this for Hanami.</p>
+
+<p>The important things here are that we set the delivery method to use Letter Opener and we set the output location where the temporary email files live. The first argument to <code class="language-plaintext highlighter-rouge">delivery_method</code> contains the strategy and the keyword argument <code class="language-plaintext highlighter-rouge">location</code> sets the file location.</p>
+
+<p>For Hanami mailer options are found within <code class="language-plaintext highlighter-rouge">project_name/config/environment.rb</code>. Open this file up.</p>
+
+<p>First add we need to require letter opener at the top of the file.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'bundler/setup'</span>
+<span class="nb">require</span> <span class="s1">'hanami/setup'</span>
+<span class="nb">require</span> <span class="s1">'hanami/model'</span>
+<span class="nb">require</span> <span class="s1">'letter_opener'</span> <span class="c1"># add this line</span>
+
+<span class="o">...</span>
+</code></pre></div></div>
+
+<p>Next, looking inside the <code class="language-plaintext highlighter-rouge">Hanami.configure</code> block, there are two ways you can configure but I only recommend the first.</p>
+
+<h2 id="recommended-method-1---development-environment">(Recommended) Method 1 - Development environment</h2>
+
+<p>If you look inside the <code class="language-plaintext highlighter-rouge">environment :production do</code> block you’ll see that it contains a special <code class="language-plaintext highlighter-rouge">mailer do</code> block. Directly above the production environment setup is a <code class="language-plaintext highlighter-rouge">environment :development do</code> block. That’s where we want to add our configuration code. This ensures that it only will send us emails when running in the development environment.</p>
+
+<p>Here’s the working setup code:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">environment</span> <span class="ss">:development</span> <span class="k">do</span>
+    <span class="c1"># See: https://guides.hanamirb.org/projects/logging</span>
+    <span class="n">logger</span> <span class="ss">level: :debug</span>
+
+    <span class="n">mailer</span> <span class="k">do</span>
+      <span class="n">delivery</span> <span class="no">LetterOpener</span><span class="o">::</span><span class="no">DeliveryMethod</span><span class="p">,</span> <span class="ss">location: </span><span class="no">File</span><span class="p">.</span><span class="nf">expand_path</span><span class="p">(</span><span class="s1">'../tmp/letter_opener'</span><span class="p">,</span> <span class="kp">__FILE__</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>Now when an email is sent in development, it will instead be opened in the browser.</p>
+
+<h2 id="alternative-method-2---all-environments-but-production">(Alternative) Method 2 - All environments but production</h2>
+
+<p>The second method is not scoped to any one environment but rather configured in the main <code class="language-plaintext highlighter-rouge">mailer do</code> configuration block. This has the benefit of setting up Letter Opener for all environments but production (because production has its own special setup block already). Unfortunately, this benefit is also a downside as now mailers will be opened in your browser for other environments like test. This means running a spec that contains a mailer will open browser tabs. Not necessarily ideal if you have a lot of mailer specs.</p>
+
+<p>You can find the main mailer setup by searching for the <code class="language-plaintext highlighter-rouge">mailer do</code> block which by default looks like:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">mailer</span> <span class="k">do</span>
+    <span class="n">root</span> <span class="s1">'lib/project_name/mailers'</span>
+
+    <span class="c1"># See https://guides.hanamirb.org/mailers/delivery</span>
+    <span class="n">delivery</span> <span class="ss">:test</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>Change the delivery line to use <code class="language-plaintext highlighter-rouge">LetterOpener::DeliveryMethod</code> and a set location and you’re good to go.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">mailer</span> <span class="k">do</span>
+    <span class="n">root</span> <span class="s1">'lib/project_name/mailers'</span>
+
+    <span class="c1"># See https://guides.hanamirb.org/mailers/delivery</span>
+    <span class="n">delivery</span> <span class="no">LetterOpener</span><span class="o">::</span><span class="no">DeliveryMethod</span><span class="p">,</span> <span class="ss">location: </span><span class="no">File</span><span class="p">.</span><span class="nf">expand_path</span><span class="p">(</span><span class="s1">'../tmp/letter_opener'</span><span class="p">,</span> <span class="kp">__FILE__</span><span class="p">)</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>What did you think? Was this a helpful tip for testing mailers in Hanami? I’d love to hear about other tips using Hanami in the comments below.</p>
+
+<p>Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/metrics-for-identifying-technical-debt/" alt="Metrics for identifying technical debt">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Metrics for identifying technical debt</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/configure-rspec-for-multiple-databases-with-database-cleaner-support/" alt="Configure RSpec for multiple databases with Database Cleaner support">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Configure RSpec for multiple databases with Database Cleaner support</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

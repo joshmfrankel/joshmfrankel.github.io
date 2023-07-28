@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Ordinal abbreviations for dates in Rails | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Ordinal abbreviations for dates in Rails" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Working with Dates and Times as a developer can be a tricky business. Recently I ran into an interesting time format which consisted of day of week, abbreviation of month, and the ordinalized day of the month. If you’re unfamiliar with ordinalized dates what it refers to are day of the month followed by a suffix. So 1st, 2nd, 3rd… I found a super cool trick to making this happen built into ActiveSupport::Inflector." />
+<meta property="og:description" content="Working with Dates and Times as a developer can be a tricky business. Recently I ran into an interesting time format which consisted of day of week, abbreviation of month, and the ordinalized day of the month. If you’re unfamiliar with ordinalized dates what it refers to are day of the month followed by a suffix. So 1st, 2nd, 3rd… I found a super cool trick to making this happen built into ActiveSupport::Inflector." />
+<link rel="canonical" href="http://joshfrankel.me/blog/ordinal-abbreviations-for-dates-in-rails/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/ordinal-abbreviations-for-dates-in-rails/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-12-16T14:16:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2020-12-16T14:16:00+00:00","dateModified":"2020-12-16T14:16:00+00:00","headline":"Ordinal abbreviations for dates in Rails","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/ordinal-abbreviations-for-dates-in-rails/"},"url":"http://joshfrankel.me/blog/ordinal-abbreviations-for-dates-in-rails/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Working with Dates and Times as a developer can be a tricky business. Recently I ran into an interesting time format which consisted of day of week, abbreviation of month, and the ordinalized day of the month. If you’re unfamiliar with ordinalized dates what it refers to are day of the month followed by a suffix. So 1st, 2nd, 3rd… I found a super cool trick to making this happen built into ActiveSupport::Inflector.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Ordinal abbreviations for dates in Rails</h1>
+
+    
+      <p class="Banner-information">
+        <time>December 16, 2020</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Working with Dates and Times as a developer can be a tricky business. Recently I ran into an interesting time format which consisted of day of week, abbreviation of month, and the ordinalized day of the month. If you’re unfamiliar with ordinalized dates what it refers to are day of the month followed by a suffix. So 1st, 2nd, 3rd… I found a super cool trick to making this happen built into ActiveSupport::Inflector.</p>
+
+<!--excerpt-->
+
+<p>First off the format we’re looking to replicate here is: <code class="language-plaintext highlighter-rouge">Monday, Dec 14th</code> based on a timestamp. Let’s use the timestamp for this post “2020-12-16 12:49 -0400”.</p>
+
+<p>Assuming we have access to the string version of our date we can convert it to a DateTime object using the <code class="language-plaintext highlighter-rouge">parse</code> method. Once converted we can save it to a temporary variable which allows us to both format the first half of the output (day, month) and the ordinalized day of the month (16th).</p>
+
+<p>Formatting the first part of the DateTime utilizes the <code class="language-plaintext highlighter-rouge">strftime</code> method along with the proper directives. In our case we need the following:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">%A - The full weekday name ('Sunday')</code></li>
+  <li><code class="language-plaintext highlighter-rouge">%b - The abbreviated month name ('Jan')</code></li>
+</ul>
+
+<p>For a full listing of directives <a href="https://ruby-doc.org/stdlib-2.6.1/libdoc/date/rdoc/DateTime.html#method-i-strftime">check out the docs here</a>.</p>
+
+<p>Now for the ordinalization. <a href="https://apidock.com/rails/Integer/ordinalize">ActiveSupport::Inflector has a method, ordinalize</a>, which does exactly what we need here. We
+can further improve upon this by using our previously parsed DateTime object’s day method to retrieve the
+numerical value for the day of the month. With these two together we ensure that we generate the correct date format
+as well as only parsing the original date once.</p>
+
+<p>Check out the below for how this is accomplished.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="n">date</span><span class="p">:)</span>
+  <span class="n">parsed_date</span> <span class="o">=</span> <span class="no">DateTime</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+
+  <span class="n">parsed_date</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="s2">"%A, %b "</span><span class="p">)</span> <span class="o">+</span> <span class="n">parsed_date</span><span class="p">.</span><span class="nf">day</span><span class="p">.</span><span class="nf">ordinalize</span>
+<span class="k">end</span>
+
+<span class="n">format_date</span><span class="p">(</span><span class="ss">date: </span><span class="s2">"2020-12-16 12:49 -0400"</span><span class="p">)</span> <span class="c1">#=&gt; Monday, Dec 14th</span>
+</code></pre></div></div>
+
+<p>Got any DateTime tricks up your sleeve? I’d love to hear about them in the comments.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/a-guide-for-upgrading-to-rails-6/" alt="A Guide for Upgrading to Rails 6">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">A Guide for Upgrading to Rails 6</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/add-joy-to-your-test-suite-with-cardi-b/" alt="Add joy to your test suite with Cardi B">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Add joy to your test suite with Cardi B</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

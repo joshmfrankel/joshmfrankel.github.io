@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Restrict an integer to a specific range in Ruby | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Restrict an integer to a specific range in Ruby" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Ever wanted an integer to be allowed a specific range of valid numbers rounding when necessary? Well, unfortunately in the Ruby community this has been a point of contention because no built-in function exists. We can however easily replicate the intended behavior through the clever usage of the enumerable sort method." />
+<meta property="og:description" content="Ever wanted an integer to be allowed a specific range of valid numbers rounding when necessary? Well, unfortunately in the Ruby community this has been a point of contention because no built-in function exists. We can however easily replicate the intended behavior through the clever usage of the enumerable sort method." />
+<link rel="canonical" href="http://joshfrankel.me/blog/restrict-an-integer-to-a-specific-range-in-ruby/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/restrict-an-integer-to-a-specific-range-in-ruby/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-07-08T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2015-07-08T00:00:00+00:00","dateModified":"2015-07-08T00:00:00+00:00","headline":"Restrict an integer to a specific range in Ruby","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/restrict-an-integer-to-a-specific-range-in-ruby/"},"url":"http://joshfrankel.me/blog/restrict-an-integer-to-a-specific-range-in-ruby/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Ever wanted an integer to be allowed a specific range of valid numbers rounding when necessary? Well, unfortunately in the Ruby community this has been a point of contention because no built-in function exists. We can however easily replicate the intended behavior through the clever usage of the enumerable sort method.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Restrict an integer to a specific range in Ruby</h1>
+
+    
+      <p class="Banner-information">
+        <time>July 8, 2015</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Ever wanted an integer to be allowed a specific range of valid numbers rounding when necessary? Well, unfortunately in the Ruby community this has been a point of contention because no built-in function exists. We can however easily replicate the intended behavior through the clever usage of the enumerable sort method.</p>
+<!--excerpt-->
+<h2>This may be a bit overkill...</h2>
+<img src="/img/2015/clamp-integer-post-clamp.jpg" alt="Image property of amazon.com" />
+<p><small><em>Image property of amazon.com</em></small></p>
+<p>Because we want to return an integer that has been "clamped" to a specific range we need a way to set a minimum and maximum value. The Enumerable sort method comes in handy for this purpose. We'll be using the sort method while grabbing the second element in the returned array to gather the appropriate clamp value.</p>
+<h2>All about sort</h2>
+<p><code>Enumerable#sort</code> takes an array and attempts to sort the elements either alphabetically or by number unless a custom sort is passed to the block. This allows something like the following to occur.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sx">%w(rhea kea flea)</span><span class="p">.</span><span class="nf">sort</span>     <span class="c1">#=&gt; ["flea", "kea", "rhea"]</span></code></pre></figure>
+
+<p class="well"><strong>Sort Defined:</strong><br />"Returns an array containing the items in enum sorted, either according to their own <=> method, or by using the results of the supplied block."</p>
+
+<p>For the sake of this post we will use the <strong>following integer range of 0 to 10</strong> to set the min and max values. These values will use the sort method to order them in rising order. I will show a couple examples below to demonstrate how this method works.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">x</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">].</span><span class="nf">sort</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#=&gt; 10</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span>
+<span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">].</span><span class="nf">sort</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#=&gt; 0</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">].</span><span class="nf">sort</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#=&gt; 6</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">].</span><span class="nf">sort</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#=&gt; 10</span></code></pre></figure>
+<p>Pretty slick looking, albeit a bit cryptic. Never fear it is actually quite simple to explain.</p>
+<p>By using three integers, one of which is our input integer, and then calling sort on them we receive the integers in rising order from lowest to smallest. The trick here is <code>.sort[1]</code>. This says sort the previous array and return the 2nd element from it. Since arrays start at 0 then <code>[1]</code> means the second or middle element.</p>
+<p class="well"><strong>Clamp Equation:</strong><br />[x, a, b].sort[1] <br /><br />x - input<br />a - minimum value<br />b - maximum value</p>
+
+<h2>Disassemble it!</h2>
+<img src="/img/2015/clamp-disassemble.jpg" alt="Image property of http://genius.com/" />
+<p><small><em>Image property of http://genius.com/</em></small></p>
+<p>So now we will always return the proper clamped value. Lets take a look at an example of what is happening. I'll reuse the first example from above with comments to disassemble what is happening in the intermediate steps.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Usage</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">].</span><span class="nf">sort</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Explanation</span>
+<span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="c1"># [20, 0, 10]  This is what the array looks like in reality</span>
+
+<span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">].</span><span class="nf">sort</span>
+<span class="c1"># [0, 10, 20]  What the array looks like after the sort method is called</span>
+
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">].</span><span class="nf">sort</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="c1"># .sort[1] returns 10 because 10 is the second index in the array</span></code></pre></figure>
+<p>There you have it. A simple and easy way to clamp integers between a range. Also you might be wondering why I keep using the phrase clamp. That is because in other programming languages the clamp method is built-in to accomplish this from the start.</p>
+
+<h2>TL;DR</h2>
+<p>Here it is in method form for easy copy and pasting.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">clamp</span> <span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">input</span><span class="p">,</span> <span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">].</span><span class="nf">sort</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">end</span></code></pre></figure>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/rails-4-turbolinks-fix-for-jquery-only-working-after-hard-refresh/" alt="Rails 4 turbolinks fix for jQuery only working after hard refresh">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Rails 4 turbolinks fix for jQuery only working after hard refresh</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/how-to-output-a-string-from-the-elusive-non-output-block-method-concat/" alt="How to output a string from the elusive non-output block method; concat">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">How to output a string from the elusive non-output block method; concat</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

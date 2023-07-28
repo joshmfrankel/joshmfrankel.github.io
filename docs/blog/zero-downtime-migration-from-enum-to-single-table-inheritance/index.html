@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Zero downtime migration from Enum to Single Table Inheritance | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Zero downtime migration from Enum to Single Table Inheritance" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I’ve been refactoring quite a bit of legacy code recently. I love this kind of work because you get to architect new patterns and code pathways for future developers to use. Right past mistakes and make the future of the application just a bit brighter. My most recent refactoring involved converting an Enum based architecture to utilize Rail’s Single Table Inheritance setup. So what does it take to move from one architecture to another? Keep reading to find out strategies that I use to help keep bugs to a minimum while ensuring that end-users experience zero downtime." />
+<meta property="og:description" content="I’ve been refactoring quite a bit of legacy code recently. I love this kind of work because you get to architect new patterns and code pathways for future developers to use. Right past mistakes and make the future of the application just a bit brighter. My most recent refactoring involved converting an Enum based architecture to utilize Rail’s Single Table Inheritance setup. So what does it take to move from one architecture to another? Keep reading to find out strategies that I use to help keep bugs to a minimum while ensuring that end-users experience zero downtime." />
+<link rel="canonical" href="http://joshfrankel.me/blog/zero-downtime-migration-from-enum-to-single-table-inheritance/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/zero-downtime-migration-from-enum-to-single-table-inheritance/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-05-26T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2018-05-26T00:00:00+00:00","dateModified":"2018-05-26T00:00:00+00:00","headline":"Zero downtime migration from Enum to Single Table Inheritance","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/zero-downtime-migration-from-enum-to-single-table-inheritance/"},"url":"http://joshfrankel.me/blog/zero-downtime-migration-from-enum-to-single-table-inheritance/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"I’ve been refactoring quite a bit of legacy code recently. I love this kind of work because you get to architect new patterns and code pathways for future developers to use. Right past mistakes and make the future of the application just a bit brighter. My most recent refactoring involved converting an Enum based architecture to utilize Rail’s Single Table Inheritance setup. So what does it take to move from one architecture to another? Keep reading to find out strategies that I use to help keep bugs to a minimum while ensuring that end-users experience zero downtime.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Zero downtime migration from Enum to Single Table Inheritance</h1>
+
+    
+      <p class="Banner-information">
+        <time>May 26, 2018</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>I’ve been refactoring quite a bit of legacy code recently. I love this kind
+of work because you get to architect new patterns and code pathways for future developers to use. Right past mistakes and make the future of the application just a bit brighter. My most recent refactoring involved converting an Enum based architecture to utilize Rail’s Single Table Inheritance setup. So what does it take to move from one architecture to another? Keep reading to find out strategies that I use to help keep bugs to a minimum while ensuring that end-users experience zero downtime.
+<!--excerpt--></p>
+
+<p>For major architecture refactors, there are a few steps I take to determine what the desirable end result is. Do you want to modify an existing feature? Convert an existing feature into another? Is this a brand new feature? These high-level questions about the purpose behind the refactor help guide you in making decisions that lead to a successful delivery.</p>
+
+<h2 id="assessing-the-challenge">Assessing the challenge</h2>
+
+<p>For the purposes of our case, let’s assume we’re dealing with the following goal.</p>
+
+<p><strong>Situation</strong><br />
+An enum column on our table has gotten out of control and we need to move to a more
+organized architecture. We’ve decided something needs to change now let’s figure out what we
+want the new application to look like.</p>
+
+<p>Here’s a little bit of background visualization on our application:</p>
+
+<p><img src="/img/2018/zero-downtime-enum.png" alt="Zero Downtime enum diagram" /></p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Restaurant</span>
+  <span class="n">has_many</span> <span class="ss">:beers</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Beer</span>
+  <span class="n">belongs_to</span> <span class="ss">:restaurant</span>
+
+  <span class="n">enum</span> <span class="ss">beer_types: </span><span class="sx">%i(porter stout hefeweizen)</span>
+<span class="k">end</span> </code></pre></figure>
+
+<p>As time goes on, the pattern above perpetuates itself and developers keep adding more and more beer_types. This isn’t necessarily a bad thing except each of these types has special processing logic. This means every time we add a new beer type at the very least the <code>#is_on_tap?</code>, <code>#preferred_glass</code>, and <code>#serving_temperature</code> methods below become just a little bit more complicated.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Beer</span>
+  <span class="n">belongs_to</span> <span class="ss">:restaurant</span>
+
+  <span class="n">enum</span> <span class="ss">beer_types: </span><span class="sx">%i(porter stout hefeweizen)</span>
+
+  <span class="c1"># Only certain beers are on-tap</span>
+  <span class="k">def</span> <span class="nf">is_on_tap?</span>
+    <span class="k">return</span> <span class="kp">true</span> <span class="k">if</span> <span class="n">porter?</span> <span class="o">||</span> <span class="n">stout?</span>
+    <span class="kp">false</span>
+  <span class="k">end</span>
+
+  <span class="c1"># New shipments of beer aren't cold initially</span>
+  <span class="k">def</span> <span class="nf">preferred_glass</span>
+    <span class="k">case</span> <span class="n">beer_type</span>
+    <span class="k">when</span> <span class="n">porter?</span> <span class="k">then</span> <span class="n">glass_1</span>
+    <span class="k">when</span> <span class="n">stout?</span> <span class="k">then</span> <span class="n">glass_2</span>
+    <span class="k">when</span> <span class="n">hefeweizen?</span> <span class="k">then</span> <span class="n">glass_3</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">serving_temperature</span>
+    <span class="k">case</span> <span class="n">beer_type</span>
+    <span class="k">when</span> <span class="n">porter?</span><span class="p">,</span> <span class="n">stout?</span> <span class="k">then</span> <span class="s2">"45-50"</span>
+    <span class="k">when</span> <span class="n">hefeweizen?</span> <span class="k">then</span> <span class="s2">"40-45"</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span> </code></pre></figure>
+
+<p>As you can see above, using enums leads to more and more conditional statements. To make matters worse these conditionals end up living in the base <code>Beer</code> model further cluttering its domain. Now you could move these into a concern but that is essentially equivalent to sweeping the dirt elsewhere. We still have a pattern that left unchecked will lead to bloat in our application. Like we discussed above, our entire purpose is to make this better for the next developer so let’s do that by determining the preferred outcome through some introspective questioning.</p>
+
+<blockquote class="Info Info-right">“When the future cost of doing nothing is the same as the current cost, postpone the decision. Make the decision only when you must with the information you have at that time.”<br />
+  <cite>- Sandi Metz, Practical Object-Oriented Design in Ruby: An Agile Primer</cite>
+</blockquote>
+
+<p><strong>Q: Do we want each type to have its own database table or share a single table?</strong><br />
+A: This is a fundamental question when deciding upon a refactor approach. Currently, we have a single database table Beers. For each type to have its own database table we would need to implement <a href="http://guides.rubyonrails.org/association_basics.html#polymorphic-associations">polymorphic associations</a> which consist of a table per type and a join table that contains an <code>id</code> and <code>type</code> for matching. While a more future-proof solution, this approach has a more complicated migration strategy as the current Beers table now needs to be split up into several different tables with properly joined associations for any existing records.</p>
+
+<p>The other option is to reuse the existing <code>Beers</code> table and allowing it to serve as a storage location for multiple types. This is accomplished via <a href="http://guides.rubyonrails.org/association_basics.html#single-table-inheritance">Single Table Inheritance</a>. In this implementation all we need is a new type column on the existing table and to backfill existing type data. The thinking here being, if you don’t need full blown polymorphic associations and inheritance will work then stick with the solution you know will work today. Additionally, we gain many of same benefits of polymorphic associations like type specific classes and greater composition opportunities with less work. The strategy is much simpler and for the purposes of this article is just enough to accomplish our desired outcome.</p>
+
+<h3 id="preferred-outcome">Preferred Outcome</h3>
+
+<ol>
+  <li><code>Beer</code> should stop relying on of the <code>beer_type</code> column and instead utilize STI’s <code>type</code> column</li>
+  <li><code>Beer</code> should have a class for each type of beer to help separate the different responsibilities between the types</li>
+  <li>Beer’s <code>beer_type</code> column should eventually be removed completely in favor of the new method.</li>
+  <li>New <code>Beer</code> STI type models should share common responsibilities through composition (e.g. modules)</li>
+</ol>
+
+<h2 id="planning-the-migration-strategy">Planning the migration strategy</h2>
+
+<p>Now that we have an idea of what we’d like to accomplish, we’ll want a step-by-step strategy for doing it. This is important to avoid issues of application downtime as well as ensuring that your approach is sound.</p>
+
+<blockquote class="Info Info-right"><strong>Downtime example</strong><br /> In a single deployment a new developer adds both a new column and the code that depends on it. During deployment there is a period of time where the new code is live before all the migrations have run. It is during this interval of waiting on the database that any users accessing the application will receive 500 errors from the new feature.</blockquote>
+
+<p>Something to note here is that each of the stages below is deployed separately from one another. Let me repeat that. Each one of these stages needs to be a separate deploy. The reason for this is when you add code that depends upon a database column existing but the migration hasn’t ran yet the code cannot function properly. This leads to application errors and downtime. By adding a new column in one deploy and then on the subsequent one adding the code that uses the column there is no risk of exceptions.</p>
+
+<p>Here’s a brief overview of our strategy with more details in each of the upcoming sections:</p>
+
+<ol>
+  <li>Add a new database column called “type” to enable STI on the Beer Table</li>
+  <li>Sync all new Beer records by ensuring that their “type” is filled out. Additionally, backfill existing Beer data’s type column.</li>
+  <li>Abstract and separate the type concerns. This means adding type specific logic into each of the new STI models. Additionally, disallow using the old Beer.beer_type column.</li>
+  <li>With the application relying completely on the new column and the old column disabled we can finally drop the <code>beer_type</code> column and any supporting code.</li>
+</ol>
+
+<h2 id="phase-1-add-a-new-database-column-called-type-to-the-beer-table">Phase 1: Add a new database column called type to the Beer table</h2>
+
+<p>This is the easiest phase. There isn’t any major changes or concerns with locking the database of existing Beers. All we need here is a simple migration to add the type column.</p>
+
+<blockquote class="Info Info-right"><strong>Note</strong><br /> One thing to avoid at this point is adding a <code>not: null</code> constraint to the new type field. The reason for this is because type doesn't have valid data yet and setting a constraint will only force it to throw exceptions everywhere.</blockquote>
+
+<p>The migration below can also be generator from the command line with <code>rails g migration AddTypeColumnToBeers type:string</code>.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">AddTypeColumnToBeers</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">add_column</span> <span class="ss">:beers</span><span class="p">,</span> <span class="ss">:type</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<h2 id="phase-2-sync-all-new-beer-records-and-backfill-existing-records">Phase 2: Sync all new Beer records and backfill existing records</h2>
+
+<p>Now that we have our new column deployed we can start using it. The first thing we’ll want to do is ensure that all new Beers use the new setup. We can accomplish this with a simple before callback that allows us to keep the new column in sync with the old. I prefer to place these into concerns with comments detailing that they should be removed at a later date.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># This should be removed once Beer::question_type is not longer necessary</span>
+<span class="k">module</span> <span class="nn">SyncBeerType</span>
+  <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Concern</span>
+
+  <span class="n">included</span> <span class="k">do</span>
+    <span class="n">before_save</span> <span class="ss">:sync_type</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">sync_type</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">type</span> <span class="o">=</span> <span class="n">beer_type</span><span class="p">.</span><span class="nf">to_s</span><span class="p">.</span><span class="nf">classify</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Beer</span>
+  <span class="kp">include</span> <span class="no">SyncBeerType</span>
+
+  <span class="n">belongs_to</span> <span class="ss">:restaurant</span>
+
+  <span class="c1"># ... other methods ...</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>With this in place, all future Beers also set a proper <code>type</code> value.</p>
+
+<h3 id="laying-some-ground-work-for-our-sti-implementation">Laying some ground-work for our STI implementation</h3>
+
+<p><img src="/img/2018/zero-downtime-sti.png" alt="Zero Downtime STI class diagram" /></p>
+
+<p>Next, we can start creating the type specific models for each Beer type. This is good preparation work for when we have confidence that our database’s type column is always filled out (phase 3). We don’t actually need any logic in these yet but they are necessary for STI to function properly.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Porter</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Stout</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Hefeweizen</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>You may have noticed above that each of these inherit from the original Beer class. This makes each of them behave the same way the old code does while preparing us to start abstracting type specific logic into the individual Beer type models in the next phase. Additionally, single table inheritance requires a each child class to inherit from the parent base class.</p>
+
+<h3 id="adding-new-sti-scopes-to-the-restaurant-model">Adding new STI scopes to the Restaurant model</h3>
+
+<p>Remember our dinky little <code>Restaurant</code> model? All it does is say a Restaurant has many Beers. Now with STI setup we can add some additional helper associations to improve chaining and querying in ActiveRecord.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Restaurant</span>
+  <span class="n">has_many</span> <span class="ss">:beers</span>
+  <span class="n">has_many</span> <span class="ss">:porters</span><span class="p">,</span> <span class="ss">class_name: </span><span class="no">Porter</span>
+  <span class="n">has_many</span> <span class="ss">:stouts</span><span class="p">,</span> <span class="ss">class_name: </span><span class="no">Stout</span>
+  <span class="n">has_many</span> <span class="ss">:hefeweizens</span><span class="p">,</span> <span class="ss">class_name: </span><span class="no">Hefeweizen</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>We can now chain queries like <code>Restaurant.first.porters</code> to see all of
+a given <code>Restaurant's</code> Porter beers.</p>
+
+<h3 id="backfill-all-existing-beer-database-records">Backfill all existing Beer database records</h3>
+
+<p>The last part of this phase is to backfill the existing data. We can do this with a migration that updates batches of records at a time. The reason for using batches is that if you have say hundreds of thousands of Beer records trying to update them all at once might leave your database locked up. Again this could lead to downtime for your users which we’d like to avoid here.</p>
+
+<blockquote class="Info Info-right"><strong>All migration should be reversible</strong><br /> A good guideline for migration is to ensure that <code>rails db:rollback</code> works without issue. When code is anticipated in the future to be removed but is required for a migration to work, like below, re-implementing the logic directly in the migration allows for the migration to always work. This is regardless of the application's implementation.</blockquote>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">BackfillBeerTypeColumnWithExistingEnumData</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.0</span><span class="p">]</span>
+  <span class="c1"># Disables the standard Rails transaction that is wrapped around each</span>
+  <span class="c1"># migration. For this migration we're pretty safe in that we're updating in </span>
+  <span class="c1"># batches using an update_all statement.</span>
+  <span class="n">disable_ddl_transaction!</span>
+
+  <span class="c1"># We are re-implementing this class here for a good reason! Eventually</span>
+  <span class="c1"># Beer's beer_types will be completely removed from the application meaning that</span>
+  <span class="c1"># if we just used Beer.beer_types in the below code it wouldn't work. This </span>
+  <span class="c1"># situation would only occur for new development environment setup's of the </span>
+  <span class="c1"># application. It is a best practice to keep your migrations as reversible as possible.</span>
+  <span class="k">class</span> <span class="nc">Beer</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+    <span class="n">enum</span> <span class="ss">beer_types: </span><span class="sx">%i(porter stout hefeweizen india_pale_ale brown_ale saison pilsner lager)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">up</span>
+    <span class="no">Beer</span><span class="p">.</span><span class="nf">beer_types</span><span class="p">.</span><span class="nf">keys</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">beer_type</span><span class="o">|</span>
+      <span class="n">update_beer_type</span><span class="p">(</span><span class="n">beer_type</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">down</span>
+    <span class="no">Beer</span><span class="p">.</span><span class="nf">beer_types</span><span class="p">.</span><span class="nf">keys</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">beer_type</span><span class="o">|</span>
+      <span class="n">nullify_beer_type</span><span class="p">(</span><span class="n">beer_type</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">update_beer_type</span><span class="p">(</span><span class="n">beer_type</span><span class="p">)</span>
+    <span class="n">type</span> <span class="o">=</span> <span class="n">beer_type</span><span class="p">.</span><span class="nf">classify</span>
+
+    <span class="no">Beer</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">beer_type</span><span class="p">.</span><span class="nf">to_sym</span><span class="p">).</span><span class="nf">where</span><span class="p">(</span><span class="ss">type: </span><span class="kp">nil</span><span class="p">).</span><span class="nf">in_batches</span> <span class="k">do</span> <span class="o">|</span><span class="n">beer_batch</span><span class="o">|</span>
+      <span class="n">beer_batch</span><span class="p">.</span><span class="nf">update_all</span><span class="p">(</span><span class="ss">type: </span><span class="n">type</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">nullify_beer_type</span><span class="p">(</span><span class="n">beer_type</span><span class="p">)</span>
+    <span class="no">Beer</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">beer_type</span><span class="p">.</span><span class="nf">to_sym</span><span class="p">).</span><span class="nf">where</span><span class="p">.</span><span class="nf">not</span><span class="p">(</span><span class="ss">type: </span><span class="kp">nil</span><span class="p">).</span><span class="nf">in_batches</span> <span class="k">do</span> <span class="o">|</span><span class="n">beer_batch</span><span class="o">|</span>
+      <span class="n">beer_batch</span><span class="p">.</span><span class="nf">update_all</span><span class="p">(</span><span class="ss">type: </span><span class="kp">nil</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Additionally, at this point we can really lock down the type column by adding a 
+database level <code>not: null</code> constraint. This prevents new records from
+being created or updated if the <code>type</code> column is empty.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">AddNullConstraintToTypeColumnOnBeersTable</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">change_column_null</span> <span class="ss">:beers</span><span class="p">,</span> <span class="ss">:type</span><span class="p">,</span> <span class="kp">false</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Once we’ve deployed the above phase, we can have complete confidence that all of
+our Beer’s have their <code>type</code> column filled out. Let’s move onto the phase
+where we start making big changes.</p>
+
+<h2 id="phase-3-abstract-out-and-separate-type-specific-responsibilities">Phase 3: Abstract out and separate type specific responsibilities</h2>
+
+<p>Now that we have a fully working STI architecture we can begin to move logic into 
+type specific locations. One of the largest benefits of STI is it allows better organization of logic based on type.</p>
+
+<p>Before we jump into that you’ll want to spend some time at this point ensuring that all code branches that create new <code>Beer</code> records in the database also supply the proper <code>type</code>. The reason for this is that we also want to move away from relying on the <code>SyncBeerType</code>’s callback and instead have the system work properly. A quick example of a controller action change might look something like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Original controller</span>
+<span class="k">class</span> <span class="nc">BeersController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="vi">@beer</span> <span class="o">=</span> <span class="no">Beer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">beer_params</span><span class="p">)</span>
+
+    <span class="c1"># Assuming that we are sending json responses</span>
+    <span class="k">if</span> <span class="vi">@beer</span><span class="p">.</span><span class="nf">save</span>
+      <span class="n">render</span> <span class="ss">json: </span><span class="p">{</span> <span class="ss">success: </span><span class="kp">true</span> <span class="p">}</span>
+    <span class="k">else</span>
+      <span class="n">render</span> <span class="ss">json: </span><span class="p">{</span> <span class="ss">success: </span><span class="kp">false</span><span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">beer_params</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:beer</span><span class="p">).</span><span class="nf">permit</span><span class="p">(</span><span class="ss">:id</span><span class="p">,</span> <span class="ss">:name</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># Updated controller to account for Beer::type</span>
+<span class="k">class</span> <span class="nc">BeersController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="vi">@beer</span> <span class="o">=</span> <span class="no">Beer</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">beer_params</span><span class="p">)</span>
+    <span class="c1"># OR constantize the type</span>
+    <span class="vi">@beer</span> <span class="o">=</span> <span class="n">beer_params</span><span class="p">[</span><span class="ss">:type</span><span class="p">]</span>
+      <span class="p">.</span><span class="nf">classify</span>
+      <span class="p">.</span><span class="nf">safe_constantize</span>
+      <span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">beer_params</span><span class="p">)</span>
+
+    <span class="c1"># Assuming that we are sending json responses</span>
+    <span class="k">if</span> <span class="vi">@beer</span><span class="p">.</span><span class="nf">save</span>
+      <span class="n">render</span> <span class="ss">json: </span><span class="p">{</span> <span class="ss">success: </span><span class="kp">true</span> <span class="p">}</span>
+    <span class="k">else</span>
+      <span class="n">render</span> <span class="ss">json: </span><span class="p">{</span> <span class="ss">success: </span><span class="kp">false</span><span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="c1"># Add type to the strong parameters</span>
+  <span class="k">def</span> <span class="nf">beer_params</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="ss">:beer</span><span class="p">).</span><span class="nf">permit</span><span class="p">(</span><span class="ss">:id</span><span class="p">,</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:type</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Once, you changed all the branches for Beer records being created or updated you can begin to break down some of the current <code>Beer</code> class logic into specific types.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Porter</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+  <span class="k">def</span> <span class="nf">is_on_tap?</span>
+    <span class="kp">true</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">preferred_glass</span>
+    <span class="n">glass_1</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">serving_temperature</span>
+    <span class="s2">"45-50"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Stout</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+  <span class="k">def</span> <span class="nf">is_on_tap?</span>
+    <span class="kp">true</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">preferred_glass</span>
+    <span class="n">glass_2</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">serving_temperature</span>
+    <span class="s2">"45-50"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Hefeweizen</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+  <span class="c1"># Note: Because we inherit from Beer and only need the default implementation</span>
+  <span class="c1"># we can rely completely on the parent's #is_on_tap? method</span>
+
+  <span class="k">def</span> <span class="nf">preferred_glass</span>
+    <span class="n">glass_3</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">serving_temperature</span>
+    <span class="s2">"40-45"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Beer</span>
+  <span class="n">belongs_to</span> <span class="ss">:restaurant</span>
+
+  <span class="n">enum</span> <span class="ss">beer_types: </span><span class="sx">%i(porter stout hefeweizen)</span>
+
+  <span class="c1"># Inheritors of Beer can override this method</span>
+  <span class="k">def</span> <span class="nf">is_on_tap?</span>
+    <span class="kp">false</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This method can now utilize the template pattern ensuring that all</span>
+  <span class="c1"># subclasses follow the interface contract set</span>
+  <span class="k">def</span> <span class="nf">preferred_glass</span>
+    <span class="k">raise</span> <span class="no">NotImplementedError</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="si">}</span><span class="s2"> cannot respond to: </span><span class="si">#{</span><span class="n">__method__</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Another template pattern to ensure #serving temperature is defined in subclasses</span>
+  <span class="k">def</span> <span class="nf">serving_temperature</span>
+    <span class="k">raise</span> <span class="no">NotImplementedError</span><span class="p">,</span> <span class="s2">"</span><span class="si">#{</span><span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="si">}</span><span class="s2"> cannot respond to: </span><span class="si">#{</span><span class="n">__method__</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span> </code></pre></figure>
+
+<p>Looks pretty good so far. We’ve moved much of the conditional logic out of Beer and instead allowed each type to just know what it is capable of. Since Beer is now the base class, or parent class, it serves as the default implementation for method definitions. You can see one of the benefits above which is the template method pattern.</p>
+
+<blockquote class="Info Info-right"><strong>Template method pattern</strong><br />"In software engineering, the template method pattern is a behavioral design pattern that defines the program skeleton of an algorithm in an operation, deferring some steps to subclasses."<br />
+<cite>- Wikipedia, Template Method Pattern</cite>
+</blockquote>
+
+<p>Let’s take a look at a direct benefit of STI. With the old style of using enums we’d have to write type-checking code like the below snippet:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">beer</span> <span class="o">=</span> <span class="no">Beer</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">beer</span><span class="p">.</span><span class="nf">porter?</span>
+  <span class="n">beer</span><span class="p">.</span><span class="nf">pour_porter</span>
+<span class="k">elsif</span> <span class="n">beer</span><span class="p">.</span><span class="nf">stout?</span>
+  <span class="n">beer</span><span class="p">.</span><span class="nf">pour_stout</span>
+<span class="k">elsif</span> <span class="n">beer</span><span class="p">.</span><span class="nf">hefeweizen?</span>
+  <span class="n">beer</span><span class="p">.</span><span class="nf">pour_hefeweizen</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>With the new single table inheritance architecture, we can trust the object to know
+how to respond to the interface from the base class (Beer). This allows any Beer object stand in for one another. We could now re-write the above like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Using the base class of Beer, allows us to lookup</span>
+<span class="c1"># any available beer that matches the id</span>
+<span class="n">beer</span> <span class="o">=</span> <span class="no">Beer</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span> <span class="c1">#=&gt; SELECT * FROM beers WHERE id = 1 LIMIT 1</span>
+<span class="n">beer</span><span class="p">.</span><span class="nf">pour</span>
+
+<span class="c1"># If we know the type in the sent controller params we</span>
+<span class="c1"># could also write something like the following to directly</span>
+<span class="c1"># query by the STI model's type.</span>
+<span class="c1"># (assuming that params[:type] #=&gt; "Stout")</span>
+<span class="n">beer</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="ss">:type</span><span class="p">]</span>
+  <span class="p">.</span><span class="nf">classify</span>
+  <span class="p">.</span><span class="nf">safe_constantize</span>
+  <span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span> <span class="c1">#=&gt; SELECT * FROM beers WHERE type IN ('Stout') AND id = 1 LIMIT 1 </span>
+<span class="n">beer</span><span class="p">.</span><span class="nf">pour</span></code></pre></figure>
+
+<blockquote class="Info Info-right"><strong>Drunk ducks</strong><br /> Because all future types of Beers inherit from the base class of beer, they all respond to the same interface of methods. This enables us to write duck types or have any type of Beer object stand-in for another. This avoids the necessity of type-checks. Quack, quack.</blockquote>
+
+<p>Additionally, single table inheritance allows us to call the model directly and ActiveRecord knows to properly build sql to query the specific type (see the raw sql below).</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">beer</span> <span class="o">=</span> <span class="no">Porter</span><span class="p">.</span><span class="nf">first</span> <span class="c1">#=&gt; SQL: select * from beers where type = 'Porter' LIMIT 1</span>
+<span class="n">beer</span><span class="p">.</span><span class="nf">pour</span> <span class="c1">#=&gt; Pours a Porter</span>
+
+<span class="c1"># Customer would like another one</span>
+<span class="n">beer</span> <span class="o">=</span> <span class="no">Stout</span><span class="p">.</span><span class="nf">first</span> <span class="c1">#=&gt; SQL: select * from beers where type = 'Stout' LIMIT 1</span>
+<span class="n">beer</span><span class="p">.</span><span class="nf">pour</span> <span class="c1">#=&gt; Pours a Stout</span></code></pre></figure>
+
+<h3 id="reject-the-old-column">Reject the old column</h3>
+
+<p>Rails 5 has a built-in way of manually disabling columns in ActiveRecord. This is a great trick for simulating in advance what the application will function like once phase 4’s dropping of the <code>beer_type</code> column occurs. Not only does this allow you to modify your test suite to accommodate the removal of the column but it also prevents the application from holding onto the rejected column in memory. For example, having this step occur one deployment before phase 4 prevents the application from using the column in any manner.</p>
+
+<p>What I like to do here is modify the module used for syncing to instead ignore the column to be dropped in the upcoming deployment.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">SyncBeerType</span>
+  <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Concern</span>
+
+  <span class="n">included</span> <span class="k">do</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">ignored_columns</span> <span class="o">=</span> <span class="sx">%w(beer_type)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<blockquote class="Info Info-right"><strong>Duck Typing</strong><br />
+  "Whenever possible, you should treat objects according to the methods they define rather than the classes from which they inherit or the modules they include."<br />
+  <cite>- <a href="http://rubylearning.com/satishtalim/duck_typing.html">http://rubylearning.com/satishtalim/duck_typing.html</a></cite>
+</blockquote>
+
+<p>While ignoring the beer_type column in ActiveRecord prevents it from being visible, there are still several enum predicate methods that can be used. The methods I’m referring to are <code class="language-plaintext highlighter-rouge">porter?</code>, <code class="language-plaintext highlighter-rouge">stout?</code>, <code class="language-plaintext highlighter-rouge">hefeweizen?</code>. These essentially perform type checks, which for our purposes, we want to instead favor duck typing.</p>
+
+<p>Between Phase 3 and Phase 4, other developers may continue to use these predicate methods. One way to avoid this is to override the predicate methods to signal to developers that they are no longer supported. Similar to ignoring the ActiveRecord column above, this allows us to prepare for the next phase without having to update other developer code in the interim. We can also leave a helpful message to encourage the use of duck typing.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">SyncBeerType</span>
+  <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Concern</span>
+
+  <span class="n">included</span> <span class="k">do</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">ignored_columns</span> <span class="o">=</span> <span class="sx">%w(beer_type)</span>
+
+    <span class="c1"># New Error type</span>
+    <span class="no">UnsupportedMethodError</span> <span class="o">=</span> <span class="no">Class</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span>
+
+    <span class="c1"># All predicate methods follow the same pattern. We could probably</span>
+    <span class="c1"># use something like method_missing here but for the sake of explictness</span>
+    <span class="c1"># I've written each of them out.</span>
+    <span class="c1">#</span>
+    <span class="c1"># __method__ is just a magic variable that contains the name of the current</span>
+    <span class="c1"># method. (e.g. porter?, stout?, hefeweizen?)</span>
+    <span class="k">def</span> <span class="nf">porter?</span>
+      <span class="n">unsupported_method</span><span class="p">(</span><span class="n">__method__</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">stout?</span>
+      <span class="n">unsupported_method</span><span class="p">(</span><span class="n">__method__</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">hefeweizen?</span>
+      <span class="n">unsupported_method</span><span class="p">(</span><span class="n">__method__</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="c1"># This looks complicated but actually just raises the new Error type</span>
+    <span class="c1"># and prints a message that includes the calling method's signature.</span>
+    <span class="k">def</span> <span class="nf">unsupported_method</span><span class="p">(</span><span class="nb">method</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="no">UnsupportedMethodError</span><span class="p">,</span> <span class="o">&lt;&lt;~</span><span class="no">EXCEPTION</span><span class="sh">
+        </span><span class="si">#{</span><span class="nb">method</span><span class="si">}</span><span class="sh"> is no longer supported. If you need to know a Beer's type please use `object.is_a?(some-type)`
+        A more ideal approach is to have a Beer object respond to a message via duck typing.
+</span><span class="no">      EXCEPTION</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Additionally, at this point we can remove the bit of code within the old <code>Beer</code> model that specified the enums:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Beer</span>
+  <span class="n">belongs_to</span> <span class="ss">:restaurant</span>
+
+  <span class="c1"># Remove the line of code below as it is no longer necessary</span>
+  <span class="n">enum</span> <span class="ss">beer_types: </span><span class="sx">%i(porter stout hefeweizen)</span>
+
+  <span class="c1"># ... additional logic ...</span>
+<span class="k">end</span> </code></pre></figure>
+
+<p>The assumption at this point is that all code will be writing to only the new <code>type</code> column and that any old logic will no longer work with the old <code>beer_type</code> column. Also by using the same concern we don’t need to update any of the Beer subclasses include statements.</p>
+
+<h3 id="share-common-behavior-through-composition-instead-of-inheritance">Share common behavior through Composition instead of Inheritance</h3>
+
+<div class="article-image" itemprop="image" itemscope="" itemtype="https://schema.org/ImageObject">
+  <img src="/img/2018/zero-downtime-with-module.png" alt="Zero downtime class diagram with modules" />
+  <meta itemprop="url" content="/img/2018/zero-downtime-with-module.png" />
+  <meta itemprop="width" content="424" />
+  <meta itemprop="height" content="329" />
+</div>
+
+<p>Something else we could start doing here is abstracting out common logic into modules. For instance both the Porter and the Stout are served at the same temperature. They also both happen to be dark beers. From this we can create a <code>DarkBeer</code> module that is includeable in any future dark beer models.</p>
+
+<blockquote class="Info Info-right"><strong>Inheritance vs. Composition</strong><br />
+  Use Inheritance for <em>is-a</em> relationships. A Stout is-a Beer.
+  Use Composition for <em>has-a</em> relationships. A Stout has-a DarkBeer color.<br />
+  <cite>- Sandi Metz, Practical Object-Oriented Design in Ruby: An Agile Primer, Paraphrase</cite>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">DarkBeer</span>
+  <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Concern</span>
+
+  <span class="k">def</span> <span class="nf">serving_temperature</span>
+    <span class="s2">"45-50"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Porter</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+  <span class="kp">include</span> <span class="no">DarkBeer</span>
+
+  <span class="k">def</span> <span class="nf">is_on_tap?</span>
+    <span class="kp">true</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">preferred_glass</span>
+    <span class="n">glass_1</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Stout</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+  <span class="kp">include</span> <span class="no">DarkBeer</span>
+
+  <span class="k">def</span> <span class="nf">is_on_tap?</span>
+    <span class="kp">true</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">preferred_glass</span>
+    <span class="n">glass_2</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>You may at first be tempted to create another layer of inheritance with something like <code>Beer &gt; DarkBeer &gt; Porter</code>. While this technically would work, it also ties us to the strict hierarchy which may or may not be the right abstraction at this point. This increases upkeep costs of maintaining the codebase. Using composition with modules allows us to reuse behaviors, like <code>DarkBeer</code>, without ties specific types to a strict interface that inheritance implements. Sandi Metz explains the pitfalls of inheritance best in the below quote.</p>
+
+<blockquote>"Shallow, narrow hierarchies are easy to understand. Shallow, wide hierarchies are
+slightly more complicated. Deep, narrow hierarchies are a bit more challenging and
+unfortunately have a natural tendency to get wider, strictly as a side effect of their
+depth. Deep, wide hierarchies are difficult to understand, costly to maintain, and
+should be avoided."<br />
+<cite>- Sandi Metz, Practical Object-Oriented Design in Ruby: An Agile Primer</cite></blockquote>
+
+<p>At this point, you can continue on abstracting common logic and methods while improving the overall structure of the new STI architecture. Once, you feel good about it (less is more here) you can move onto the last phase dropping the old enum <code>beer_type</code> column</p>
+
+<h2 id="phase-4-drop-the-old-beer_type-column">Phase 4: Drop the old beer_type column</h2>
+
+<p>We did it! We’ve abstracted common code logic into modules and placed type specific logic in its respective model. We have a database that contains accurate data and all future record creations write to the proper column. Additionally, we have disallowed writing to the old column which allows us to safely remove it from the system. This also means that the system is prepared to function without the column existing. So the only things left are to write a migration to drop the <code>beer_type</code> column and remove the <code>SyncBeerType</code>.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">DropBeerTypeColumnFromBeers</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">drop_column</span> <span class="ss">:beers</span><span class="p">,</span> <span class="ss">:beer_type</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># Remove the module</span>
+<span class="k">module</span> <span class="nn">SyncBeerType</span>
+  <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Concern</span>
+
+  <span class="n">included</span> <span class="k">do</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">ignored_columns</span> <span class="o">=</span> <span class="sx">%w(beer_type)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># Remove the individual includes from Porter and Stout</span>
+<span class="k">class</span> <span class="nc">Porter</span> <span class="o">&lt;</span> <span class="no">Beer</span>
+  <span class="kp">include</span> <span class="no">DarkBeer</span> <span class="c1"># Remove this line</span>
+  
+  <span class="c1"># ... more logic ...</span>
+<span class="k">end</span></code></pre></figure>
+
+<h2 id="tldr-on-the-above-strategy">TL;DR; on the above strategy</h2>
+
+<p>Here’s a brief overview of various deployment phases to ensure a smooth migration strategy:</p>
+
+<ol>
+  <li>Add new column called “type”</li>
+  <li>All new Beer records write to the “type” column and all existing Beer records are backfilled with “type” data</li>
+  <li>Abstract and organize common logic between types. Reject writing to the old column in preparation for removal.</li>
+  <li>Drop the old beer_type column.</li>
+</ol>
+
+<p>And there you have it. A safe and zero downtime approach to moving from an existing Enum column to Single Table Inheritance. Enjoy, responsibly!</p>
+
+<p><img src="/img/2018/beer.jpeg" alt="Enjoy a beer, responsibly" /></p>
+
+<p>Is there something you find useful while migrating an application’s architecture? Did I miss an important step or trick you’d like to see added to this post? Shoot me a comment below and thanks for reading!</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/how-to-call-pry-from-within-a-simpledelegator-decorator/" alt="How to call Pry from within a SimpleDelegator Decorator">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">How to call Pry from within a SimpleDelegator Decorator</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/overriding-activerecord-getters-with-the-same-attribute-name/" alt="Override an ActiveRecord attribute value while using the same getter method">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Override an ActiveRecord attribute value while using the same getter method</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

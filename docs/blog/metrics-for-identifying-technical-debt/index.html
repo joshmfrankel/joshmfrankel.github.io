@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Metrics for identifying technical debt | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Metrics for identifying technical debt" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A common theme I’ve noticed throughout my career is that every product, every feature, and every company eventually hits a threshold in their application of what was designed to support. Once this magic threshold is reached, the application starts to fall down the technical debt cliff. Now, I’m not saying that this is due to bad design or bad decisions, really it is just that technical debt is difficult to identify and more difficult to prioritize. It isn’t building new features or fixing existing bugs, but rather building better architecture for the future. That’s tough to sell as something worth investing in. In this article, we’ll discuss several metrics for identifying technical debt in your application." />
+<meta property="og:description" content="A common theme I’ve noticed throughout my career is that every product, every feature, and every company eventually hits a threshold in their application of what was designed to support. Once this magic threshold is reached, the application starts to fall down the technical debt cliff. Now, I’m not saying that this is due to bad design or bad decisions, really it is just that technical debt is difficult to identify and more difficult to prioritize. It isn’t building new features or fixing existing bugs, but rather building better architecture for the future. That’s tough to sell as something worth investing in. In this article, we’ll discuss several metrics for identifying technical debt in your application." />
+<link rel="canonical" href="http://joshfrankel.me/blog/metrics-for-identifying-technical-debt/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/metrics-for-identifying-technical-debt/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-12-18T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2019-12-18T00:00:00+00:00","dateModified":"2019-12-18T00:00:00+00:00","headline":"Metrics for identifying technical debt","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/metrics-for-identifying-technical-debt/"},"url":"http://joshfrankel.me/blog/metrics-for-identifying-technical-debt/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"A common theme I’ve noticed throughout my career is that every product, every feature, and every company eventually hits a threshold in their application of what was designed to support. Once this magic threshold is reached, the application starts to fall down the technical debt cliff. Now, I’m not saying that this is due to bad design or bad decisions, really it is just that technical debt is difficult to identify and more difficult to prioritize. It isn’t building new features or fixing existing bugs, but rather building better architecture for the future. That’s tough to sell as something worth investing in. In this article, we’ll discuss several metrics for identifying technical debt in your application.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Metrics for identifying technical debt</h1>
+
+    
+      <p class="Banner-information">
+        <time>December 18, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>A common theme I’ve noticed throughout my career is that every product, every feature, and every company eventually hits a threshold in their
+application of what was designed to support. Once this magic threshold is reached, the application starts to fall down the technical debt cliff.
+Now, I’m not saying that this is due to bad design or bad decisions, really it is just that technical debt is difficult to identify and more difficult to
+prioritize. It isn’t building new features or fixing existing bugs, but rather building better architecture for the future. That’s tough
+to sell as something worth investing in. In this article, we’ll discuss several metrics for identifying technical debt in your application.
+<!--excerpt--></p>
+
+<h2 id="what-is-technical-debt">What is Technical Debt?</h2>
+
+<p>First off, what exactly is technical debt?</p>
+
+<p>From my experience, technical debt is the accumulation of inconsistent or unideal architecture
+that is prone to failure, resistant to change, and difficult to build upon.</p>
+
+<p>Martin Fowler defines technical debt with the following quote:</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Software systems are prone to the build up of cruft - deficiencies in internal quality that make it harder than it would ideally be to modify and extend the system further. Technical Debt is a metaphor, coined by Ward Cunningham, that frames how to think about dealing with this cruft, thinking of it like a financial debt. The extra effort that it takes to add new features is the interest paid on the debt.
+  </p>
+
+  
+    <a href="https://martinfowler.com/bliki/TechnicalDebt.html">Martin Fowler</a>
+  
+</blockquote>
+
+<p>Cruft is a great vocabularly word to describe technical debt.</p>
+
+<p>Technical cliffs on the otherhand refers to the point at which a current system can no longer support a feature or process.
+This happens when technical debt builds up to such a degree that the system begins to fail consistently. Some examples of
+technical debt cliffs are: known slow performance hotspots receiving more traffic, database contention between queries, and
+background jobs failing to finish in a timely manner.</p>
+
+<p>A less dense perspective to technical debt, would be the following house construction metaphor:</p>
+
+<ul>
+  <li>You’re building a new home</li>
+  <li>You only have so much money to spend on construction that you decide to cut a few corners early on</li>
+  <li>Later, construction is going well, foundation is being poured, walls are going up but eventually at some point the corners
+you cut begin to resurface</li>
+  <li>One of the corners you cut was to use old copper piping for the plumbing. Now the pipeing is rusting and leaking throughout
+the home.</li>
+  <li>When you start to replace the piping with PVC, you realize that the corner you cut with wiring has caused several electrical
+fires within the walls. Yeesh, that’s bad.</li>
+  <li>Eventually all these little cut corners begin to add up to a single major problem. You’re out of funds but that house
+isn’t built yet.</li>
+</ul>
+
+<p>Technical debt is a lot like this. The level of quality that you take to build it ensures that the home lasts longer.
+Building to quickly or without regard for quality might allow you to finish the home sooner at the cost of more issues
+with the home later down the road. Once there is significant technical debt present, it makes changing and/or fixing
+things like trying to crawl through mud.</p>
+
+<p><img src="/img/2019/home-metaphor.jpg" alt="Home Metaphor" title="Image by Paul Brennan from Pixabay" />
+<!-- https://pixabay.com/photos/new-home-construction-builder-2897352/ --></p>
+
+<h3 id="but-what-about-legacy-code">But what about Legacy Code?</h3>
+
+<p>Notice how I never mentioned the phrase “legacy code”. That’s because legacy code (or code that is older) does not automatically make it technical debt. Legacy code
+ can be thought of as code that has weathered the requirements of the application over a long period of time. The code was good enough at the time it was
+written to last long into the future. In simpler phrasing, legacy code is not inherently bad code. In fact, newly written code can quickly become technical debt when it reaches its
+solution through less than ideal means. I’ve seen it happen.</p>
+
+<h2 id="ok-ok-ok-so-why-do-i-care">Ok, ok, ok… So why do I care?</h2>
+
+<p>Stepping down from my soapbox, I believe that too often existing and new architecture
+is not evalutated further than the thought of, “Well it works so why are spending time on it?”. The pitfall with this style
+of thinking is that when that code encounters a failure, the team has to respond to it reactively. Remember the section above
+describing what technical cliffs were? Technical cliffs often are difficult to fix and challenging to reproduce.</p>
+
+<p>When your team is fixing technical debt reactively the time you spend finding a solution and implementing is accelerated from
+the actual time you need to implement a longer lasting solution. Conversly, a proactive approach allots for adequate time
+deciding on well thought out solutions, fully tested quality, and implemented in an effort not to further dig into the technical debt hole.</p>
+
+<h2 id="still-unconvinced">Still unconvinced?</h2>
+
+<p>If you’re still feeling unconvinced or the above doesn’t seem like a valid business reason to invest in improving known debt, think
+about the following statements.</p>
+
+<ul>
+  <li>The more clients that use your product the more likely it is you’ll encounter technical cliffs</li>
+  <li>Larger clients accelerating you to known/unknown thresholds more quickly</li>
+  <li>Reacting to technical cliffs is only a viable strategy as long as the solutions implemented don’t end up creating additional technical debt</li>
+  <li>More technical cliffs, means more application failures, which is frustrating for end-users</li>
+</ul>
+
+<p>All of the above leads to clients having less confidence in your product and more frustration while using it. Lack of confidence and frustration are
+great reasons to begin seeking out alternatives that contain less of a headache.</p>
+
+<p>There are other reasons for pursuing a culture of managing technical debt. I hope I’ve at least convinced you that technical debt
+is important to consider when building new features.</p>
+
+<p>In the next section, I’ve outlined a framework of metrics to help identify, prioritize, and educate your team on technical debt cliffs and their estimated risk.</p>
+
+<h2 id="metrics-for-identifying-technical-debt-cliffs-and-their-risk">Metrics for identifying Technical Debt cliffs and their risk</h2>
+
+<p><img src="/img/2019/technical-debt-metrics.png" alt="Technical Debt Metrics" /></p>
+
+<p>Above, I’ve listed out 6 different metrics for identifying technical debt: <strong>Chronology, Coverage, Caliber, Codependence, Consumption, Contention</strong>. These metrics aren’t meant to be used in isolation but rather
+as parts of the greater whole. This is because some metrics are lagging, others are leading, and the rest are coincident indicators. I use these terms
+from market analysis but in the context of a software application.</p>
+
+<ul>
+  <li><strong>Lagging indicators</strong> are factors that lag behind technical cliff events</li>
+  <li><strong>Leading indicators</strong> indicate future technical cliffs</li>
+  <li><strong>Coincident indicators</strong> are factors that occur simultaenously with technical cliffs</li>
+</ul>
+
+<p>I also believe that some of these metrics indicate more risk than others. If your code is 5 years old but your rate of incidence is low then that area of
+the application might be at lower risk. Just looking at the one of these metrics alone wouldn’t allow you to reach a supported hypothesis.</p>
+
+<p>This framework is meant to be used as a guide. Use your best judgement given your own specific situation along with a healthy dose of inquisitivenss. With that
+let’s dig into these a bit deeper.</p>
+
+<h3 id="chronology">Chronology</h3>
+
+<p>Chronology, also could be called age, is the last moment in time this part of the application was modified. You could equate this to
+saying, “How old is the code?”. Now some of you might be reacting to this statement with, “Uh, huh. Didn’t you just say legacy code isn’t technical debt?”. And you’d be
+right.</p>
+
+<p>When I refer to the chronology of the code, this is only meant to be used as a lagging indicator. I truly believe that legacy code does not equal technical debt. Instead
+chronology can be used a way to get closer to various older parts of the codebase. Maybe your user sign in process is 5 years old. A quick run through of the code shows
+that it works efficiently. Alternatively looking back through it you notice an edge case where users can potentially request password resets for other users. Good thing we
+you did some quick discovery into it.</p>
+
+<p>Think about cleaning different areas of your home. Some may remain clean for weeks while others are constantly dirty.
+You’ll only know if an area needs to be cleaned if you take the time to investigate it. Same idea with older code in your codebase.</p>
+
+<p>One way to calculate how old code is, is to check the <a href="https://git-scm.com/docs/git-blame" target="_blank">git blame</a> details for the file in question. This details line-by-line the last time commit that effected the code
+with the last contributor listed alongside it. I’ve begun looking into ways of automating this utilizing <code class="language-plaintext highlighter-rouge">git ls-tree</code> by recursively searching through all tracked files
+and building a data structure for each. Github (or other online repository applications) can also be a good place to look as they often include a way to check a file’s history.</p>
+
+<p><strong>Chronology of code can indicate a section of your codebase that needs to be revisited</strong>. I believe that this metric should be thought of as lower risk as chronology of code doesn’t always indicate technical debt.</p>
+
+<h3 id="coverage">Coverage</h3>
+
+<p>If you’re only going to look at one of these metrics, then Code Coverage is one of the most important. Coverage measures the percentage
+of well tested code in your codebase. This is presented as a ratio of available code to lines tested.</p>
+
+<p>Missing test coverage in wide sections of a codebase, is a recipe for disaster. You’ll have no idea when a change elsewhere
+in the application has wide reaching consequences. Not only that but you’ll waste time fixing the issue by having to also
+write tests that should have already been written originally.</p>
+
+<p>I come from a Ruby environment, which means I’m most familar with <a href="https://github.com/colszowka/simplecov" target="_blank">SimpleCov</a>. SimpleCov allows you to capture statistics around
+your test suite along with outputting them in an easy to view HTML format. This is really a great tool for discovering
+those low coverage areas in your application.</p>
+
+<p><strong>Well tested code increases confidence and consistency</strong> in business logic resulting in less overall bugs and less time
+spent debugging. Code Coverage is a leading indicator meaning that less coverage can indicate where future
+problems will occur. From my perspective, this metric holds a high risk as you can’t be confident that code works without
+it being properly tested.</p>
+
+<h3 id="caliber">Caliber</h3>
+
+<p>Overall caliber of code can ensure that future code is written with a high degree of
+craftsmanship and quality. There are many tools for measuring this. Static analysis and linters are some of the best types of
+tools to generate more insight into a codebase.</p>
+
+<p><strong>Following general community standards and best practices helps to ensure that code is built well the first time</strong>. Generally
+there are very good reasons as to why the community agreed upon a specific standard. Though some standards are more up to preference the
+important thing here is to decide on a single standard and follow it. If your company decides to follow Airbnb’s JavaScript styleguide, then
+make sure you have ways to enforce this decision. Also make the necessary exceptions and changes to your own local style that support your
+team’s culture. Below I’ve listed a non-exhaustive list of examples that support the caliber metric:</p>
+
+<ul>
+  <li><a href="https://github.com/rubocop-hq/rubocop" target="_blank">Rubocop</a> for Ruby static analysis</li>
+  <li><a href="https://stylelint.io/" target="_blank">Stylelint</a> for CSS/SCSS linting</li>
+  <li><a href="https://eslint.org/" target="_blank">ESlint</a> for JavaScript linting</li>
+  <li><a href="https://github.com/troessner/reek" target="_blank">Reek</a> for detecting general code smells in Ruby</li>
+</ul>
+
+<p>In addition to being superb tools for measuring standard of code, many of these can also be configured to automatically fix
+the underlying rules that they run. This means that things like line length can be set to automatically wrap at a set numerical threshold. Less
+work to ensure high quality. Nice!</p>
+
+<p>Integrating this into your culture is essential for ensuring well crafted code. Do code reviews take into account your styleguide? Do you foster
+an environment that encourages team member skill development? Processes like these keep code simple and flexible to future change.</p>
+
+<p>Like Code Coverage, Caliber tends to be a leading indicator of code locations where you’ll experience strife in the future. This
+can also be considered as requiring a higher weight in terms of monitoring the overal caliber of a system.</p>
+
+<h3 id="codependence">Codependence</h3>
+
+<p>Codependence refers to how coupled a particular part of your application is with other parts. <strong>The more coupled your code is the less flexible it is to future change</strong>. Dependencies
+can come in two general flavors: Internal and External.</p>
+
+<p>Breaking this down a bit more, if you have a class that requires at least 3 other classes in the system to function then
+you could think of this single class as having 3 dependencies. ActiveRecord could be thought of as a dependency.</p>
+
+<p>Now, dependencies aren’t necessarily a bad thing. Neither is highly coupled code. Both of which, when used judiciously, can be
+effective solutions. Applications couldn’t function without depending on at least several other concerns.
+The important thing to remember here is to limit the number of dependencies that a single unit requires. If limiting dependencies is
+difficult to impossible, then building the dependencies and consumers of the dependencies in a flexible manner helps to mimize future
+risk and technical debt.</p>
+
+<p>An example of what to avoid could be a single class that takes in dependencies as well as calling out to several other dependencies. The dependencies it
+calls out to then have additional dependencies that they call out to. This style of stacking dependency ontop of dependency where the
+process can’t function without one quickly can become a house of cards. A bug in one dependency instead of requiring a single fix, could require
+a large fix to the overall dependency chain. Dependency injection is a great way to avoid such headaches. This sounds like a complicated
+phrase but in reality it means supply your class with the objects it depends on. <a href="https://guides.hanamirb.org/architecture/interactors/#dependency-injection" target="_blank">Hanami has a great tutorial on the subject.</a></p>
+
+<p><img src="/img/2019/house-of-cards.jpg" alt="House of cards" title="Photo by Karolina Michalak from FreeImages" /></p>
+
+<p>In terms of measuring internal dependencies, there are a few ways in which I think about this. From a Ruby perspective:</p>
+
+<ol>
+  <li>How many arguments does your class’s <code class="language-plaintext highlighter-rouge">#initialize</code> method accept? Are some optional?</li>
+  <li>Are the arguments passed into your class in the format they will be used in? (e.g. instead of calling another class pass in the built object as an argument)</li>
+  <li>How many of the methods within your class call other classes throughout the system? Do those dependencies call other dependencies?</li>
+</ol>
+
+<p>Considering external dependencies, things like what version of Rails are you using? React? Is it up-to-date? Keeping external depedencies up-to-date
+ensures that you continue to design code that is built in a way that the dependency author intended.
+<strong>Keeping a pulse on your external dependencies is important for gaining new features, versions, and security updates.</strong></p>
+
+<p>Codependence is another leading indictator metric which could be monitored through static analysis. I say leading indicator as having a large
+number of dependencies or a chain of dependencies can indicate technical debt. A naive approach to this I’m currently toying with is some type of Rubocop rule
+that looks for calls to other classes in private methods. Instead it could guide you to utilizing dependency injection to craft flexible
+interfaces.</p>
+
+<h3 id="consumption">Consumption</h3>
+
+<p>By consumption, I don’t mean your code has Tuberculosis…</p>
+
+<p>What I mean is, what is the quantity of usage that your code pathways receive. Maybe your user signup process
+receives 5,000 requests everyday. Maybe it only receives 100. <strong>Knowing the amount of interaction a process in your codebase receives allows
+for better prioritization of technical debt initiatives</strong>.</p>
+
+<p>Priorization allows for concentrating engineering team effort around technical debt where that debt has a high usage rate. More usage in
+a higher concentration of technical debt can indicate an area of your application that should be improved before other technical debt. This
+is pretty much a, “Duh! If it is used more then fix it first” but it still is worth considering when identifying debt.</p>
+
+<p>You can measure the consumption through many application monitoring tools. Some great examples of these are listed below:</p>
+
+<ul>
+  <li><a href="https://instrumentalapp.com/" target="_blank">Instrumental</a></li>
+  <li><a href="https://newrelic.com/products/application-monitoring" target="_blank">New Relic APM</a></li>
+  <li><a href="https://www.datadoghq.com/" target="_blank">Datadog</a></li>
+</ul>
+
+<p>This metric is a leading and coincident indicator. It is leading because as you notice trends in application usage you
+can predict hotspots in the system. By coincident I mean that a spike in usage can uncover technical debt cliffs really fast.
+Did you just sell to a large enterprise client? This might accelerate to unknown technical debt cliffs based on the influx
+of usage.</p>
+
+<h3 id="contention">Contention</h3>
+
+<p>While consumption above refers to usage rate, contention refers to failure rate. How often does a single process in
+your codebase experience failure? Is it happening everyday? Hour? Second? This is important for uncovering current
+technical debt as well as future debt. I believe that this metric and consumption above work in tandem by helping identify
+areas of an application that should be improved before others.</p>
+
+<p>Let’s say you have an area of high contention but low usage (maybe only a single client uses the feature) then you can decide on appropriate priority. Area of low contention but high usage? This could indicate
+part of the application that is causing widespread user frustration. <strong>Minimizing areas of contention leads to greater
+client happiness</strong>.</p>
+
+<p><img src="/img/2019/frustrated-man-using-computer.jpg" alt="Frustrated man using computer" title="Photo by Oladimeji Ajegbile from Pexels" />
+<!--<a href="https://www.pexels.com/photo/man-working-using-a-laptop-2696299/?utm_content=attributionCopyText&amp;utm_medium=referral&amp;utm_source=pexels">Photo by Oladimeji Ajegbile from Pexels</a>--></p>
+
+<p>Contention is a lagging and coincident indicator. It generally lags behind technical debt while happening coincidently
+at the same time as a spike in errors. Contention is something that you can see happen with good error reporting and customer ticket handling. Giving
+customers a way to report issues is a great way to capture this metric. I always have the thought that if one person is reporting an issue there are likely
+at least 5 others that have already seen it and closed your application.</p>
+
+<p>Like above there are lots of great tools out there. Here’s a few listed below:</p>
+
+<ul>
+  <li><a href="https://www.honeybadger.io/" target="_blank">Honeybadger</a> for error reporting</li>
+  <li><a href="https://rollbar.com/" target="_blank">Rollbar</a> also for error reporting</li>
+  <li><a href="https://www.zendesk.com/?variant=a" target="_blank">Zendesk</a> for customer support and ticket handling</li>
+</ul>
+
+<h2 id="putting-it-all-together">Putting it all together</h2>
+
+<p>Now that I’ve detailed the above 6 metrics, technical debt can be thought of through multiple lenses. Each of the above
+is important in its own right. From predicting future debt to prioritizing current debt, they all function as a single
+framework. Quickly reviewing the above, some highlights:</p>
+
+<ul>
+  <li><strong>(Chronology)</strong> Chronology of code can indicate a section of your codebase that needs to be revisited</li>
+  <li><strong>(Code Coverage)</strong> Well tested code increases confidence and consistency</li>
+  <li><strong>(Caliber)</strong> Following general community standards and best practices helps to ensure that code is built well the first time</li>
+  <li><strong>(Codependence)</strong> The more coupled your code is the less flexible it is to future change</li>
+  <li><strong>(Codependence)</strong> Keeping a pulse on your external dependencies is important for gaining new features, versions, and security updates</li>
+  <li><strong>(Consumption)</strong> Knowing the amount of interaction a process in your codebase receives allows for better prioritization of technical debt initiatives</li>
+  <li><strong>(Contention)</strong> Minimizing areas of contention leads to greater client happiness</li>
+</ul>
+
+<p>A lot of the above needs to be considered with the context of the other metrics. High Contention but low Consumption might be lower priority than low Coverage and high Consumption. It really depends on
+your application’s situation. In future articles in this series, I’d like to dive deeper into prioritzing the highest risk, strategies to begin reducing technical debt, and practical examples of measuring
+these metrics.</p>
+
+<p>This article has got me thinking through= a system with the capacity to
+highlight high risk areas of an application. Being able to see the overlap between the above risk factors and metrics would give greater
+insight to not only software engineers but management and executives alike.</p>
+
+<p>Some acknowledgments on this post include my colleages at <a href="https://www.lessonly.com/" target="_blank">Lessonly</a> for helping shape the Codependence metric and my wife for listening to me
+talk about the topic of technical debt way to much.</p>
+
+<p>Do you have any guidelines for identifying technical debt? Is there one I should add to the above? Let me know with a comment below and as always
+thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/" alt="Invalidate requests when a user session contains null bytes in the Rack layer">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Invalidate requests when a user session contains null bytes in the Rack layer</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/configuring-letter-opener-for-hanami-development-environment/" alt="Configuring Letter Opener for Hanami development environment">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Configuring Letter Opener for Hanami development environment</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Request formats should match their endpoints. Authorization adds a split between authorized and unauthorized requests. ActiveRecord means we’re at times making an unnecessary database calls (which I like to avoid). One way to minimize such calls is to stub interactions between objects using stubbing. For the remainder of this post, we’re going to dig into how to properly test invalid request formats, authorization logic, and ActiveRecord failures. Let’s get to it!" />
+<meta property="og:description" content="Request formats should match their endpoints. Authorization adds a split between authorized and unauthorized requests. ActiveRecord means we’re at times making an unnecessary database calls (which I like to avoid). One way to minimize such calls is to stub interactions between objects using stubbing. For the remainder of this post, we’re going to dig into how to properly test invalid request formats, authorization logic, and ActiveRecord failures. Let’s get to it!" />
+<link rel="canonical" href="http://joshfrankel.me/blog/testing-request-specs-for-invalid-formats-pundit-authorization-and-activerecord-failures/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/testing-request-specs-for-invalid-formats-pundit-authorization-and-activerecord-failures/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-05-22T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2019-05-22T00:00:00+00:00","dateModified":"2019-05-22T00:00:00+00:00","headline":"Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/testing-request-specs-for-invalid-formats-pundit-authorization-and-activerecord-failures/"},"url":"http://joshfrankel.me/blog/testing-request-specs-for-invalid-formats-pundit-authorization-and-activerecord-failures/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Request formats should match their endpoints. Authorization adds a split between authorized and unauthorized requests. ActiveRecord means we’re at times making an unnecessary database calls (which I like to avoid). One way to minimize such calls is to stub interactions between objects using stubbing. For the remainder of this post, we’re going to dig into how to properly test invalid request formats, authorization logic, and ActiveRecord failures. Let’s get to it!","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures</h1>
+
+    
+      <p class="Banner-information">
+        <time>May 22, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Request formats should match their endpoints. Authorization adds a split between authorized and unauthorized requests. ActiveRecord means we’re at times making an unnecessary database calls (which I like to avoid). One way to minimize such calls is to stub interactions between objects using stubbing.</p>
+
+<p>For the remainder of this post, we’re going to dig into how to properly test invalid request formats, authorization logic, and ActiveRecord failures. Let’s get to it!</p>
+
+<!--excerpt-->
+
+<h3 id="sections">Sections</h3>
+
+<p>If you’re just looking to understand one part of this post I’ve listed out some
+section shortcuts below:</p>
+
+<ol>
+  <li><a href="#when-format-is-not-json">Testing request format</a></li>
+  <li><a href="#when-the-current-user-is-unauthorized">Testing unauthorized request via Pundit</a></li>
+  <li><a href="#for-authorized-requests">Testing authorized request via Pundit</a></li>
+  <li><a href="#when-activerecord-fails">Testing ActiveRecord update failure</a></li>
+</ol>
+
+<h2 id="first-a-little-bit-about-request-specs">First a little bit about Request Specs</h2>
+<p>With the advent of RSpec 3.5, request specs were noted as being the standard going forward. They 
+allow for better testing of functionality by providing a more realistic environment 
+than controller specs. Also they’re apparently really fast.</p>
+
+<p><img src="/img/2019/why-request-specs.jpg" alt="...But why request specs?" title="Zoolander meme with request specs" /></p>
+
+<p>I’ll let the RSpec team take over here:</p>
+
+<blockquote class="Info">The official recommendation of the Rails team and the RSpec core team is to write request specs instead. Request specs allow you to focus on a single controller action, but unlike controller tests involve the router, the middleware stack, and both rack requests and responses. This adds realism to the test that you are writing, and helps avoid many of the issues that are common in controller specs.
+<cite><a href="http://rspec.info/blog/2016/07/rspec-3-5-has-been-released/">RSpec 3.5 has been released</a></cite></blockquote>
+
+<h2 id="our-controller-and-request-spec">Our Controller and Request spec</h2>
+
+<p>We’ll start out with a simple controller action that is used for a JSON endpoint. It has a few responsibilities that it needs to support:</p>
+
+<ul>
+  <li>Find an object based on incoming params</li>
+  <li>Perform authorization on the object (via Pundit)</li>
+  <li>Attempt to update the object</li>
+  <li>Return a JSON response</li>
+</ul>
+
+<p>The first thing I like to do is write out a skeleton of contexts that I want to test. With that knowledge, the corresponding <code class="language-plaintext highlighter-rouge">/spec/requests/users_spec.rb</code> might look like the following:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># /spec/requests/users_spec.rb</span>
+<span class="nb">require</span> <span class="s2">"spec_helper"</span>
+
+<span class="n">describe</span> <span class="no">UsersController</span> <span class="k">do</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:current_user</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:user_object_to_authorize</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">before</span> <span class="k">do</span>
+    <span class="c1"># Does the necessary login logic for our application</span>
+    <span class="n">login_to_application</span><span class="p">(</span><span class="ss">user: </span><span class="n">current_user</span><span class="p">,</span> <span class="ss">password: </span><span class="n">password</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">describe</span> <span class="s2">"PATCH#update"</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s2">"WHEN format is not JSON"</span> <span class="k">do</span>
+      <span class="n">pending</span> <span class="s2">"raises an ActionController::RoutingError exception"</span>
+    <span class="k">end</span>
+
+    <span class="n">context</span> <span class="s2">"WHEN format is JSON"</span> <span class="k">do</span>
+      <span class="n">context</span> <span class="s2">"WHEN unauthorized"</span> <span class="k">do</span>
+        <span class="n">pending</span> <span class="s2">"raises a Pundit::NotAuthorizedError exception"</span>
+      <span class="k">end</span>
+
+      <span class="n">context</span> <span class="s2">"WHEN authorized"</span> <span class="k">do</span>
+        <span class="n">context</span> <span class="s2">"AND the update fails"</span> <span class="k">do</span>
+          <span class="n">pending</span> <span class="s2">"doesn't update the user and responds with a 422 status"</span>
+        <span class="k">end</span>
+
+        <span class="n">context</span> <span class="s2">"AND the update succeeds"</span> <span class="k">do</span>
+          <span class="n">pending</span> <span class="s2">"updates the user and responds with a 200 status"</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>I’m using RSpec’s <code class="language-plaintext highlighter-rouge">pending</code> syntax to stub 🙄… tests I’d like to write. I’ve found this as a great way to detail all the various logic branches. This way I can be confident when I’ve finished the pending tests that the underlying code is properly covered. Note, that this method only works if you know
+what functionality you’d like to build next. If while developing, I come up with
+additional contexts I can add them to the skeleton as pending while working on
+the previously known expectations.</p>
+
+<p>Normally, at this point I’d use test-driven development. For the sake of understanding, I’ve written out the final <code class="language-plaintext highlighter-rouge">UsersController#update?</code> action and corresponding <code class="language-plaintext highlighter-rouge">routes.rb</code> file will look like before writing tests:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># /app/controllers/users_controller.rb</span>
+<span class="k">class</span> <span class="nc">UsersController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">update</span>
+    <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:id</span><span class="p">])</span>
+    <span class="n">authorize</span> <span class="vi">@user</span>
+
+    <span class="c1"># Just a simple update to the User's name string</span>
+    <span class="k">if</span> <span class="vi">@user</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:name</span><span class="p">])</span>
+      <span class="n">render</span> <span class="ss">json: </span><span class="p">{</span> <span class="ss">success: </span><span class="kp">true</span> <span class="p">},</span> <span class="ss">status: :ok</span>
+    <span class="k">else</span>
+      <span class="n">render</span> <span class="ss">json: </span><span class="p">{</span> <span class="ss">success: </span><span class="kp">false</span> <span class="p">},</span> <span class="ss">status: :unprocessable_entity</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># config/routes.rb</span>
+<span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">draw</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">only: :update</span><span class="p">,</span> <span class="ss">constraints: </span><span class="o">-&gt;</span> <span class="n">request</span> <span class="p">{</span> <span class="n">request</span><span class="p">.</span><span class="nf">format</span> <span class="o">==</span> <span class="ss">:json</span> <span class="p">}</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>If you’re unfamiliar with the <strong>constraints</strong> attribute in the <strong>routes.rb</strong> file above, I recommend you read my previous post, <a href="http://joshfrankel.me/blog/using-request-based-constraints-to-only-accept-json-formats-for-endpoints/">“Using request-based constraints to only accept JSON formats for endpoints”</a></p>
+
+<p>Now that we’ve got a baseline example, we’ll work our way from the top-down of the request.</p>
+
+<h2 id="working-from-the-the-top-down">Working from the the top-down</h2>
+
+<p>The term top-down is a bit loaded, so here’s what I mean.</p>
+
+<p>Given a request, start testing at the highest level of the stack and work your way down to the lowest. What this means is that we’ll start with the routing, then the authorization, and finally the <strong>ActiveRecord</strong> call. If you look back at the <strong>users_spec.rb</strong> file you’ll notice that’s exactly how I organized the tests. <code class="language-plaintext highlighter-rouge">"WHEN format is not JSON"</code> is a context that checks to make sure that the incoming request is using the proper format. This is higher level than the authorization check <code class="language-plaintext highlighter-rouge">authorize @user</code>. An invalid format will trigger an <code class="language-plaintext highlighter-rouge">ActionController::RoutingError</code> exception before authorization is even called, so testing it first is logical. I also find that this way of organizing tests organically builds nested contexts to place tests within.</p>
+
+<p>Ok, enough talking. Moar coding!</p>
+
+<h3 id="when-format-is-not-json">When format is not JSON</h3>
+<p>First we’ll add supporting coverage for non-JSON formatted requests.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"spec_helper"</span>
+
+<span class="n">describe</span> <span class="no">UsersController</span> <span class="k">do</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:current_user</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:user_object_to_authorize</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">before</span> <span class="k">do</span>
+    <span class="c1"># Does the necessary login logic for our application</span>
+    <span class="n">login_to_application</span><span class="p">(</span><span class="ss">user: </span><span class="n">current_user</span><span class="p">,</span> <span class="ss">password: </span><span class="n">password</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">describe</span> <span class="s2">"PATCH#update"</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s2">"WHEN format is not JSON"</span> <span class="k">do</span>
+      <span class="n">it</span> <span class="s2">"raises an ActionController::RoutingError exception"</span> <span class="k">do</span>
+        <span class="n">expect</span> <span class="k">do</span>
+          <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">format: :html</span> <span class="p">}</span>
+        <span class="k">end</span><span class="p">.</span><span class="nf">to</span> <span class="n">raise_error</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">RoutingError</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="o">...</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>I’ll break this down a bit. From above we’re calling the named route <code class="language-plaintext highlighter-rouge">user_path(user_object_to_authorize)</code> with the <strong>PATCH</strong> update action which translates to the route <code class="language-plaintext highlighter-rouge">patch "/users/:id"</code>.</p>
+
+<p>We’re also passing <code class="language-plaintext highlighter-rouge">format: :html</code> to specify the request is asking for HTML.</p>
+
+<p>Finally, we wrap the entire request in an <code class="language-plaintext highlighter-rouge">expect do ... end</code> block, to capture the exception that is raised. If we were instead to write the test like this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">it</span> <span class="s2">"raises an ActionController::RoutingError exception"</span> <span class="k">do</span>
+  <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">format: :html</span> <span class="p">}</span>
+  <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="p">).</span><span class="nf">to</span> <span class="n">raise_error</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">RoutingError</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>It wouldn’t work properly. This is because as the <code class="language-plaintext highlighter-rouge">ActionController::RoutingError</code> is raised it would halt execution and trigger a spec failure. That’s why wrapping the patch call in a block allows us to capture the exception and match it to the expectation.</p>
+
+<p>Expectation meet exception.</p>
+
+<h3 id="when-the-current-user-is-unauthorized">When the current user is unauthorized</h3>
+
+<blockquote class="Info Info-right">
+  <strong>A little more about Pundit</strong><br />
+  Essentially, it distills down business logic for questions like, "Can user X do action Y?" or "Can User X access record Z?". Here's the gem's homepage in case you haven't used it before: 
+  <cite><a href="https://github.com/varvet/pundit">https://github.com/varvet/pundit</a></cite>
+</blockquote>
+
+<p>Alright, now that we’re onto our first authorization stub things start to get interesting. We want the <code class="language-plaintext highlighter-rouge">@user</code> object to fail authorization. What we don’t want to do is actually create a validly authorized user for the test but rather just have authorize return false. This avoids database interaction which is 👍 for speedy specs.</p>
+
+<p>With Pundit, we have a corresponding <strong>UserPolicy</strong> class that implements the <strong>update?</strong> method. All that this method does is check to see if the <strong>current_user</strong> can perform the <strong>update?</strong> action. Our request spec doesn’t care about the implementation details of the <code class="language-plaintext highlighter-rouge">UserPolicy#update?</code> method, all it needs is for it to throw an exception if the <strong>current_user</strong> is unauthorized.</p>
+
+<p>Behind the scenes what <code class="language-plaintext highlighter-rouge">authorize @user</code> does is call <code class="language-plaintext highlighter-rouge">UserPolicy.new(current_user, @user).update?</code>. Where <strong>current_user</strong> is the currently logged in user and <code class="language-plaintext highlighter-rouge">@user</code> is the object we want to perform authorization for the <strong>update?</strong> action.</p>
+
+<p>With the above we’re also going to assume that the <code class="language-plaintext highlighter-rouge">UserPolicy#update?</code> method has extensive test
+coverage. So why re-test it in a request spec? Stubbing the UserPolicy like we’re about to do is also known as stubbing an outgoing message. Or messages sent to external objects. For more details, I’ve <a href="http://joshfrankel.me/blog/what-it-means-to-stub-the-system-under-test/#what-to-stub">previously written a post</a> that describes what to stub and what not to as well as the difference between stubs and mocks.</p>
+
+<p>Ok, so with that out of the way here’s the resulting spec coverage:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">describe</span> <span class="s2">"PATCH#update"</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s2">"WHEN format is not JSON"</span> <span class="k">do</span>
+      <span class="c1"># already tested</span>
+    <span class="k">end</span>
+    
+    <span class="n">context</span> <span class="s2">"WHEN format is JSON"</span> <span class="k">do</span>
+      <span class="n">context</span> <span class="s2">"WHEN unauthorized"</span> <span class="k">do</span>
+        <span class="n">it</span> <span class="s2">"raises a Pundit::NotAuthorizedError exception"</span> <span class="k">do</span>
+          <span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">false</span><span class="p">)</span>
+          <span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+
+          <span class="n">expect</span> <span class="k">do</span>
+            <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">format: :json</span> <span class="p">}</span>
+          <span class="k">end</span><span class="p">.</span><span class="nf">to</span> <span class="n">raise_error</span> <span class="no">Pundit</span><span class="o">::</span><span class="no">NotAuthorizedError</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>There’s a lot going on above let’s step through it.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">false</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">instance_double</code> specifies that we want a partial double of the <strong>UserPolicy</strong>. This
+object should stand in for <strong>UserPolicy</strong> acting just like it. Since it is imitating the object it will only have access to the same implemented methods as the <strong>UserPolicy</strong>. This is the major difference between <strong>double</strong> and <strong>instance_double</strong></p>
+
+<p>The second parameter <code class="language-plaintext highlighter-rouge">update?: false</code> stubs the implemented <code class="language-plaintext highlighter-rouge">UserPolicy#update?</code> method with a return value of <strong>false</strong>. This will come into play in a second.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>With this line, we’re expecting the original call to <code class="language-plaintext highlighter-rouge">UserPolicy.new(current_user, @user).update?</code> to occur with the slight twist of instead returning the previously defined <strong>mock_policy</strong>. The above reads like:</p>
+
+<ul>
+  <li>When <strong>UserPolicy</strong> has the <strong>new</strong> method called</li>
+  <li><strong>With</strong> the parameters <strong>current_user</strong> and <strong>user_object_to_authorize</strong></li>
+  <li>Return the <strong>mock_policy</strong> object</li>
+</ul>
+
+<p>Because the <strong>mock_policy</strong> defined a return value of <code class="language-plaintext highlighter-rouge">update?: false</code> directly on it, the authorization check
+will fail. This in turn raises a <strong>Pundit::NotAuthorizedError</strong> exception. Because of this there’s now no need to make the authorization test setup accurate as we’ve just ensured that this test always fails authorization checks.</p>
+
+<p>The remaining code should look familiar to the previous non-JSON format coverage.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">expect</span> <span class="k">do</span>
+  <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">format: :json</span> <span class="p">}</span>
+<span class="k">end</span><span class="p">.</span><span class="nf">to</span> <span class="n">raise_error</span> <span class="no">Pundit</span><span class="o">::</span><span class="no">NotAuthorizedError</span>
+</code></pre></div></div>
+
+<p>Again, we’re just capturing the error during execution of the controller action. The difference is that the exception is now Pundit specific and we’re passing <code class="language-plaintext highlighter-rouge">format: :json</code> which uses the expected format.</p>
+
+<p>Now onto an authorized request</p>
+
+<h3 id="for-authorized-requests">For authorized requests</h3>
+
+<p>Now that we’ve detailed how to specify a failure to authorize, we can do the same thing in the opposite polarity to simulate an authorized request.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">describe</span> <span class="s2">"PATCH#update"</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s2">"WHEN format is not JSON"</span> <span class="k">do</span>
+      <span class="c1"># already tested</span>
+    <span class="k">end</span>
+    
+    <span class="n">context</span> <span class="s2">"WHEN format is JSON"</span> <span class="k">do</span>
+      <span class="n">context</span> <span class="s2">"WHEN unauthorized"</span> <span class="k">do</span>
+        <span class="c1"># For reference I left this previous spec implementation</span>
+        <span class="n">it</span> <span class="s2">"raises a Pundit::NotAuthorizedError exception"</span> <span class="k">do</span>
+          <span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">false</span><span class="p">)</span>
+          <span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+
+          <span class="n">expect</span> <span class="k">do</span>
+            <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">format: :json</span> <span class="p">}</span>
+          <span class="k">end</span><span class="p">.</span><span class="nf">to</span> <span class="n">raise_error</span> <span class="no">Pundit</span><span class="o">::</span><span class="no">NotAuthorizedError</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">context</span> <span class="s2">"WHEN authorized"</span> <span class="k">do</span>
+        <span class="n">context</span> <span class="s2">"AND the update fails"</span> <span class="k">do</span>
+          <span class="c1"># We'll come back to this one next</span>
+        <span class="k">end</span>
+
+        <span class="n">context</span> <span class="s2">"AND the update succeeds"</span> <span class="k">do</span>
+          <span class="n">it</span> <span class="s2">"updates the user and responds with a 200 status"</span> <span class="k">do</span>
+            <span class="c1"># The major difference here is that update?: returns true</span>
+            <span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">true</span><span class="p">)</span>
+            <span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+              <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+              <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+
+            <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> 
+              <span class="ss">format: :json</span><span class="p">,</span>
+              <span class="ss">name: </span><span class="s2">"Elliot Alderson"</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Response expectations</span>
+            <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_http_status</span><span class="p">(</span><span class="ss">:ok</span><span class="p">)</span>
+            <span class="n">expect</span><span class="p">(</span><span class="n">json_response</span><span class="p">).</span><span class="nf">to</span> <span class="n">match_json_expression</span><span class="p">(</span><span class="ss">success: </span><span class="kp">true</span><span class="p">)</span>
+
+            <span class="c1"># Object was updated expectation</span>
+            <span class="n">expect</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">.</span><span class="nf">reload</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_attributes</span><span class="p">(</span>
+              <span class="ss">id: </span><span class="n">user_object_to_authorize</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span>
+              <span class="ss">name: </span><span class="s2">"Elliot Alderson"</span>
+            <span class="p">)</span>
+          <span class="k">end</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>The major difference in the test setup is specifying <code class="language-plaintext highlighter-rouge">update?: true</code> on the <strong>mock_policy</strong>. This ensures that the current request will pass the authorization check.</p>
+
+<p>We’ll skip down to the actual request line</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> 
+  <span class="ss">format: :json</span><span class="p">,</span>
+  <span class="ss">name: </span><span class="s2">"Elliot Alderson"</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<blockquote class="Info Info-right"><strong>match_json_expression</strong>:<br /> I'm using the <a href="https://github.com/chancancode/json_expressions">json_expressions gem</a> for the `match_json_expression` matcher. It is super handy
+  when dealing with JSON payloads.
+</blockquote>
+
+<p>Pretty straightforward here. We’re just passing <code class="language-plaintext highlighter-rouge">name: "Elliot Alderson"</code> which becomes <strong>params[:name]</strong> in the controller to be used to
+update the <strong>User</strong> with a new name.</p>
+
+<p>Next we make some expectations to assert that the request is a <strong>200 :ok</strong> as well as a json payload of <code class="language-plaintext highlighter-rouge">success: true</code></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_http_status</span><span class="p">(</span><span class="ss">:ok</span><span class="p">)</span>
+<span class="n">expect</span><span class="p">(</span><span class="n">json_response</span><span class="p">).</span><span class="nf">to</span> <span class="n">match_json_expression</span><span class="p">(</span><span class="ss">success: </span><span class="kp">true</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Finally, we check to make sure that the update actually took place.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">expect</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">.</span><span class="nf">reload</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_attributes</span><span class="p">(</span>
+  <span class="ss">id: </span><span class="n">user_object_to_authorize</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span>
+  <span class="ss">name: </span><span class="s2">"Elliot Alderson"</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote class="Info Info-right"><strong>Happy path?</strong><br />
+  "[A] happy path is a default scenario featuring no exceptional or error conditions".<br /><br />
+  Oppositely, the sad path is one where execution is expected to
+  encounter an error condition.
+<cite><a href="https://en.wikipedia.org/wiki/Happy_path">Wikipedia</a></cite></blockquote>
+
+<p>One thing to note here is that because <strong>user_object_to_authorize</strong> is defined before the request is made we have to call <code class="language-plaintext highlighter-rouge">user_object_to_authorize.reload</code> to ensure we have the latest object from the database. We could possibly take this a step further and stub the update but I usually like to leave at least the happy path calling <strong>ActiveRecord</strong>. This is just a preference of mine so feel free to keep on down the stubbing path if it feels right.</p>
+
+<h3 id="when-activerecord-fails">When ActiveRecord fails</h3>
+
+<p>Without specific model validations or other direct ways to force a failure of <code class="language-plaintext highlighter-rouge">@user.update</code>, it might be easy to just skip testing the failure case. I’d recommend against it. I’ve had several headaches around failures cases not having matching test coverage while refactoring existing code. This usually leads to thoughts like, “Why the hell isn’t this working! It has tests… oh wait, actually it’s missing coverage”.</p>
+
+<p>For a successful <strong>ActiveRecord</strong> update we went ahead and made it a real call to the database. However, since we don’t have a way to make this test fail let’s simulate it again with some mocking.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">describe</span> <span class="s2">"PATCH#update"</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s2">"WHEN format is not JSON"</span> <span class="k">do</span>
+      <span class="c1"># already tested</span>
+    <span class="k">end</span>
+    
+    <span class="n">context</span> <span class="s2">"WHEN format is JSON"</span> <span class="k">do</span>
+      <span class="n">context</span> <span class="s2">"WHEN unauthorized"</span> <span class="k">do</span>
+        <span class="c1"># already tested</span>
+      <span class="k">end</span>
+
+      <span class="n">context</span> <span class="s2">"WHEN authorized"</span> <span class="k">do</span>
+        <span class="n">context</span> <span class="s2">"AND the update fails"</span> <span class="k">do</span>
+          <span class="n">it</span> <span class="s2">"doesn't update the user and responds with a 422 status"</span> <span class="k">do</span>
+            <span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">true</span><span class="p">)</span>
+            
+            <span class="c1"># Inject our user_object_to_authorize as what ActiveRecord returns</span>
+            <span class="c1"># from the find method</span>
+            <span class="n">allow</span><span class="p">(</span><span class="no">User</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:find</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">)</span>
+            <span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+              <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+              <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+
+            <span class="c1"># Stub the ActiveRecord update method to return false indicating a </span>
+            <span class="c1"># failure.</span>
+            <span class="n">allow</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:update</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span>
+
+            <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> 
+              <span class="ss">format: :json</span><span class="p">,</span>
+              <span class="ss">name: </span><span class="s2">"Elliot Alderson"</span>
+            <span class="p">}</span>
+
+            <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_http_status</span><span class="p">(</span><span class="ss">:unprocessable_entity</span><span class="p">)</span>
+            <span class="n">expect</span><span class="p">(</span><span class="n">json_response</span><span class="p">).</span><span class="nf">to</span> <span class="n">match_json_expression</span><span class="p">(</span><span class="ss">success: </span><span class="kp">false</span><span class="p">)</span>
+          <span class="k">end</span>
+        <span class="k">end</span>
+
+        <span class="n">context</span> <span class="s2">"AND the update succeeds"</span> <span class="k">do</span>
+          <span class="c1"># already tested</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>This was is a bit more specific than the last context; as we’re injecting an
+object where normally <code class="language-plaintext highlighter-rouge">User.find</code> would return one from the database. Essentially,
+we’re getting in front interaction between controller and model to use our
+own object. This allows for the necessary stubbing of a failed <strong>ActiveRecord</strong> action.
+A side effect of the above stubbing setup is that we never touch the database.</p>
+
+<p>Some of the above is identical to the successful request.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">true</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>This is just making sure that the authorization check returns true for successfully authorized.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Inject our user_object_to_authorize as what ActiveRecord returns</span>
+<span class="c1"># from the find method</span>
+<span class="n">allow</span><span class="p">(</span><span class="no">User</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:find</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">)</span>
+<span class="o">...</span>
+
+<span class="c1"># Stub the ActiveRecord update method to return false indicating a </span>
+<span class="c1"># failure.</span>
+<span class="n">allow</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:update</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Above, we inject our <code class="language-plaintext highlighter-rouge">user_object_to_authorize</code> test object as what <strong>ActiveRecord</strong> returns from the call to <strong>find</strong>. Later on, we stub that same user object to
+respond to the update message with the value of false. By doing this we simulate
+what would happen in the event that <code class="language-plaintext highlighter-rouge">@user.update(params[:name])</code> would fail.</p>
+
+<p>One thing you might notice is the order of stubbing above. I find that stubbing is most understandable when you perform it in order of code execution. This make looking back at what an old test was accomplishing intuitive. Quick refresher on our controller action shows the following order:</p>
+
+<ol>
+  <li>Load a User object from a request param <code class="language-plaintext highlighter-rouge">@user = User.find(params[:id])</code></li>
+  <li>Authorize the loaded user object <code class="language-plaintext highlighter-rouge">authorize @user</code></li>
+  <li>Update the authorized user object <code class="language-plaintext highlighter-rouge">@user.update(params[:name])</code></li>
+</ol>
+
+<p>That’s why the order of stubbing looks like:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Step 1</span>
+<span class="n">allow</span><span class="p">(</span><span class="no">User</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:find</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">)</span>
+
+<span class="c1"># Step 2</span>
+<span class="c1"># We use expect here because we really want to be sure that the proper objects</span>
+<span class="c1"># are being sent to the authorization check</span>
+<span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+
+<span class="c1"># Step 3</span>
+<span class="n">allow</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:update</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Another difference above is the usage of <strong>allow</strong> and <strong>expect</strong>. Using <strong>expect</strong>, will fail the test if the object does not receive the method and parameters specified. Using <strong>allow</strong>, simply stubs the method but will continue to work even if that method is never called. I’m using allow above for the ActiveRecord calls as I don’t care as much about what they are performing outside of ensuring they return a specific value. For the <strong>UserPolicy</strong> I want the extra confidence that not only is it calling the <strong>new</strong> method but also it is passing the proper parameters of <strong>.with(current_user, user_object_to_authorize)</strong>. This is mostly a preference of mine as you could use allow / expect here interchangeably.</p>
+
+<p>Now, by stubbing both the authorization as well as the return value from ActiveRecord, we now can test what happens when the update fails. Notably that it returns a
+status code of <strong>422 (unprocessable_entity)</strong> and the <strong>JSON</strong> payload contains <code class="language-plaintext highlighter-rouge">success: false</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_http_status</span><span class="p">(</span><span class="ss">:unprocessable_entity</span><span class="p">)</span>
+<span class="n">expect</span><span class="p">(</span><span class="n">json_response</span><span class="p">).</span><span class="nf">to</span> <span class="n">match_json_expression</span><span class="p">(</span><span class="ss">success: </span><span class="kp">false</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We’ve written coverage for an invalid request format, stubbed Pundit authorization for a user object, and simulated an ActiveRecord failure. With this, we have a well tested endpoint that doesn’t test more than it has to. We can not be confident that future changes don’t impact this endpoint along with keeping the spec efficient.</p>
+
+<p>Here’s the spec in its full form:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"spec_helper"</span>
+
+<span class="n">describe</span> <span class="no">UsersController</span> <span class="k">do</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:current_user</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">let</span><span class="p">(</span><span class="ss">:user_object_to_authorize</span><span class="p">)</span> <span class="p">{</span> <span class="n">create</span><span class="p">(</span><span class="ss">:user</span><span class="p">)</span> <span class="p">}</span>
+
+  <span class="n">before</span> <span class="k">do</span>
+    <span class="n">login_to_application</span><span class="p">(</span><span class="ss">user: </span><span class="n">current_user</span><span class="p">,</span> <span class="ss">password: </span><span class="n">password</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">describe</span> <span class="s2">"PATCH#update"</span> <span class="k">do</span>
+    <span class="n">context</span> <span class="s2">"WHEN format is not JSON"</span> <span class="k">do</span>
+      <span class="n">it</span> <span class="s2">"raises an ActionController::RoutingError exception"</span> <span class="k">do</span>
+        <span class="n">expect</span> <span class="k">do</span>
+          <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">format: :html</span> <span class="p">}</span>
+        <span class="k">end</span><span class="p">.</span><span class="nf">to</span> <span class="n">raise_error</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">RoutingError</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="n">context</span> <span class="s2">"WHEN format is JSON"</span> <span class="k">do</span>
+      <span class="n">context</span> <span class="s2">"WHEN unauthorized"</span> <span class="k">do</span>
+        <span class="n">it</span> <span class="s2">"raises a Pundit::NotAuthorizedError exception"</span> <span class="k">do</span>
+          <span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">false</span><span class="p">)</span>
+          <span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+
+          <span class="n">expect</span> <span class="k">do</span>
+            <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">format: :json</span> <span class="p">}</span>
+          <span class="k">end</span><span class="p">.</span><span class="nf">to</span> <span class="n">raise_error</span> <span class="no">Pundit</span><span class="o">::</span><span class="no">NotAuthorizedError</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">context</span> <span class="s2">"WHEN authorized"</span> <span class="k">do</span>
+        <span class="n">context</span> <span class="s2">"AND the update fails"</span> <span class="k">do</span>
+          <span class="n">it</span> <span class="s2">"doesn't update the user and responds with a 422 status"</span> <span class="k">do</span>
+            <span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">true</span><span class="p">)</span>
+            
+            <span class="c1"># Inject our user_object_to_authorize as what ActiveRecord returns</span>
+            <span class="c1"># from the find method</span>
+            <span class="n">allow</span><span class="p">(</span><span class="no">User</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:find</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">)</span>
+            <span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+              <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+              <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+
+            <span class="c1"># Stub the ActiveRecord update method to return false indicating a </span>
+            <span class="c1"># failure.</span>
+            <span class="n">allow</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:update</span><span class="p">).</span><span class="nf">and_return</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span>
+
+            <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> 
+              <span class="ss">format: :json</span><span class="p">,</span>
+              <span class="ss">name: </span><span class="s2">"Elliot Alderson"</span>
+            <span class="p">}</span>
+
+            <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_http_status</span><span class="p">(</span><span class="ss">:unprocessable_entity</span><span class="p">)</span>
+            <span class="n">expect</span><span class="p">(</span><span class="n">json_response</span><span class="p">).</span><span class="nf">to</span> <span class="n">match_json_expression</span><span class="p">(</span><span class="ss">success: </span><span class="kp">false</span><span class="p">)</span>
+          <span class="k">end</span>
+        <span class="k">end</span>
+
+        <span class="n">context</span> <span class="s2">"AND the update succeeds"</span> <span class="k">do</span>
+          <span class="n">it</span> <span class="s2">"updates the user and responds with a 200 status"</span> <span class="k">do</span>
+            <span class="c1"># The major difference here is that update?: returns true</span>
+            <span class="n">mock_policy</span> <span class="o">=</span> <span class="n">instance_double</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">,</span> <span class="ss">update?: </span><span class="kp">true</span><span class="p">)</span>
+            <span class="n">expect</span><span class="p">(</span><span class="no">UserPolicy</span><span class="p">).</span><span class="nf">to</span> <span class="n">receive</span><span class="p">(</span><span class="ss">:new</span><span class="p">)</span>
+              <span class="p">.</span><span class="nf">with</span><span class="p">(</span><span class="n">current_user</span><span class="p">,</span> <span class="n">user_object_to_authorize</span><span class="p">)</span>
+              <span class="p">.</span><span class="nf">and_return</span><span class="p">(</span><span class="n">mock_policy</span><span class="p">)</span>
+
+            <span class="n">patch</span> <span class="n">user_path</span><span class="p">(</span><span class="n">existing_user</span><span class="p">),</span> <span class="ss">params: </span><span class="p">{</span> 
+              <span class="ss">format: :json</span><span class="p">,</span>
+              <span class="ss">name: </span><span class="s2">"Elliot Alderson"</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Response expectations</span>
+            <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_http_status</span><span class="p">(</span><span class="ss">:ok</span><span class="p">)</span>
+            <span class="n">expect</span><span class="p">(</span><span class="n">json_response</span><span class="p">).</span><span class="nf">to</span> <span class="n">match_json_expression</span><span class="p">(</span><span class="ss">success: </span><span class="kp">true</span><span class="p">)</span>
+
+            <span class="c1"># Object was updated expectation</span>
+            <span class="n">expect</span><span class="p">(</span><span class="n">user_object_to_authorize</span><span class="p">.</span><span class="nf">reload</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_attributes</span><span class="p">(</span>
+              <span class="ss">id: </span><span class="n">user_object_to_authorize</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span>
+              <span class="ss">name: </span><span class="s2">"Elliot Alderson"</span>
+            <span class="p">)</span>
+          <span class="k">end</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>We had to dig into the internals of Pundit a bit to properly stub UserPolicy. What did
+you think of this approach? Did it couple the test stubs to closely to a third-party
+implementation? Do you have an alternative you know about?</p>
+
+<p>Is there a way we could refactor or consolidate the test logic above? (I can think
+of two options 😉)</p>
+
+<p>I would love to hear your thoughts below. As always, thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/using-request-based-constraints-to-only-accept-json-formats-for-endpoints/" alt="Using request-based constraints to only accept JSON formats for endpoints">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Using request-based constraints to only accept JSON formats for endpoints</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/signing-commits-for-github-and-sublime-merge/" alt="Signing commits for Github and Sublime Merge">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Signing commits for Github and Sublime Merge</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

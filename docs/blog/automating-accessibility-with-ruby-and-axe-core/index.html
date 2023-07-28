@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Automating Accessibility with Ruby and Axe Core | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Automating Accessibility with Ruby and Axe Core" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Building an accessible application can be challenging. Keeping an application accessible can be impossible. Without dedicated roles or full team support, accessibility regressions are easy to introduce. In the past, I’ve used eslint-plugin-jsx-a11y for ensuring React components are accessible, and it helped tremendously. Recently, I’ve dived into Hotwire &amp; Stimulus and needed a solution for ensuring an accessible application. Now as a disclaimer, all automated accessibility checkers have gaps between them and being fully accessible. Striving for a dedicated position or policy to ensure compliance is still something that automation can’t replace. That being said, automation can help keep regresssion at bay." />
+<meta property="og:description" content="Building an accessible application can be challenging. Keeping an application accessible can be impossible. Without dedicated roles or full team support, accessibility regressions are easy to introduce. In the past, I’ve used eslint-plugin-jsx-a11y for ensuring React components are accessible, and it helped tremendously. Recently, I’ve dived into Hotwire &amp; Stimulus and needed a solution for ensuring an accessible application. Now as a disclaimer, all automated accessibility checkers have gaps between them and being fully accessible. Striving for a dedicated position or policy to ensure compliance is still something that automation can’t replace. That being said, automation can help keep regresssion at bay." />
+<link rel="canonical" href="http://joshfrankel.me/blog/automating-accessibility-with-ruby-and-axe-core/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/automating-accessibility-with-ruby-and-axe-core/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-03-17T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-03-17T00:00:00+00:00","dateModified":"2022-03-17T00:00:00+00:00","headline":"Automating Accessibility with Ruby and Axe Core","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/automating-accessibility-with-ruby-and-axe-core/"},"url":"http://joshfrankel.me/blog/automating-accessibility-with-ruby-and-axe-core/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Building an accessible application can be challenging. Keeping an application accessible can be impossible. Without dedicated roles or full team support, accessibility regressions are easy to introduce. In the past, I’ve used eslint-plugin-jsx-a11y for ensuring React components are accessible, and it helped tremendously. Recently, I’ve dived into Hotwire &amp; Stimulus and needed a solution for ensuring an accessible application. Now as a disclaimer, all automated accessibility checkers have gaps between them and being fully accessible. Striving for a dedicated position or policy to ensure compliance is still something that automation can’t replace. That being said, automation can help keep regresssion at bay.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Automating Accessibility with Ruby and Axe Core</h1>
+
+    
+      <p class="Banner-information">
+        <time>March 17, 2022</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Building an accessible application can be challenging. Keeping an application accessible can be impossible. Without dedicated roles or full team support, accessibility regressions are easy to introduce.</p>
+
+<p>In the past, I’ve used <code class="language-plaintext highlighter-rouge">eslint-plugin-jsx-a11y</code> for ensuring React components are accessible, and it helped tremendously. Recently, I’ve dived into Hotwire &amp; Stimulus and needed a solution for ensuring an accessible application. Now as a disclaimer, all automated accessibility checkers have gaps between them and being fully accessible. Striving for a dedicated position or policy to ensure compliance is still something that automation can’t replace. That being said, automation can help keep regresssion at bay.</p>
+
+<!--excerpt-->
+
+<h2 id="what-makes-for-an-accessible-application">What makes for an accessible application?</h2>
+
+<p>First off, what does it mean for an application to be accessible. The Web Content Accessibility Guidelines 2.1 (or WCAG) outline four principles of accessible media.</p>
+
+<ul>
+  <li><strong>Perceivable</strong> - Information and user interface components must be presentable to users in ways they can perceive.</li>
+  <li><strong>Operable</strong> - User interface components and navigation must be operable.</li>
+  <li><strong>Understandable</strong> - Information and the operation of user interface must be understandable.</li>
+  <li><strong>Robust</strong> - Content must be robust enough that it can be interpreted reliably by a wide variety of user agents, including assistive technologies.</li>
+</ul>
+
+<p><strong>Source</strong>: <a href="https://www.w3.org/WAI/WCAG21/Understanding/intro#understanding-the-four-principles-of-accessibility">w3.org</a></p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    If any of these are not true, users with disabilities will not be able to use the Web.
+  </p>
+
+  
+    <a href="hhttps://www.w3.org/WAI/WCAG21/Understanding/intro#understanding-the-four-principles-of-accessibility">Understanding the Four Principles of Accessibility</a>
+  
+</blockquote>
+
+<p>Any website or application that doesn’t adhere to the above, will create challenges
+for those in need of accessible requirements.</p>
+
+<p>So the above contain overarching principles of good accessible design, but what about
+specifics? WCAG has that covered as well as part of a three tier compliance recommendation. The tiers are defined as:</p>
+
+<ul>
+  <li>A - minimal compliance</li>
+  <li>AA - general compliance</li>
+  <li>AAA - high compliance</li>
+</ul>
+
+<p>In order to meet one of the above tiers, all recommendations for that level must be met. Looking for a full list of all the recommendations? The following link provides in-depth explanations: https://www.w3.org/TR/WCAG21/#abstract</p>
+
+<p>There is a wealth of information on Accessibility for the web out there, and I am by no means an expert. This post is merely the tip of the iceberg into the subject.</p>
+
+<p>With the stage set, let’s get into how to implement your own automated accessibility check.</p>
+
+<h2 id="initial-approach">Initial Approach</h2>
+
+<p>The goal for this initiative was to enforce <a href="https://www.w3.org/WAI/standards-guidelines/wcag/">WCAG</a> AA (at least) compliance programmatically. Either through a linter check or testing. While looking for a solution, I came up with two potential strategies:</p>
+
+<ol>
+  <li>Linting raw HTML elements within ERB templates</li>
+  <li>Testing application pages for accessibility compliance within feature test</li>
+</ol>
+
+<p>Approach one felt more inline with how <code class="language-plaintext highlighter-rouge">eslint-plugin-jsx-a11y</code> works. That is linting the html that will be rendered. One downside with this is that it is further
+away from the actual end-user. Additionally, I couldn’t find anything that quite worked for checking ERB templates against accessibility requirements.</p>
+
+<p>For approach two, I searched for a library that would help fail a testing suite as well as print what needed to be fixed. I discovered a company dedicated to this purpose called Deque. They have several solutions which are really handy for testing accessibility (one of which is a ruby gem). So with that found, I moved into implementation.</p>
+
+<h2 id="testing-for-accessibility">Testing for accessibility</h2>
+
+<p>Deque’s gem <code class="language-plaintext highlighter-rouge">axe-core</code> has a nice capybara plugin called <code class="language-plaintext highlighter-rouge">axe-core-capybara</code>. Now for those of you using RSpec there’s additionally a great <a href="https://github.com/dequelabs/axe-core-gems/blob/develop/packages/axe-core-rspec/README.md">axe-core-rspec</a> gem which takes care of configuration. For me, I was using minitest and needed a separate solution.</p>
+
+<p>First off, let’s add <code class="language-plaintext highlighter-rouge">axe-core-capybara</code> to our Gemfile. I’m also assuming you have capybara and webdrivers for running feature tests.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Gemfile</span>
+<span class="n">group</span> <span class="ss">:test</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s2">"capybara"</span><span class="p">,</span> <span class="s2">"&gt;= 3.26"</span>
+  <span class="n">gem</span> <span class="s2">"selenium-webdriver"</span>
+  <span class="n">gem</span> <span class="s2">"webdrivers"</span>
+
+  <span class="c1"># Axe-core</span>
+  <span class="n">gem</span> <span class="s2">"axe-core-capybara"</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Next, within your <code class="language-plaintext highlighter-rouge">ApplicationSystemTestCase</code> you’ll need to require the axe matchers.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s2">"axe/matchers/be_axe_clean"</span>
+
+<span class="k">class</span> <span class="nc">ApplicationSystemTestCase</span> <span class="o">&lt;</span> <span class="no">ActionDispatch</span><span class="o">::</span><span class="no">SystemTestCase</span>
+  <span class="o">...</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>From here what we require is to use the internal axe matcher within a similarly named dsl style method to what we see in Capybara. What I mean by that is, a naming convention that follows the <code class="language-plaintext highlighter-rouge">assert_</code> prefix but indicates we’re testing for accessibility. The following gives us the new <code class="language-plaintext highlighter-rouge">assert_accessible</code> method to be used on the current page rendered.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">assert_accessible</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">matcher</span> <span class="o">=</span> <span class="no">Axe</span><span class="o">::</span><span class="no">Matchers</span><span class="o">::</span><span class="no">BeAxeClean</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">according_to</span><span class="p">(</span><span class="ss">:wcag21aa</span><span class="p">,</span> <span class="s2">"best-practice"</span><span class="p">))</span>
+  <span class="n">audit_result</span> <span class="o">=</span> <span class="n">matcher</span><span class="p">.</span><span class="nf">audit</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+  <span class="n">assert</span><span class="p">(</span><span class="n">audit_result</span><span class="p">.</span><span class="nf">passed?</span><span class="p">,</span> <span class="n">audit_result</span><span class="p">.</span><span class="nf">failure_message</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Above, <code class="language-plaintext highlighter-rouge">matcher</code> can be overridden, but by default is the internal BeAxeClean matcher. Note that I have it set to AA compliance as well as best practices. For a description of all available rules, you can visit the <a href="https://github.com/dequelabs/axe-core/blob/master/doc/rule-descriptions.md#rule-descriptions">following documentation</a>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">audit</code> refers to the internal <code class="language-plaintext highlighter-rouge">Axe::Api::Audit</code> class which can be <a href="https://github.com/dequelabs/axe-core-gems/blob/develop/packages/axe-core-api/lib/axe/api/audit.rb">found here</a>. This provides several nice helper methods like: <code class="language-plaintext highlighter-rouge">passed?</code> and <code class="language-plaintext highlighter-rouge">failure_message</code>. Using these we can generate a simple assertion by saying, if the matcher result doesn’t pass then display the failure message from axe.</p>
+
+<p>With that, we can utilize the new matcher for our feature tests like so:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Accessibility System test</span>
+<span class="nb">require</span> <span class="s2">"application_system_test_case"</span>
+
+<span class="k">class</span> <span class="nc">AccessibilityTest</span> <span class="o">&lt;</span> <span class="no">ApplicationSystemTestCase</span>
+  <span class="nb">test</span> <span class="s2">"landing page is accessible"</span> <span class="k">do</span>
+    <span class="n">visit</span> <span class="n">root_path</span>
+
+    <span class="n">assert_accessible</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h2 id="bonus-browser-extension-for-testing-accessibility">Bonus: Browser Extension for testing Accessibility</h2>
+
+<p>Now, axe doesn’t just have libraries for auditing page accessibility, they also have a great Chrome extension. I highly recommend installing this if you plan to do automated accessibility testing, as it helps track down failing issues. Additionally, it can find accessibility recommendations that the automated testing above misses. <a href="https://chrome.google.com/webstore/detail/axe-devtools-web-accessib/lhdoppojpmngadmnindnejefpokejbdd?hl=en-US">Download the extension here</a>. The free version works great</p>
+
+<p><img src="/img/2022/axe-dev-tools-demo.png" alt="Axe DevTools example" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We now have a test suite which can fail on Accessibility being outside of compliance. This will help reduce any accessibility regressions being introduced into the application. I don’t think this is a full solution for ensuring accessibility compliance. As far as I’ve found, you need an actual person conducting accessibility auditing. So keep that in mind when working towards a more accessible application.</p>
+
+<p>We’ve only scratched the surface of automated accessibility testing. What have you found to make accessibility testing easier? Is there a tool or process you love? I’d love to hear about them and discuss in the comments below.</p>
+
+<p>Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/examining-power-and-privilege-in-the-workplace-basecamps-problematic-policies/" alt="Examining power and privilege in the workplace; Basecamp's problematic policies">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Examining power and privilege in the workplace; Basecamp's problematic policies</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/tips-i-learned-working-with-activestorage/" alt="Tips I learned working with ActiveStorage">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Tips I learned working with ActiveStorage</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

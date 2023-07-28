@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Lessons learned from using Capybara for feature testing | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Lessons learned from using Capybara for feature testing" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Having confidence in your application helps with the aid of great interation tests. For Rails, that means utilizing the Capybara gem for testing features from end-to-end. While Capybara is a great gem for accomplishing this goal, it can be at time difficult, frustrating, and nuanced in its implementation. I’ve been keeping track of all the tricks I use reguarly and compiled a list of the best ones. Hopefully, this helps give some clarity to a few best practices I use on a daily basis." />
+<meta property="og:description" content="Having confidence in your application helps with the aid of great interation tests. For Rails, that means utilizing the Capybara gem for testing features from end-to-end. While Capybara is a great gem for accomplishing this goal, it can be at time difficult, frustrating, and nuanced in its implementation. I’ve been keeping track of all the tricks I use reguarly and compiled a list of the best ones. Hopefully, this helps give some clarity to a few best practices I use on a daily basis." />
+<link rel="canonical" href="http://joshfrankel.me/blog/lessons-learned-from-using-capybara-for-feature-testing/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/lessons-learned-from-using-capybara-for-feature-testing/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-09-06T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2017-09-06T00:00:00+00:00","dateModified":"2017-09-06T00:00:00+00:00","headline":"Lessons learned from using Capybara for feature testing","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/lessons-learned-from-using-capybara-for-feature-testing/"},"url":"http://joshfrankel.me/blog/lessons-learned-from-using-capybara-for-feature-testing/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Having confidence in your application helps with the aid of great interation tests. For Rails, that means utilizing the Capybara gem for testing features from end-to-end. While Capybara is a great gem for accomplishing this goal, it can be at time difficult, frustrating, and nuanced in its implementation. I’ve been keeping track of all the tricks I use reguarly and compiled a list of the best ones. Hopefully, this helps give some clarity to a few best practices I use on a daily basis.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Lessons learned from using Capybara for feature testing</h1>
+
+    
+      <p class="Banner-information">
+        <time>September 6, 2017</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Having confidence in your application helps with the aid of great interation tests.
+For Rails, that means utilizing the Capybara gem for testing features from end-to-end.</p>
+
+<p>While Capybara is a great gem for accomplishing this goal, it can be at time difficult, frustrating, and
+nuanced in its implementation. I’ve been keeping track of all the tricks I use reguarly and compiled a
+list of the best ones. Hopefully, this helps give some clarity to a few best practices I use on a daily basis.
+<!--excerpt--></p>
+
+<h2 id="find-element-attribute">Find element attribute</h2>
+<p>You can use the hash symbol syntax to return the full value of any attributes from a captured element.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">have_css</span><span class="p">(</span><span class="s2">".PathContentOptions .NewButton[disabled]"</span><span class="p">)</span></code></pre></figure>
+
+<p>The additional syntax of <code>find(".PathContentOptions .NewButton")[:disabled]</code> is also available but
+not recommended due to its inability to wait for the element to load fully with the specific
+attribute.</p>
+
+<h2 id="find-the-parent-of-an-element">Find the parent of an element</h2>
+<p>Sometimes it might be nearly impossible to grab a specific container element. Whether that is due to multiple existing on the page or insufficient selector specificity, it can be difficult to grab ambigous elements.</p>
+
+<p>However, if you can find an element that is a child of the element you want to write expectations against you can use xpath to find its parent.</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">"target"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;div&gt;</span>
+  <span class="nt">&lt;p&gt;</span>Excluded<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/div&gt;</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">node</span> <span class="o">=</span> <span class="n">page</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="s2">".target"</span><span class="p">)</span>
+<span class="n">parent</span> <span class="o">=</span> <span class="n">node</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="ss">:xpath</span><span class="p">,</span> <span class="s2">".."</span><span class="p">)</span>
+<span class="n">parent</span><span class="p">[</span><span class="s2">"innerHTML"</span><span class="p">]</span> <span class="c1">#=&gt; &lt;p&gt;Excluded&lt;/p&gt;</span></code></pre></figure>
+
+<h2 id="set-element-value-without-an-id-or-name">Set element value without an ID or name</h2>
+<p>Using the keyword <code>set</code> you can mimic the fill_in shortcut for elements that are difficult to find by id or name.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">find</span><span class="p">(</span><span class="s2">".AssignModal-recurringAmount"</span><span class="p">).</span><span class="nf">set</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></code></pre></figure>
+
+<p>You can also select options from a drop down in a similiar fashion with the <code>select_option</code>
+keyword.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">find</span><span class="p">(</span><span class="s2">".AssignModal-recurringUnit select"</span><span class="p">).</span><span class="nf">first</span><span class="p">(</span><span class="ss">:option</span><span class="p">,</span> <span class="s2">"Weeks"</span><span class="p">).</span><span class="nf">select_option</span></code></pre></figure>
+
+<h2 id="mimic-user-typing-directly-with-send_keys">Mimic user typing directly with send_keys</h2>
+<p>While the previous example gives you a way to directly set what value is within
+an element, sometimes you want to actually mimic the user’s interaction. This is 
+especially important with things like <strong>autocomplete</strong> or <strong>fuzzy searches</strong>.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">find</span><span class="p">(</span><span class="s2">".someElement"</span><span class="p">).</span><span class="nf">native</span><span class="p">.</span><span class="nf">send_keys</span><span class="p">(</span><span class="s2">"User typing each character"</span><span class="p">)</span></code></pre></figure>
+
+<p><code>Native</code> returns the element directly from the driver allowing for more control of
+elements that is closer to the real implementation of the browser.</p>
+
+<p><code>Send_keys</code> mimics a user typing each character one at a time into whatever element
+it is pointed at.</p>
+
+<h2 id="assert-that-the-button-is-disabled">Assert that the button is disabled</h2>
+<p>This allows you to match only disabled buttons on the page. Without this line Capybara 
+defaults to marking elements that are disabled as not being part of the content.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">expect</span><span class="p">(</span><span class="n">page</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_button</span><span class="p">(</span><span class="s2">"Review and Assign"</span><span class="p">,</span> <span class="ss">disabled: </span><span class="kp">true</span><span class="p">)</span></code></pre></figure>
+
+<p>Furthermore, you can also check for visible buttons or elements with the visible attribute.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">expect</span><span class="p">(</span><span class="n">page</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_button</span><span class="p">(</span><span class="s2">"Review and Assign"</span><span class="p">,</span> <span class="ss">visible: </span><span class="kp">true</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="switch-your-test-context-to-a-popup">Switch your test context to a popup</h2>
+<p>By switching to the latest browser window as the current page window you can seamlessly 
+test a popup’s interactions and styles.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">popup</span> <span class="o">=</span> <span class="n">page</span><span class="p">.</span><span class="nf">driver</span><span class="p">.</span><span class="nf">browser</span><span class="p">.</span><span class="nf">window_handles</span><span class="p">.</span><span class="nf">last</span>
+<span class="n">page</span><span class="p">.</span><span class="nf">driver</span><span class="p">.</span><span class="nf">browser</span><span class="p">.</span><span class="nf">switch_to_window</span><span class="p">(</span><span class="n">popup</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="ensure-specific-counts-for-element-matches">Ensure specific counts for element matches</h2>
+<p>Allows for matching and expecting a certain number of elements. Fails if there are
+more or less than the specified amount.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">expect</span><span class="p">(</span><span class="n">page</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_selector</span><span class="p">(</span><span class="s2">".Icon"</span><span class="p">,</span> <span class="ss">count: </span><span class="mi">4</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="expect-selector-with-text">Expect selector with text</h2>
+<p>Matching a css class or ID can sometimes not be specific enough. Especially, in
+cases where a class appears more than once further matching the selector based on 
+the text within it can help increase expectation specificity.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">expect</span><span class="p">(</span><span class="n">page</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_selector</span><span class="p">(</span><span class="s2">".LearningContent-actionButton"</span><span class="p">,</span> <span class="ss">text: </span><span class="s2">"Start Lesson"</span><span class="p">)</span></code></pre></figure>
+
+<p>Additionally, text can accept regexp syntax so you can use the <code>/i</code> case insensitive matcher</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">expect</span><span class="p">(</span><span class="n">page</span><span class="p">).</span><span class="nf">to</span> <span class="n">have_selector</span><span class="p">(</span><span class="s2">".LearningContent-actionButton"</span><span class="p">,</span> <span class="ss">text: </span><span class="sr">/Start Lesson/i</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="waiting-for-ajax-sleep-no-more">Waiting for ajax? Sleep no more!</h2>
+
+<p>Waiting for ajax can be a pain. How long should sleep be set for? A quarter-second? 1 second? Luckily, there’s a way to properly wait for ajax to complete without using sleep.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Put this in your javascript helpers or other helper location you use for</span>
+<span class="c1"># your feature specs</span>
+<span class="k">def</span> <span class="nf">wait_for_ajax</span>
+  <span class="no">Timeout</span><span class="p">.</span><span class="nf">timeout</span><span class="p">(</span><span class="no">Capybara</span><span class="p">.</span><span class="nf">default_max_wait_time</span><span class="p">)</span> <span class="k">do</span>
+    <span class="kp">loop</span> <span class="k">until</span> <span class="n">page</span><span class="p">.</span><span class="nf">evaluate_script</span><span class="p">(</span><span class="s2">"jQuery.active"</span><span class="p">).</span><span class="nf">zero?</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># Then use in your test like</span>
+<span class="n">it</span> <span class="s2">"performs an ajax request"</span> <span class="k">do</span>
+  <span class="n">some_ajax_event</span>
+
+  <span class="n">wait_for_ajax</span>
+
+  <span class="n">more_expectations</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The original solution (which the above is based on) was proposed by Thoughtbot and can be <a href="https://coderwall.com/p/aklybw/wait-for-ajax-with-capybara-2-0">found here on Coderwall</a>.</p>
+
+<h2 id="poltergeist-web-driver-clicking-elements">Poltergeist web driver clicking elements</h2>
+<p><code>Error message: Capybara::Poltergeist::MouseEventFailed:</code>
+The element you are trying to interact with might be overlapping another element. If you don’t care about this, using node.trigger(‘click’) can ignore
+this situation.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">find</span><span class="p">(</span><span class="s2">"some element"</span><span class="p">).</span><span class="nf">trigger</span><span class="p">(</span><span class="s2">"click"</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="search-within-particular-element-context">Search within particular element context</h2>
+<p>You probably know that you can change the page context with the <code>within(".selector") do</code> block. But did you know you can also 
+select a specific element based on where it appears?</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">within</span><span class="p">(</span><span class="n">first</span><span class="p">(</span><span class="s2">".selector"</span><span class="p">,</span> <span class="ss">match: :first</span><span class="p">))</span>
+<span class="n">within</span><span class="p">(</span><span class="n">first</span><span class="p">(</span><span class="s2">".selector"</span><span class="p">,</span> <span class="ss">text: </span><span class="s2">"Some text here"</span><span class="p">))</span></code></pre></figure>
+
+<p><strong>Note</strong> Make sure you use an option or element waiting approach when using first()
+since first() doesn’t wait until all elements load.</p>
+
+<h2 id="use-current_scope-to-debug-the-current-context">Use current_scope to debug the current context</h2>
+<p>If you wanted to debug the html from within a within block you unfortunately can’t do something like:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">within</span><span class="p">(</span><span class="s2">".selector"</span><span class="p">)</span> <span class="k">do</span>
+  <span class="nb">puts</span> <span class="n">page</span><span class="p">[</span><span class="s2">"innerHTML"</span><span class="p">]</span> <span class="c1"># =&gt; NoMethodError</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Luckily, there is a keyword that allows you to access the current scope called current_scope</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">within</span><span class="p">(</span><span class="s2">".selector"</span><span class="p">)</span> <span class="k">do</span>
+  <span class="nb">puts</span> <span class="n">current_scope</span><span class="p">[</span><span class="s2">"innerHTML"</span><span class="p">]</span> <span class="c1">#=&gt; Returns the html within the within block</span>
+<span class="k">end</span></code></pre></figure>
+
+<h2 id="directly-debugging-the-current-page">Directly debugging the current page</h2>
+<p>Sometimes using <code>save_and_open_page</code> isn’t enough to determine what is going
+on within a test. It doesn’t load assets properly or interact well with user
+input.</p>
+
+<p>However, there is a trick to actually debugging the state of the current page within
+a test.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">puts</span> <span class="n">current_url</span>
+<span class="nb">binding</span><span class="p">.</span><span class="nf">pry</span></code></pre></figure>
+
+<p>You’ll end up with a printed url within your test suite which can then be copy-pasted
+into your browser where you can interact with the current page. Using binding.pry
+pauses execution right where you want the state of the page to be currently. I can’t take credit for this trick as the <a href="https://quickleft.com/blog/five-capybara-hacks-to-make-your-testing-experience-less-painful/">excellent post on QuickLeft</a> directed me to it.</p>
+
+<h2 id="avoiding-flaky-tests">Avoiding flaky tests</h2>
+
+<p>Another article by the Thoughtbot team, about all the ways of avoiding race condition
+like tests. I’ve gleaned some of my information from this article which <a href="https://robots.thoughtbot.com/write-reliable-asynchronous-integration-tests-with-capybara">can be found
+here</a></p>
+
+<h2 id="remove-css-animations-for-less-flakes-and-a-faster-test-suite">Remove css animations for less flakes and a faster test suite</h2>
+
+<p>By default poltergeist, and potentially other js drivers, perform css animations.
+Depending upon your expectations this might slow your test down in that expectations
+need to wait until an element is fully loaded. Additionally, this could impact
+the consistency of your tests by introducing flaky race conditions.</p>
+
+<p>Instead, if we disable animations altogether we should in theory have a 
+faster test suite that is more reliable. I found the basic idea for this on 
+<a href="https://stackoverflow.com/questions/19662287/turn-off-animations-in-capybara-tests">StackOverflow</a>.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># spec_helper.rb or wherever you've configured Capybara</span>
+<span class="no">Capybara</span><span class="p">.</span><span class="nf">register_driver</span> <span class="ss">:poltergeist</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+  <span class="n">opts</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="ss">extensions: </span><span class="p">[</span><span class="s2">"</span><span class="si">#{</span><span class="no">Rails</span><span class="p">.</span><span class="nf">root</span><span class="si">}</span><span class="s2">/features/support/disable_animations.js"</span><span class="p">],</span> <span class="c1"># Disable animations for capybara</span>
+    <span class="ss">timeout: </span><span class="mi">2</span><span class="p">.</span><span class="nf">minutes</span><span class="p">,</span>
+    <span class="ss">js_errors: </span><span class="kp">true</span>
+  <span class="p">}</span>
+
+  <span class="no">Capybara</span><span class="o">::</span><span class="no">Poltergeist</span><span class="o">::</span><span class="no">Driver</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// /features/support/disable_animations.js</span>
+<span class="cm">/*
+ * Disable transition, transform, and animation css rules
+ * for all feature specs. This produces faster specs that are less prone
+ * to flakes due to race conditions of element loading.
+ */</span>
+<span class="kd">var</span> <span class="nx">disableAnimationStyles</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">-webkit-transition: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-moz-transition: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-ms-transition: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-o-transition: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">transition: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-webkit-transform: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-moz-transform: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-ms-transform: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-o-transform: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">transform: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-webkit-animation: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-moz-animation: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-ms-animation: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">-o-animation: none !important;</span><span class="dl">'</span> <span class="o">+</span>
+                             <span class="dl">'</span><span class="s1">animation: none !important;</span><span class="dl">'</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">animationStyles</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">style</span><span class="dl">'</span><span class="p">);</span>
+  <span class="nx">animationStyles</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">text/css</span><span class="dl">'</span><span class="p">;</span>
+  <span class="nx">animationStyles</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">* {</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">disableAnimationStyles</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">}</span><span class="dl">'</span><span class="p">;</span>
+  <span class="nb">document</span><span class="p">.</span><span class="nx">head</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">animationStyles</span><span class="p">);</span>
+<span class="p">};</span></code></pre></figure>
+
+<h2 id="disabling-capybarapoltergeistjavascripterror">Disabling Capybara::Poltergeist::JavascriptError</h2>
+<p>By default Capybara will fail any spec that produces a javascript error. These can be disabled (though not recommended) from where <code>Capybara::Poltergeist::Driver.new</code> is registered with the following:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># specs/spec_helper.rb</span>
+<span class="no">Capybara</span><span class="p">.</span><span class="nf">register_driver</span> <span class="ss">:poltergeist</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
+  <span class="no">Capybara</span><span class="o">::</span><span class="no">Poltergeist</span><span class="o">::</span><span class="no">Driver</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="ss">timeout: </span><span class="mi">2</span><span class="p">.</span><span class="nf">minutes</span><span class="p">,</span> <span class="ss">js_errors: </span><span class="kp">false</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Using binding.pry as described above can help track down where errors are occuring in the execution flow and is generally the most useful approach.</p>
+
+<h2 id="poltergeist-javascript-errors-caused-by-your-isp">Poltergeist Javascript Errors caused by your ISP</h2>
+
+<p>If you are constantly receieving errors it is possible that there is a network issue preventing the test from passing. Yes, <strong>a local network setting could prevent the test suite from passing in development</strong>. Here’s an example of an ISP blocking and redirecting a request being made to the jquery cdn from a feature spec.</p>
+
+<figure class="highlight"><pre><code class="language-terminal" data-lang="terminal"><span class="go">  Error: Bootstrap's JavaScript requires jQuery
+  Error: Bootstrap's JavaScript requires jQuery
+    at http://dnserrorassist.att.net/s/js/bootstrap.min.js:6 in global code</span></code></pre></figure>
+
+<p>The give away here is that jQuery is being required by Bootstrap but Bootstrap can’t find it. At the end of the error in the console the url returned is suspicious http://<strong>dnserrorassist.att.net</strong>/s/js/bootstrap.min.js:6. Specifically the highlighted part indicates that the request is be re-routed by the network.</p>
+
+<p>In order to fix these type of issues you’ll need to change your network settings on your router, adjust privacy settings with your ISP, or if you are on public WIFI move to a new location.</p>
+
+<p>Do you have an awesome Capybara trick I missed? Let me know with a comment below.</p>
+
+<p>Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/saving-script-output-from-heroku-to-a-local-file/" alt="Saving Script Output From Heroku to a Local File">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Saving Script Output From Heroku to a Local File</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/resetting-your-elasticsearch-indices-on-heroku-staging-when-you-ve-reached-the-maximum-index-count-for-the-current-plan/" alt="Resetting your Elasticsearch indices on heroku staging when you've reached the maximum index count for the current plan">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Resetting your Elasticsearch indices on heroku staging when you've reached the maximum index count for the current plan</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

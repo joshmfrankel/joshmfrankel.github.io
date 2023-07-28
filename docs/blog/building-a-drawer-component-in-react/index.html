@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Building a Drawer component in React | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Building a Drawer component in React" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In this article, we’re going to learn how to build a React Drawer component from start-to-finish. We’ll work through several iterations of the component. Finally, we’ll end with something that could be reusable anywhere throughout your application." />
+<meta property="og:description" content="In this article, we’re going to learn how to build a React Drawer component from start-to-finish. We’ll work through several iterations of the component. Finally, we’ll end with something that could be reusable anywhere throughout your application." />
+<link rel="canonical" href="http://joshfrankel.me/blog/building-a-drawer-component-in-react/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/building-a-drawer-component-in-react/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-10-25T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2019-10-25T00:00:00+00:00","dateModified":"2019-10-25T00:00:00+00:00","headline":"Building a Drawer component in React","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/building-a-drawer-component-in-react/"},"url":"http://joshfrankel.me/blog/building-a-drawer-component-in-react/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"In this article, we’re going to learn how to build a React Drawer component from start-to-finish. We’ll work through several iterations of the component. Finally, we’ll end with something that could be reusable anywhere throughout your application.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Building a Drawer component in React</h1>
+
+    
+      <p class="Banner-information">
+        <time>October 25, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>In this article, we’re going to learn how to build a React Drawer component from start-to-finish. We’ll work through several iterations of the component. Finally, we’ll end with something that could be reusable anywhere throughout your application.
+<!--excerpt--></p>
+
+<h2 id="what-were-going-to-build">What we’re going to build</h2>
+
+<p>We’re going to be constructing a drawer component. I ran with the Drawer metaphor and placed some clothing in our Drawer. The end feature will look like this:</p>
+
+<p><img src="/img/2019/final-drawer.gif" alt="Final Drawer Component" /></p>
+
+<p>First, we’ll list out all our high-level feature tasks to complete. This will keep us focused and provide a framework.</p>
+
+<ul>
+  <li>A clickable title that on click expands an attached content section</li>
+  <li>Content section that animates like a drawer</li>
+  <li>Screen reader compatible tab functionality</li>
+</ul>
+
+<p>With these in mind, let’s get to the actual coding.</p>
+
+<h2 id="building-the-basic-react-component">Building the basic React Component</h2>
+
+<p>The first thing we’ll need is something to store the current state of the Drawer component’s content. This will either be expanded or collapsed to toggle the display of the content inside the drawer. We can use a state variable <code class="language-plaintext highlighter-rouge">active</code> to denote this in our component’s constructor. Active just let’s us know if the user has toggled the drawer open or not.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">React</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">react</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">class</span> <span class="nx">Drawer</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">active</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">Drawer</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>So far we have a basic React component but we’re not showing anything to the end-user. We’ll need to craft the HTML necessary within the render method. <code class="language-plaintext highlighter-rouge">title</code> will
+be a prop directly passed into the component like <code class="language-plaintext highlighter-rouge">&lt;Drawer title="Cool title"&gt;</code>. This means using our component like this:</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">&lt;</span><span class="nc">Drawer</span> <span class="na">title</span><span class="p">=</span><span class="s">"Cool Title"</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>hi<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nc">Drawer</span><span class="p">&gt;</span>
+</code></pre></div></div>
+
+<p>We’re also going to be using the special React prop <code class="language-plaintext highlighter-rouge">this.props.children</code> which refers to any
+elements that are contained within our component callsite. Specifically, this means that within <code class="language-plaintext highlighter-rouge">Drawer</code> the <code class="language-plaintext highlighter-rouge">this.props.children</code> prop returns the inner content of <code class="language-plaintext highlighter-rouge">&lt;p&gt;hi&lt;/p&gt;</code>.</p>
+
+<p>By structuring it in this manner we allow future developers to compose the content they want displayed within the container. It affords a lot of freedom and flexibility in how the component is consumed.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer"</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">title</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">children</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    The destructuring assignment syntax is a JavaScript expression that makes it possible to unpack values from arrays, or properties from objects, into distinct variables.
+  </p>
+
+  
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">developer.mozilla.org</a>
+  
+</blockquote>
+
+<p>Sprinkle in some assignment destructuring and we can make this even simpler.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">title</span><span class="p">,</span> <span class="nx">children</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer"</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="nx">title</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="nx">children</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Right now if we ran the above code our component would load and display its title along
+with any containing content. It would be shown by default and there wouldn’t be any styling
+applied to yet (outside of browser defaults). Since we’re looking for some type of toggle on
+showing the <code class="language-plaintext highlighter-rouge">Drawer-content</code> element above we’ll move onto working with our stateful variable <code class="language-plaintext highlighter-rouge">active</code>.</p>
+
+<p>Since we need to toggle the state variable <code class="language-plaintext highlighter-rouge">active</code> whenever a user clicks the title, we can start by adding an <code class="language-plaintext highlighter-rouge">onClick</code> handler to the element. This will be the start of us fulfilling our first requirement, <strong>A clickable title that on click expands an attached content section</strong>.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// This negates the boolean for active which effectively toggles it between true and false</span>
+<span class="nx">handleTitleClick</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">active</span> <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">title</span><span class="p">,</span> <span class="nx">children</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer"</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span> <span class="na">onClick</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="si">}</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="nx">title</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="nx">children</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now that we are toggling whether <code class="language-plaintext highlighter-rouge">active</code> is true or false, we can use the boolean
+value to conditionally output specific CSS tyles on the top-level HTML element. This will give
+us control over how the component looks when activated via our stylesheet.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">title</span><span class="p">,</span> <span class="nx">children</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">drawerStyles</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">active</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">is-expanded</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">''</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="si">{</span><span class="s2">`Drawer </span><span class="p">${</span><span class="nx">drawerStyles</span><span class="p">}</span><span class="s2">`</span><span class="si">}</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span> <span class="na">onClick</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="si">}</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="nx">title</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="nx">children</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>There’s a minor stumbling block at this point with the above setting of state. We’re using a negated form of the previous state <code class="language-plaintext highlighter-rouge">!this.state.active</code> to inform the current state what its value is. The problem is that state updates are batched meaning you can’t rely on them being immediate. To fix this we need to explictly use the previous state within the <code class="language-plaintext highlighter-rouge">setState</code> function.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    setState() does not always immediately update the component. It may batch or defer the update until later. This makes reading this.state right after calling setState() a potential pitfall.
+  </p>
+
+  
+    <a href="https://reactjs.org/docs/react-component.html#setstate">reactjs.org</a>
+  
+</blockquote>
+
+<p>We’ll use an arrow function here to select the previous state into a variable named <code class="language-plaintext highlighter-rouge">prevState</code>. This will allow us to be confident that the state change will be accurate.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">handleTitleClick</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span> <span class="p">}));</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Now our onClick handler properly deals with existing state.</p>
+
+<p>However, the onClick handler can only update state by accessing the <code class="language-plaintext highlighter-rouge">this</code> context. Which means we’ll also need to bind it to <code class="language-plaintext highlighter-rouge">this</code> properly within the constructor.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">active</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="p">};</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    If you are using the experimental public class fields syntax, you can use class fields to correctly bind callbacks
+  </p>
+
+  
+    <a href="https://reactjs.org/docs/handling-events.html">reactjs.org</a>
+  
+</blockquote>
+
+<p>While this currently works, we can clean this up by taking it one step further using the <strong>public class fields syntax</strong>.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">active</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="p">};</span>
+
+  <span class="c1">// No binding necessary</span>
+<span class="p">}</span>
+
+<span class="c1">// Instead of () {} is now = () =&gt; {}</span>
+<span class="nx">handleTitleClick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">active</span> <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I really love how easy this syntax reads and how it cleans up your constructor function from all the binding cruft.</p>
+
+<p>So with all that out of the way, we now have our first iteration of our component below.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">React</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">react</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">class</span> <span class="nx">Drawer</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">active</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+
+  <span class="nx">handleTitleClick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span> <span class="p">}));</span>
+  <span class="p">};</span>
+
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">title</span><span class="p">,</span> <span class="nx">children</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">drawerStyles</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">active</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">is-expanded</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">''</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="si">{</span><span class="s2">`Drawer </span><span class="p">${</span><span class="nx">drawerStyles</span><span class="p">}</span><span class="s2">`</span><span class="si">}</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span>
+          <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span>
+          <span class="na">onClick</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="si">}</span>
+        <span class="p">&gt;</span>
+          <span class="si">{</span><span class="nx">title</span><span class="si">}</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span><span class="p">&gt;</span>
+          <span class="si">{</span><span class="nx">children</span><span class="si">}</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">Drawer</span><span class="p">;</span>
+
+<span class="c1">/////////////////////////////////////</span>
+<span class="c1">// And here's how you would use it //</span>
+<span class="c1">/////////////////////////////////////</span>
+<span class="k">import</span> <span class="nx">React</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">react</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">Drawer</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">~/components/Drawer</span><span class="dl">'</span><span class="p">;</span> <span class="c1">// The location of our new component</span>
+
+<span class="kd">class</span> <span class="nx">AnotherComponent</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="c1">// code omitted</span>
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"AnotherComponent"</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Welcome to my Clothing drawer<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nc">Drawer</span> <span class="na">title</span><span class="p">=</span><span class="s">"My Clothing"</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Yellow Dress<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Red Skirt<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Purple Jacket<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+          <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nc">Drawer</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here’s what it looks like so far. Really the only thing it does is provide
+HTML structure and a toggleable CSS class called <code class="language-plaintext highlighter-rouge">is-expanded</code> based on state.</p>
+
+<p><img src="/img/2019/unstyled-drawer-component.gif" alt="Unstyled Drawer Component" /></p>
+
+<p>So far no one would want this on their website because it’s ugly. In the next section we’re going to add some SCSS styles to it.</p>
+
+<h2 id="adding-style">Adding Style</h2>
+
+<p>One problem right now, is the drawer is basically always open. This means the Drawer’s content
+is always shown. We only want it to display if the state of the component is expanded. Just like a real drawer, we want to be able to open and close it to display the content as needed. We’ll be focussing on our requirement of <strong>Content section that animates like a drawer</strong> at this point.</p>
+
+<p>We’ll use the component’s height attribute to close the drawer as eventually we’ll animate it using height. This will make the animation easier in the upcoming sections.</p>
+
+<p>Start off by hiding the content (closing the drawer) using the following style
+configuration.</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+  <span class="k">&amp;</span><span class="nt">-content</span> <span class="p">{</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nl">overflow</span><span class="p">:</span> <span class="nb">hidden</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We need both <code class="language-plaintext highlighter-rouge">height: 0</code> and <code class="language-plaintext highlighter-rouge">overflow: hidden</code> here as they work in tandem. Having a
+height of <code class="language-plaintext highlighter-rouge">0</code> continues to show the content. Adding <code class="language-plaintext highlighter-rouge">overflow: hidden</code> ensures that the content in the container outside of the height (using 0 here effectively closes it) will remain hidden. These two together close the content drawer.</p>
+
+<p>Next we probably want the <code class="language-plaintext highlighter-rouge">Drawer-title</code> element to look like it is actually clickable. We can do this by adding a border, background, and cursor styles below.</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+  <span class="k">&amp;</span><span class="nt">-title</span> <span class="p">{</span>
+    <span class="nl">background</span><span class="p">:</span> <span class="mh">#efefef</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span><span class="p">;</span>
+    <span class="nl">cursor</span><span class="p">:</span> <span class="nb">pointer</span><span class="p">;</span>
+    <span class="nl">display</span><span class="p">:</span> <span class="n">inline-block</span><span class="p">;</span>
+    <span class="nl">padding</span><span class="p">:</span> <span class="m">16px</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nt">-content</span> <span class="p">{</span>
+    <span class="nc">...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The result is a primitive looking button to click. Which brings up something else we should probably fix at this point which is keyboard accessibility. We should be able to use the <code class="language-plaintext highlighter-rouge">tab</code> key to select the button and the <code class="language-plaintext highlighter-rouge">enter</code> key to activate it. Unforntately, we’re using a <code class="language-plaintext highlighter-rouge">&lt;div&gt;</code> meaning that right now this isn’t working. Time for a slight detour.</p>
+
+<p><img src="/img/2019/basic-title-style.png" alt="Basic title styles" /></p>
+
+<h3 id="keyboard-accessibility">Keyboard Accessibility</h3>
+
+<p>One thing I recently learned about was accessibility of websites and applications. For example, anyone using a screen reader or other non-mouse assistance technology will be unable to use to our new button. This is terrible because the button’s action is integral to the feature being functional and we want to be sure we develop with everyone in mind. (<a href="https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML">Check out mozilla’s entry on general HTML accesibility here</a>). One way we could attempt to fix this is by giving our <code class="language-plaintext highlighter-rouge">Drawer-title</code> div a <code class="language-plaintext highlighter-rouge">tabIndex</code> value and a <code class="language-plaintext highlighter-rouge">role</code> value.</p>
+
+<p>We’re looking directly at our third requirement here which was, <strong>Screen reader compatible tab functionality</strong>.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">&lt;</span><span class="nt">div</span>
+  <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span>
+  <span class="na">onClick</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="si">}</span>
+  <span class="na">tabIndex</span><span class="p">=</span><span class="s">"0"</span>
+  <span class="na">role</span><span class="p">=</span><span class="s">"button"</span>
+<span class="p">&gt;</span>
+  <span class="si">{</span><span class="nx">title</span><span class="si">}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div></div>
+
+<p>The above allows the browser to focus on the element making it the current element to receive keyboard events. However, the keyboard events for enter and spacebar don’t activate our <code class="language-plaintext highlighter-rouge">onClick</code> handler. Major bummer. We could try to add an <code class="language-plaintext highlighter-rouge">onKeyPress</code> event and capture the spacebar and enter key, but why do more than we need to when there is a perfectly semantic approach. The <code class="language-plaintext highlighter-rouge">&lt;button&gt;</code> element.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    The eslint plugin jsx-a11y has some great documentation on the subject of non-semantic elements having an onClick handler.
+  </p>
+
+  
+    <a href="https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/click-events-have-key-events.md">ESlint jsx-a11y</a>
+  
+</blockquote>
+
+<p>So let’s fix this back in our <code class="language-plaintext highlighter-rouge">render()</code> method.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">title</span><span class="p">,</span> <span class="nx">children</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">drawerStyles</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">active</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">is-expanded</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">''</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="si">{</span><span class="s2">`Drawer </span><span class="p">${</span><span class="nx">drawerStyles</span><span class="p">}</span><span class="s2">`</span><span class="si">}</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">button</span>
+        <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span>
+        <span class="na">onClick</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="si">}</span>
+      <span class="p">&gt;</span>
+        <span class="si">{</span><span class="nx">title</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span><span class="p">&gt;</span>
+        <span class="si">{</span><span class="nx">children</span><span class="si">}</span>
+      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As you can see from the above, we no longer need <code class="language-plaintext highlighter-rouge">tabIndex</code>, <code class="language-plaintext highlighter-rouge">role</code>, or even additonal events like <code class="language-plaintext highlighter-rouge">onKeyPress</code>. We can also remove the <code class="language-plaintext highlighter-rouge">Drawer-title</code> style for <code class="language-plaintext highlighter-rouge">display: inline-block</code> since buttons by default are inline-block.</p>
+
+<p>At this point our button just works exactly how we would expect. Hitting the tab key on the page will focus on our new button. Once focused pressing either enter or spacebar will activate our <code class="language-plaintext highlighter-rouge">onClick</code> handler.</p>
+
+<p>Now that we’ve ensure our drawer can be accessed by users with adaptive technologies, we can transition back to our goal of showing and hiding content in the Drawer.</p>
+
+<h3 id="opening-and-closing-the-drawer">Opening and closing the Drawer</h3>
+
+<p>Having converted our <code class="language-plaintext highlighter-rouge">&lt;div&gt;</code> style button above to a more semantic <code class="language-plaintext highlighter-rouge">&lt;button&gt;</code> element, we need to work on making its height change. Since the height of the element starts out as 0 we can simply have its height change to a larger value when the <code class="language-plaintext highlighter-rouge">is-expanded</code> class is active via the <code class="language-plaintext highlighter-rouge">this.state.active</code> variable. We want this value to be greater than the containing content’s height could ever be. I choose <code class="language-plaintext highlighter-rouge">40vh</code> here as it is 40% of the current viewports height (and it seemed a reasonable starting place).</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+  <span class="k">&amp;</span><span class="nt">-title</span> <span class="p">{</span>
+    <span class="nc">...</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nt">-content</span> <span class="p">{</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nl">overflow</span><span class="p">:</span> <span class="nb">hidden</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nc">.is-expanded</span> <span class="p">{</span>
+    <span class="nc">.Drawer-content</span> <span class="p">{</span>
+      <span class="nl">height</span><span class="p">:</span> <span class="m">40vh</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Making the expanded state have a larger height tells to component to change dimenstions. Basically, mimicking the element opening and closing. We can make
+this even more polished by adding an animated transition to the content. We’ll add <code class="language-plaintext highlighter-rouge">transition: height .5s ease;</code> to our content element style.</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+  <span class="k">&amp;</span><span class="nt">-title</span> <span class="p">{</span>
+    <span class="nc">...</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nt">-content</span> <span class="p">{</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nl">overflow</span><span class="p">:</span> <span class="nb">hidden</span><span class="p">;</span>
+    <span class="nl">transition</span><span class="p">:</span> <span class="n">height</span> <span class="mi">.5s</span> <span class="n">ease</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nc">.is-expanded</span> <span class="p">{</span>
+    <span class="nc">.Drawer-content</span> <span class="p">{</span>
+      <span class="nl">height</span><span class="p">:</span> <span class="m">40vh</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now that our <code class="language-plaintext highlighter-rouge">Drawer-content</code> section animates its height (from <code class="language-plaintext highlighter-rouge">0</code> to <code class="language-plaintext highlighter-rouge">40vh</code>) our component is starting
+to show off its basic functionality. With a couple more tweaks to the styles below, we’ve got our first iteration complete.</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="m">300px</span><span class="p">;</span> <span class="c1">// Set parent width</span>
+  <span class="nl">display</span><span class="p">:</span> <span class="n">inline-block</span><span class="p">;</span> <span class="c1">// center the element</span>
+
+  <span class="k">&amp;</span><span class="nt">-title</span> <span class="p">{</span>
+    <span class="nl">padding</span><span class="p">:</span> <span class="m">16px</span><span class="p">;</span>
+    <span class="nl">border</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span><span class="p">;</span>
+    <span class="nl">background</span><span class="p">:</span> <span class="mh">#efefef</span><span class="p">;</span>
+    <span class="nl">cursor</span><span class="p">:</span> <span class="nb">pointer</span><span class="p">;</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span> <span class="c1">// Make title button take up full width of .Drawer</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nt">-content</span> <span class="p">{</span>
+    <span class="nl">background</span><span class="p">:</span> <span class="mh">#ddd</span><span class="p">;</span> <span class="c1">// Show a visible background</span>
+    <span class="nl">border-left</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span><span class="p">;</span> <span class="c1">// Add borders to all sides except top</span>
+    <span class="nl">border-right</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span><span class="p">;</span>
+    <span class="nl">border-bottom</span><span class="p">:</span> <span class="m">1px</span> <span class="nb">solid</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nl">overflow</span><span class="p">:</span> <span class="nb">hidden</span><span class="p">;</span>
+    <span class="nl">transition</span><span class="p">:</span> <span class="n">height</span> <span class="mi">.5s</span> <span class="n">ease</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nc">.is-expanded</span> <span class="p">{</span>
+    <span class="nc">.Drawer-content</span> <span class="p">{</span>
+      <span class="nl">height</span><span class="p">:</span> <span class="m">40vh</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here’s what our component looks like so far:</p>
+
+<p><img src="/img/2019/first-iteration-component.gif" alt="First iteration on Component" /></p>
+
+<h2 id="static-height-and-variable-containers">Static height and variable containers</h2>
+
+<p>While our component now functions well enough to open and close, there is a glaring issue with it. If you look back to our <code class="language-plaintext highlighter-rouge">.is-expanded</code> class we had to specify a static height of <code class="language-plaintext highlighter-rouge">40vh</code>. This means that our container (which can contain a dynamic amount of content) will never have a height larger than 40% of the viewport. What if the content is larger than 40%? A lot smaller? Well the results aren’t great:</p>
+
+<p><img src="/img/2019/set-height-bug.png" alt="Static height and variable containers example" /></p>
+
+<p>That’s a lot of extra space for a single list item! If you saw something like this online
+you might assume that whoever built it missed a step. Or possibly didn’t test it.</p>
+
+<p>So how can we fix this? Well, unfortunately if you’re looking for a pure CSS solution here the short answer is, you can’t. Or at least all the articles I’ve read online claim there isn’t a process and I haven’t been able to figure one out either.</p>
+
+<p>Really the only way to determine dynamic height for content is to calculate it using JavaScript. We’ll be calculating the space on-the-fly and adjusting as needed. So let’s do just that. Here’s our steps to follow to make this change:</p>
+
+<ul>
+  <li>Remove static height from SCSS</li>
+  <li>Calculate the height of the hidden content within the Drawer</li>
+  <li>Set the height of the content to the calculated value when visible</li>
+</ul>
+
+<h3 id="remove-static-height-from-scss">Remove static height from SCSS</h3>
+<p>We’ll start by removing the static height from our SCSS. Since JavaScript will handle
+the ending height of the element based on the contained content, we no longer need to
+set a height on the element.</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+  <span class="nc">...</span>
+
+  <span class="o">/*</span> <span class="nt">Remove</span> <span class="nt">all</span> <span class="nt">of</span> <span class="nt">this</span>
+  <span class="k">&amp;</span><span class="nc">.is-expanded</span> <span class="p">{</span>
+    <span class="nc">.Drawer-content</span> <span class="p">{</span>
+      <span class="nl">height</span><span class="p">:</span> <span class="m">40vh</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span><span class="o">*/</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Pretty simple deletion of style code here. Let’s keep moving.</p>
+
+<h3 id="calculate-the-height-of-the-hidden-content">Calculate the height of the hidden content</h3>
+
+<p>Next we can calculate the height of the hidden element through some indirection based on the target of the click event. There’s a couple ways to accomplish this. Here’s the first approach:</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">handleTitleClick</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">contentHeight</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">nextSibling</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span> <span class="p">}),</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="na">contentHeight</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">active</span> <span class="p">?</span> <span class="nx">contentHeight</span> <span class="p">:</span> <span class="mi">0</span> <span class="p">});</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>There’s a bit of added context above so let’s break it down line-by-line. First we’ll deal with calculating the hidden content’s height.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">handleTitleClick</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">contentHeight</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">nextSibling</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>We added a new argument <code class="language-plaintext highlighter-rouge">event</code> that comes from the the click event. Using this we can check its <code class="language-plaintext highlighter-rouge">target</code> which returns the button’s DOM element. <code class="language-plaintext highlighter-rouge">nextSibling</code> grabs the next related DOM element which in our case is the <code class="language-plaintext highlighter-rouge">Drawer-content</code> div. <code class="language-plaintext highlighter-rouge">scrollHeight</code> gives us the element’s height and works with elements that are hidden via overflow.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    The Element.scrollHeight read-only property is a measurement of the height of an element's content, including content not visible on the screen due to overflow.
+  </p>
+
+  
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight">mozilla.org</a>
+  
+</blockquote>
+
+<p>Next we modify our current <code class="language-plaintext highlighter-rouge">setState</code> call to accept a callback function. Using a callback function ensures that our first call to <code class="language-plaintext highlighter-rouge">this.setState</code> has finished meaning we can rely directly on any effected state variables again. We do this immediately to toggle our hidden content’s height via a ternary clause.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span> <span class="p">}),</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// This second call to setState can rely on this.state.active directly</span>
+  <span class="c1">// as the previous call must finish before this.</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="na">contentHeight</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">active</span> <span class="p">?</span> <span class="nx">contentHeight</span> <span class="p">:</span> <span class="mi">0</span> <span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Alright, so that’s the first attempt. Here’s a slightly updated one that is a bit more efficient.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">handleTitleClick</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">contentHeight</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">nextSibling</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span>
+    <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span><span class="p">,</span>
+    <span class="na">contentHeight</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span> <span class="p">?</span> <span class="nx">contentHeight</span> <span class="p">:</span> <span class="mi">0</span>
+  <span class="p">}));</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>The big change here is that instead of using a callback function with <code class="language-plaintext highlighter-rouge">setState</code> we’re relying on <code class="language-plaintext highlighter-rouge">!prevState.active</code> to let us know when the current stateful variable <code class="language-plaintext highlighter-rouge">active</code> is true. It’s a bit confusing given that we have to negate it with a <code class="language-plaintext highlighter-rouge">!</code> but that’s because the state starts out as false and then becomes true upon clicking. Additionally, we can’t rely on <code class="language-plaintext highlighter-rouge">this.state.active</code> here because the update to it is happening at the same time (since they are both within the same setState call).</p>
+
+<h3 id="setting-the-height-of-the-content">Setting the height of the content</h3>
+
+<p>Now that we’ve calculated the height of the hidden element, we can use that to directly apply an inline style. This part is actually pretty easy.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">&lt;</span><span class="nt">div</span>
+  <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span>
+  <span class="na">style</span><span class="p">=</span><span class="si">{</span><span class="p">{</span> <span class="na">height</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">contentHeight</span> <span class="p">}</span><span class="si">}</span>
+<span class="p">&gt;</span>
+  <span class="si">{</span><span class="nx">children</span><span class="si">}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div></div>
+
+<p>We use an object that contains camelCased CSS attributes as React requires this for dealing with inline styles. For example, if we were working with <code class="language-plaintext highlighter-rouge">max-height</code> we would instead write the attribute above like: <code class="language-plaintext highlighter-rouge">style={{ maxHeight: this.state.contentHeight }}</code>.</p>
+
+<p>With this our component sets the hidden content’s height accurately.</p>
+
+<p><img src="/img/2019/set-height.gif" alt="Set Height Component" /></p>
+
+<h2 id="the-dangers-of-nextsibling">The dangers of nextSibling</h2>
+
+<p>There’s still one piece of the above that’s bothering me. We’re finding the element to calculate height based on the following chain of method calls <code class="language-plaintext highlighter-rouge">event.target.nextSibling.scrollHeight</code>. What might happen if <code class="language-plaintext highlighter-rouge">nextSibling</code> doesn’t exist? Or if we change our component to include a new element between the button and the content? Future requirements might necessitate adjusting the component as we want to ensure it that works with any changes. Flexibility in crafting a component is key.</p>
+
+<p>If <code class="language-plaintext highlighter-rouge">nextSibling</code> doesn’t exist then calling <code class="language-plaintext highlighter-rouge">scrollHeight</code> on undefined is going to raise an exception. On the flipside, modifying the component means the content element will no longer be targeted as the next sibling. For example, let’s say you needed an in-between content section to sit
+between the title and the previous content like below:</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">return</span> <span class="p">(</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="si">{</span><span class="s2">`Drawer </span><span class="p">${</span><span class="nx">drawerStyles</span><span class="p">}</span><span class="s2">`</span><span class="si">}</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span>
+      <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span>
+      <span class="na">onClick</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="si">}</span>
+    <span class="p">&gt;</span>
+      <span class="si">{</span><span class="nx">title</span><span class="si">}</span>
+    <span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>In-between content section<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span> <span class="na">style</span><span class="p">=</span><span class="si">{</span><span class="p">{</span> <span class="na">height</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">contentHeight</span> <span class="p">}</span><span class="si">}</span><span class="p">&gt;</span>
+      <span class="si">{</span><span class="nx">children</span><span class="si">}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>With the new <code class="language-plaintext highlighter-rouge">&lt;div&gt;In-between content section&lt;/div&gt;</code> above we’ve broken our current height calculation. Now it looks like this:</p>
+
+<p><img src="/img/2019/broken-drawer.gif" alt="Broken Drawer" /></p>
+
+<p>It turns out that our component isn’t very flexible to future changes.</p>
+
+<p>We can fix this by using React Refs.</p>
+
+<h2 id="using-refs-for-accuracy">Using Refs for accuracy</h2>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Refs provide a way to access DOM nodes or React elements created in the render method.
+  </p>
+
+  
+    <a href="https://reactjs.org/docs/refs-and-the-dom.html">reactjs.org</a>
+  
+</blockquote>
+
+<p>Refs allow us to accurately target specific DOM element within the <code class="language-plaintext highlighter-rouge">render()</code> function. In our
+case, being able to target the content div via a ref is going provide greater flexibility to future changes and will be less brittle. Here’s how you would implement it:</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">active</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="na">contentHeight</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="p">};</span>
+
+  <span class="c1">// Here we add a new Ref to the current object</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">contentRef</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createRef</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// No longer pass in 'event' as a parameter since it isn't needed</span>
+<span class="nx">handleTitleClick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+
+  <span class="c1">// We can now use our newly defined ref from the render function below</span>
+  <span class="c1">// to accurately grab the DOM element.</span>
+  <span class="kd">const</span> <span class="nx">contentHeight</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">contentRef</span><span class="p">.</span><span class="nx">current</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span><span class="p">,</span> <span class="na">contentHeight</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span> <span class="p">?</span> <span class="nx">contentHeight</span> <span class="p">:</span> <span class="mi">0</span> <span class="p">}));</span>
+<span class="p">};</span>
+
+<span class="k">return</span> <span class="p">(</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="si">{</span><span class="s2">`Drawer </span><span class="p">${</span><span class="nx">drawerStyles</span><span class="p">}</span><span class="s2">`</span><span class="si">}</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span>
+      <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span>
+      <span class="na">onClick</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="si">}</span>
+    <span class="p">&gt;</span>
+      <span class="si">{</span><span class="nx">title</span><span class="si">}</span>
+    <span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>In-between content section<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">div</span>
+      <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span>
+      <span class="na">ref</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">contentRef</span><span class="si">}</span> <span class="c1">// Here we attach our new Ref to the element</span>
+      <span class="na">style</span><span class="p">=</span><span class="si">{</span><span class="p">{</span> <span class="na">height</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">contentHeight</span> <span class="p">}</span><span class="si">}</span>
+    <span class="p">&gt;</span>
+      <span class="si">{</span><span class="nx">children</span><span class="si">}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>Let’s go through the above line-by-line. First, we create an empty ref object within the
+constructor. The allows us to supply this property to a React DOM element within
+the <code class="language-plaintext highlighter-rouge">render()</code> function.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// omitted code</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">contentRef</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createRef</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Next we’ll set our <code class="language-plaintext highlighter-rouge">.Drawer-content</code> container to use the new Ref.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">&lt;</span><span class="nt">div</span>
+  <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-content"</span>
+  <span class="na">ref</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">contentRef</span><span class="si">}</span>
+  <span class="na">style</span><span class="p">=</span><span class="si">{</span><span class="p">{</span> <span class="na">height</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">contentHeight</span> <span class="p">}</span><span class="si">}</span>
+<span class="p">&gt;</span>
+</code></pre></div></div>
+
+<p>Finally, we need to modify our <code class="language-plaintext highlighter-rouge">onClick</code> handler to account for the new Ref. It will use
+the ref to properly target our element consistently for any future changes.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">handleTitleClick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// We use the Ref below and specify the `current` property which returns</span>
+  <span class="c1">// the Refs DOM element.</span>
+  <span class="kd">const</span> <span class="nx">contentHeight</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">contentRef</span><span class="p">.</span><span class="nx">current</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="na">active</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span><span class="p">,</span> <span class="na">contentHeight</span><span class="p">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">active</span> <span class="p">?</span> <span class="nx">contentHeight</span> <span class="p">:</span> <span class="mi">0</span> <span class="p">}));</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>And there you have it. One fully-functional Drawer component utilizing Refs instead of relying on brittle DOM selection. Nice work!</p>
+
+<h2 id="expanded-state-and-styling">Expanded state and styling</h2>
+
+<p>Remember our <code class="language-plaintext highlighter-rouge">is-expanded</code> class above? We’re technically still adding/removing
+it based on the state of <code class="language-plaintext highlighter-rouge">active</code> but right now it doesn’t do anything. It’s still nice to keep the functionality as it let’s the front-end know the state of the component for styling purposes. We can use this to
+give our Drawer component a bit more flash by providing a simple triangular
+indicator to signal if the Drawer is expanded or collapsed.</p>
+
+<p>First we’ll add a new element to our <code class="language-plaintext highlighter-rouge">render()</code> function that will contain our arrow indicator. We’ll
+also surround the displayed <code class="language-plaintext highlighter-rouge">title</code> inside the button with a <code class="language-plaintext highlighter-rouge">&lt;span&gt;</code> tag. This will come in handy
+for alignment in a minute.</p>
+
+<div class="language-jsx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">&lt;</span><span class="nt">button</span>
+  <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-title"</span>
+  <span class="na">onClick</span><span class="p">=</span><span class="si">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleTitleClick</span><span class="si">}</span>
+<span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-titleText"</span><span class="p">&gt;</span><span class="si">{</span><span class="nx">title</span><span class="si">}</span><span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">className</span><span class="p">=</span><span class="s">"Drawer-arrow Drawer--rightArrow"</span> <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</code></pre></div></div>
+
+<p>Now that we’ve added an element to style let’s make it look like an arrow. You
+could use SVG here but we can just as easily do this in CSS. <a href="https://css-tricks.com/snippets/css/css-triangle/" target="_blank">Chris Coyier of CSS-Tricks has
+an excellent article on how this works</a>. I highly recommend a read through.</p>
+
+<p>Here’s the CSS we’ll need to achieve the effect:</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+  <span class="nv">$arrowSize</span><span class="p">:</span> <span class="m">5px</span><span class="p">;</span>
+
+  <span class="k">&amp;</span><span class="nt">-arrow</span> <span class="p">{</span>
+    <span class="nl">border-top</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="nb">transparent</span><span class="p">;</span>
+    <span class="nl">border-bottom</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="nb">transparent</span><span class="p">;</span>
+    <span class="nl">border-left</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="mh">#454545</span><span class="p">;</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>A quick explanation of the above:</p>
+
+<ul>
+  <li>We set the element to have <code class="language-plaintext highlighter-rouge">height</code> and <code class="language-plaintext highlighter-rouge">width</code> of 0. This is because adding a border
+to a 0 sized element makes the borders meet at the center of the element like a triangle. Acting like a right angle that is centered in the middle of the element.</li>
+  <li><code class="language-plaintext highlighter-rouge">border-top</code> and <code class="language-plaintext highlighter-rouge">border-bottom</code> are set to transparent to hide the top and bottom of the triangle</li>
+  <li><code class="language-plaintext highlighter-rouge">border-left</code> adds a border on the left side but because it is triangular it appears to be
+pointing to the right.</li>
+</ul>
+
+<p><img src="/img/2019/drawer-arrow-off.png" alt="Drawer arrow broken" /></p>
+
+<p>We’ve now got a triangle indicator but it isn’t positioned properly as seen above. Let’s move this to
+the right side of the button using Flexbox.</p>
+
+<ul>
+  <li>First we’ll give the parent element <code class="language-plaintext highlighter-rouge">.Drawer-title</code> the property of <code class="language-plaintext highlighter-rouge">display: flex</code>.</li>
+  <li>Then we’ll set the actual title text element above to flex as much as possible using <code class="language-plaintext highlighter-rouge">flex: 1</code>.</li>
+  <li>Finally, a small tweak to our arrow by using <code class="language-plaintext highlighter-rouge">align-self: center</code> make it appear on the same baseline as the bottom of our text characters. Here’s the resulting CSS:</li>
+</ul>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+
+  <span class="k">&amp;</span><span class="nt">-title</span> <span class="p">{</span>
+    <span class="c1">// omitted</span>
+
+    <span class="nl">display</span><span class="p">:</span> <span class="n">flex</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nt">-titleText</span> <span class="p">{</span>
+    <span class="nl">flex</span><span class="p">:</span> <span class="m">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nt">-arrow</span> <span class="p">{</span>
+    <span class="nl">border-top</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="nb">transparent</span><span class="p">;</span>
+    <span class="nl">border-bottom</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="nb">transparent</span><span class="p">;</span>
+    <span class="nl">border-left</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="mh">#454545</span><span class="p">;</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+
+    <span class="nl">align-self</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We can take one more step and animate this alongside the content animation. This
+will give the appearance of the triangle twisting downward making it look like the drawer
+is expanding.</p>
+
+<div class="language-scss highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.Drawer</span> <span class="p">{</span>
+
+  <span class="k">&amp;</span><span class="nt">-arrow</span> <span class="p">{</span>
+    <span class="nl">border-top</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="nb">transparent</span><span class="p">;</span>
+    <span class="nl">border-bottom</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="nb">transparent</span><span class="p">;</span>
+    <span class="nl">border-left</span><span class="p">:</span> <span class="nv">$arrowSize</span> <span class="nb">solid</span> <span class="mh">#454545</span><span class="p">;</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="nl">height</span><span class="p">:</span> <span class="m">0</span><span class="p">;</span>
+
+    <span class="nl">align-self</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+    <span class="nl">transition</span><span class="p">:</span> <span class="n">all</span> <span class="mi">.5</span> <span class="n">ease</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">&amp;</span><span class="nc">.is-expanded</span> <span class="p">{</span>
+    <span class="nc">.Drawer-arrow</span> <span class="p">{</span>
+      <span class="nl">transform</span><span class="p">:</span> <span class="nf">rotate</span><span class="p">(</span><span class="m">90deg</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And here’s our final iteration for this article:</p>
+
+<p><img src="/img/2019/final-drawer.gif" alt="Final Drawer Component" /></p>
+
+<h2 id="wrapping-up">Wrapping up</h2>
+
+<p>So running through what we accomplished above here’s what we’ve produced:</p>
+
+<ul>
+  <li>We created a new component that has a onClick event to set a CSS class</li>
+  <li>We’re calculating the hidden content’s height in JavaScript</li>
+  <li>Using CSS we’ve hidden our content drawer, animated the height change, and created
+a triangle.</li>
+</ul>
+
+<p>If you’d like to see a full versions of the code above, <a href="/doc/2019/drawer-final.txt">I’ve condensed it here</a>.</p>
+
+<p>I’ll be writing a follow-up article to this one explaining how we can convert the above
+into a Compound Component for better Composition. As always, thanks for reading.</p>
+
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/using-callback-functions-with-setstate-in-react/" alt="Using callback functions with setState in React">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Using callback functions with setState in React</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/invalidate-requests-when-a-user-session-contains-null-bytes-in-the-rack-layer/" alt="Invalidate requests when a user session contains null bytes in the Rack layer">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Invalidate requests when a user session contains null bytes in the Rack layer</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

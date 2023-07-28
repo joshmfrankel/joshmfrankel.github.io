@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Adding a foreign key with a custom named association without using add_reference or add_foreign_key | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Adding a foreign key with a custom named association without using add_reference or add_foreign_key" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Using custom association names in Rails can be a great way of increasing understanding throughout an application. For example, it can allow for using a column called owner_id that references a User record. Let&#39;s dig into getting this setup for a migration." />
+<meta property="og:description" content="Using custom association names in Rails can be a great way of increasing understanding throughout an application. For example, it can allow for using a column called owner_id that references a User record. Let&#39;s dig into getting this setup for a migration." />
+<link rel="canonical" href="http://joshfrankel.me/blog/using-a-foreign-key-with-a-custom-named-association-without-using-add-reference-or-add-foreign-key/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/using-a-foreign-key-with-a-custom-named-association-without-using-add-reference-or-add-foreign-key/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-03-18T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2019-03-18T00:00:00+00:00","dateModified":"2019-03-18T00:00:00+00:00","headline":"Adding a foreign key with a custom named association without using add_reference or add_foreign_key","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/using-a-foreign-key-with-a-custom-named-association-without-using-add-reference-or-add-foreign-key/"},"url":"http://joshfrankel.me/blog/using-a-foreign-key-with-a-custom-named-association-without-using-add-reference-or-add-foreign-key/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Using custom association names in Rails can be a great way of increasing understanding throughout an application. For example, it can allow for using a column called owner_id that references a User record. Let&#39;s dig into getting this setup for a migration.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Adding a foreign key with a custom named association without using add_reference or add_foreign_key</h1>
+
+    
+      <p class="Banner-information">
+        <time>March 18, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p itemprop="description">Using custom association names in Rails
+  can be a great way of increasing understanding throughout an application. For example, it can allow for using a column called owner_id that references a User record. Let's dig into getting this setup for a migration.</p>
+<!--excerpt-->
+
+<blockquote class="Series">
+  <h2>This is the <em>second</em> post in a series</h2>
+  <ul>
+    <li><a href="/blog/custom-named-belongs_to-associations-in-rails-with-foreign-key-constraints/">1. Custom named belongs_to associations in Rails with foreign key constraints</a></li>
+    <li>2. Using custom named association columns in a Rails migration</li>
+  </ul>
+</blockquote>
+
+<p>Previously, I’ve written about using <code class="language-plaintext highlighter-rouge">add_reference</code> and <code class="language-plaintext highlighter-rouge">add_foreign_key</code> in the above post. These are great and definitely accomplish the end goal, but recently I discovered an easier approach.</p>
+
+<p>As a refresher, here’s the previous post’s example dataset:</p>
+
+<ul>
+  <li>A User has_many Journals</li>
+  <li>A Journal belongs_to a User</li>
+</ul>
+
+<p>Along with the corresponding migration:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># What the migration might look like</span>
+<span class="k">class</span> <span class="nc">AddCreatorToJournal</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">def</span> <span class="nf">change</span>
+
+    <span class="c1"># Notice how the index is for :creator but references users</span>
+    <span class="n">add_reference</span> <span class="ss">:journals</span><span class="p">,</span> <span class="ss">:creator</span><span class="p">,</span> <span class="ss">references: :users</span><span class="p">,</span> <span class="ss">index: </span><span class="kp">true</span>
+
+    <span class="c1"># Just like the belongs_to contained class_name: :User, the foreign key</span>
+    <span class="c1"># also needs a specific custom column name as :creator_id</span>
+    <span class="n">add_foreign_key</span> <span class="ss">:journals</span><span class="p">,</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">column: :creator_id</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>So to get started, let’s run the following Rails generator command:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># You can still use the :references syntax here</span>
+<span class="n">rails</span> <span class="n">g</span> <span class="n">model</span> <span class="no">Journal</span> <span class="n">creator</span><span class="ss">:references</span>
+
+<span class="c1"># The resulting database migration from the above command</span>
+<span class="k">class</span> <span class="nc">CreateJournals</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">create_table</span> <span class="ss">:journals</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">references</span> <span class="ss">:creator</span><span class="p">,</span> <span class="ss">foreign_key: </span><span class="kp">true</span>
+
+      <span class="n">t</span><span class="p">.</span><span class="nf">timestamps</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<h2 id="making-a-column-reference-a-different-table">Making a column reference a different table</h2>
+
+<p>So how do we hook up the above <strong>:creator</strong> column to the <strong>User</strong> model without using <code class="language-plaintext highlighter-rouge">add_reference</code>? It’s actually pretty straight forward. First we need to let the reference know that it actually points at a table with a different name than the column. This is done via the <code class="language-plaintext highlighter-rouge">references: :table_name</code> syntax.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CreateJournals</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">create_table</span> <span class="ss">:journals</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">references</span> <span class="ss">:creator</span><span class="p">,</span> <span class="ss">references: :users</span><span class="p">,</span> <span class="ss">foreign_key: </span><span class="kp">true</span>
+
+      <span class="n">t</span><span class="p">.</span><span class="nf">timestamps</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The above should look really familiar as in the last post we used: <code class="language-plaintext highlighter-rouge">add_reference :journals, :creator, references: :users</code>. Above we just added <code class="language-plaintext highlighter-rouge">references: :users</code> to the existing t.references line.</p>
+
+<h2 id="hooking-up-a-foreign-key-to-a-different-table">Hooking up a foreign key to a different table</h2>
+
+<p>Now that the table references the other one properly, we need to hook up its foreign key constraint. There’s a lesser known syntax for specifying the table that a foreign key points to called <code class="language-plaintext highlighter-rouge">foreign_key: { to_table: :association }</code>. You can find more documentation on in within the <a href="https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_reference">add_reference section</a> of the rails api. This is exactly what we need here in order to make the migration work.</p>
+
+<p>So let’s update the previous migration with the new <code class="language-plaintext highlighter-rouge">to_table</code> syntax.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CreateJournals</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">create_table</span> <span class="ss">:journals</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">references</span> <span class="ss">:creator</span><span class="p">,</span> <span class="ss">references: :users</span><span class="p">,</span> <span class="ss">foreign_key: </span><span class="p">{</span> <span class="ss">to_table: :users</span><span class="p">}</span>
+
+      <span class="n">t</span><span class="p">.</span><span class="nf">timestamps</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The result from running the above migration is a great looking schema that properly 
+creates a new creator_id column, references the users table, and constrains it with
+a foreign key. See ya later <code class="language-plaintext highlighter-rouge">add_reference</code> and <code class="language-plaintext highlighter-rouge">add_foreign_key</code></p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql">   <span class="k">Column</span>   <span class="o">|</span>            <span class="k">Type</span>             <span class="o">|</span> <span class="k">Collation</span> <span class="o">|</span> <span class="k">Nullable</span> <span class="o">|</span>               <span class="k">Default</span>                
+<span class="c1">------------+-----------------------------+-----------+----------+--------------------------------------</span>
+ <span class="n">id</span>         <span class="o">|</span> <span class="nb">integer</span>                     <span class="o">|</span>           <span class="o">|</span> <span class="k">not</span> <span class="k">null</span> <span class="o">|</span> <span class="n">nextval</span><span class="p">(</span><span class="s1">'journals_id_seq'</span><span class="p">::</span><span class="n">regclass</span><span class="p">)</span>
+ <span class="n">creator_id</span> <span class="o">|</span> <span class="nb">integer</span>                     <span class="o">|</span>           <span class="o">|</span>          <span class="o">|</span> 
+ <span class="n">created_at</span> <span class="o">|</span> <span class="nb">timestamp</span> <span class="k">without</span> <span class="nb">time</span> <span class="k">zone</span> <span class="o">|</span>           <span class="o">|</span> <span class="k">not</span> <span class="k">null</span> <span class="o">|</span> 
+ <span class="n">updated_at</span> <span class="o">|</span> <span class="nb">timestamp</span> <span class="k">without</span> <span class="nb">time</span> <span class="k">zone</span> <span class="o">|</span>           <span class="o">|</span> <span class="k">not</span> <span class="k">null</span> <span class="o">|</span> 
+<span class="n">Indexes</span><span class="p">:</span>
+    <span class="nv">"journals_pkey"</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span> <span class="n">btree</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span>
+    <span class="nv">"index_journals_on_creator_id"</span> <span class="n">btree</span> <span class="p">(</span><span class="n">creator_id</span><span class="p">)</span>
+<span class="k">Foreign</span><span class="o">-</span><span class="k">key</span> <span class="k">constraints</span><span class="p">:</span>
+    <span class="nv">"fk_rails_40d4de14e6"</span> <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">creator_id</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span></code></pre></figure>
+
+<p>What’s the most helpful SQL migration trick that you know? Tell me about it by leaving a comment below. Thanks for reading.</p>
+
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/fix-selenium-webdriver-error-unknownerror-for-capybara-chromedriver/" alt="Fix Selenium::WebDriver::Error::UnknownError for Capybara chromedriver-helper">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Fix Selenium::WebDriver::Error::UnknownError for Capybara chromedriver-helper</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/prevent-css-transitions-on-page-load-with-es6/" alt="Prevent CSS transitions on page load with ES6">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Prevent CSS transitions on page load with ES6</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

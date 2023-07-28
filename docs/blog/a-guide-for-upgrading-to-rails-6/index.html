@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>A Guide for Upgrading to Rails 6 | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="A Guide for Upgrading to Rails 6" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Upgrading to a new version of Rails is always an adventure. There are gems to update, deprecations to fix, and pitfalls to dodge. Recently, I’ve upgraded Rails from 5 to 6 and have come away with lessons I’ve learned and a general process to follow." />
+<meta property="og:description" content="Upgrading to a new version of Rails is always an adventure. There are gems to update, deprecations to fix, and pitfalls to dodge. Recently, I’ve upgraded Rails from 5 to 6 and have come away with lessons I’ve learned and a general process to follow." />
+<link rel="canonical" href="http://joshfrankel.me/blog/a-guide-for-upgrading-to-rails-6/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/a-guide-for-upgrading-to-rails-6/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-20T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2020-08-20T00:00:00+00:00","dateModified":"2020-08-20T00:00:00+00:00","headline":"A Guide for Upgrading to Rails 6","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/a-guide-for-upgrading-to-rails-6/"},"url":"http://joshfrankel.me/blog/a-guide-for-upgrading-to-rails-6/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Upgrading to a new version of Rails is always an adventure. There are gems to update, deprecations to fix, and pitfalls to dodge. Recently, I’ve upgraded Rails from 5 to 6 and have come away with lessons I’ve learned and a general process to follow.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">A Guide for Upgrading to Rails 6</h1>
+
+    
+      <p class="Banner-information">
+        <time>August 20, 2020</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Upgrading to a new version of Rails is always an adventure. There are gems to update, deprecations to fix, and pitfalls to
+dodge. Recently, I’ve upgraded Rails from 5 to 6 and have come away with lessons I’ve learned and a general process to follow.
+<!--excerpt--></p>
+
+<p>Before digging into the process, here’s some lessons I’ve learned:</p>
+
+<h3 id="take-small-steps">Take small steps</h3>
+
+<p><img src="/img/2020/ludde-lorentz-stairs.jpg" alt="Photo of spiral staircase by Ludde Lorentz (https://www.pexels.com/photo/empty-gray-and-white-concrete-spiral-stairs-3023211/)" title="Photo of spiral staircase by Ludde Lorentz (https://www.pexels.com/photo/empty-gray-and-white-concrete-spiral-stairs-3023211/)" /></p>
+
+<p>Compartmentalizing changes during an upgrade process helps to avoid bugs in production and
+allows for an easier time investigating dependency related issues. What I mean by this is upgrading a single gem (or unit of change) in a pull request. Otherwise, if
+you were to upgrade several things at once, it becomes increasingly difficult to discover which change is causing the issue. Worse still you may
+change multiple things and find out that they work well separately but not at the same time.
+All of this to say it is more efficient to just split every unit of work into an individual changeset as it will save you time in the long run.</p>
+
+<p>You can boil this tip down to the sentiement of <em>Be Patient</em>.</p>
+
+<h3 id="get-ready-to-read">Get ready to read</h3>
+
+<p><img src="/img/2020/jeshoots-reading.jpg" alt="Image of woman biting pencil in front of computer by Jeshoots.com (https://unsplash.com/photos/-2vD8lIhdnw)" title="Image of woman biting pencil in front of computer by Jeshoots.com (https://unsplash.com/photos/-2vD8lIhdnw)" /></p>
+
+<p>Reading documentation, changelogs, issues, and pull requests is
+important as you traverse an upgrade. Knowing how one gem interacts with another will help you anticipate roadblocks. Changelogs are especially great as
+they call out major differences and/or breaking changes between versions.</p>
+
+<h3 id="planning-planning-planning">Planning, planning, planning</h3>
+
+<p><img src="/img/2020/kelly-sikkema-paper-notes.jpg" alt="Image of organized post-it notes by Kelly Sikkema (https://unsplash.com/photos/-nz-GTuvyBw)" title="Image of organized post-it notes  by Kelly Sikkema (https://unsplash.com/photos/-nz-GTuvyBw)" /></p>
+
+<p>Having a good plan of action for how to implement all the changes necessary for the upgrade will help keep you focused on the finish line. Identifying work that can be done prior to upgrading helps make the actual upgrade go much easier. You can use such categories to help direct your efforts during this process.</p>
+
+<h3 id="admit-when-you-need-help">Admit when you need help</h3>
+
+<p><img src="/img/2020/christina-morillo-pair-programming.jpg" alt="Photo of pair programmers by Christina Morillo from Pexels (https://www.pexels.com/photo/woman-wearing-red-and-black-checkered-blouse-using-macbook-1181472/)" title="Photo of pair programmers by Christina Morillo from Pexels (https://www.pexels.com/photo/woman-wearing-red-and-black-checkered-blouse-using-macbook-1181472/)" /></p>
+
+<p>Going it alone on something as complicated as an upgrade can be a daunting task. In reality trying to upgrade a system without talking to the domain experts (or engineers who built the various features) will end up taking much more time in the long haul. Additionally, getting stumped by a particularly hairy dependency upgrade can be avoided by asking questions early and often. Many times I’ve found myself coming up with solutions for a problem only to ask a single question of a colleague which helps me realize that the problem I was solving doesn’t actually need solving. Pair programming can also come in handy here as well as two brains are better than one.</p>
+
+<h3 id="breaks-are-an-efficient-use-of-your-time">Breaks are an efficient use of your time</h3>
+
+<p><img src="/img/2020/andrea-piacquadio-hammock.jpg" alt="Photo of man in hammock by Andrea Piacquadio from Pexels (https://www.pexels.com/photo/man-lying-on-hammock-3776840/)" title="Photo of man in hammock by Andrea Piacquadio from Pexels (https://www.pexels.com/photo/man-lying-on-hammock-3776840/)" /></p>
+
+<p>Upgrade processes can take huge amounts of effort. Or little to none. Either way taking a break when you’re stuck can be a great way to ease frustration and come back to the problem refreshed. There have been so many times that I’ve been stumped and taking a break away from my computer I’ve come up with a viable solution. It’s also good for your health :-)</p>
+
+<p>Now onto the steps I’ve identified for a successful upgrade.</p>
+
+<h2 id="a-standard-upgrade-progress">A Standard Upgrade Progress</h2>
+
+<p>I’ve broken my process down into five steps.</p>
+
+<ol>
+  <li>Have a good test suite</li>
+  <li>Investigate Rails upgrade guide &amp; core gem changelogs</li>
+  <li>Plan and organize your work</li>
+  <li>Create a frankenbranch to identify update necessary for Rails</li>
+  <li>Execute an upgrade plan</li>
+</ol>
+
+<p>While these steps are listed in sequential order there are times when going back a number will be necessary. Generally this happens when you discover unknown scope and/or work that is necessary in later steps. For example, you may find that while implementing a fix in step 5 you uncover that another dependency also requires an upgrade. This would send you back into step 2 (or even 1 if there isn’t adequate test coverage) which is perfectly fine. There is going to be some organic back and forth between steps. The goal of having these steps is to repeat them as necessary to identify additional work.</p>
+
+<p>First things first. Having a good test suite gives confidence to upgrading.</p>
+
+<h2 id="1-have-a-good-test-suite">1. Have a good test suite</h2>
+
+<p>Before I start a new Rails upgrade, I first stop off at the test suite. I’ll take a quick look through it and determine if there are any parts that don’t have coverage. Later on when working with specific gems or code I’ll double check that it has code coverage when updating it. It’s important to lean on your tests to ensure that your application works both in the current version as well as the new version. Having test coverage that covers the critical paths will be important to ensure that regressions failures are avoided during the upgrade process. This doesn’t necessarily mean you hit a certain coverage percentage just rather that your core offering for your product is properly exercised by tests.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Having test coverage that covers the critical paths will be important to ensure that regressions failures are avoided during the upgrade process.
+  </p>
+
+  
+</blockquote>
+
+<p>There are other things you can invest in such as automated testing or continuous integration. While these make everything much easier they aren’t necessary for an upgrade process. That being said you do want to make sure you can run your entire test suite fast enough to inform your work. In case it doesn’t then you should spend the energy setting up automated testing and speeding up your test suite. This will be a great tool for discovering bugs and incompatibilities in the new Rails version. Many times I’ve pushed up a change to CI in order to watch the logs that are generated from the test runner. This helps in finding bugs and/or upcoming deprecations. I recommend CodeShip and TravisCI as potential providers.</p>
+
+<p>It’s worth noting that you may have to revisit your test suite if you find that there is missing test coverage for an upgraded feature. Once you’re confident that you have a great test suite to rely on then you can move onto investigating what it will take to upgrade.</p>
+
+<h2 id="2-investigate-rails-upgrade-guide--core-gem-changelogs">2. Investigate Rails upgrade guide &amp; core gem changelogs</h2>
+
+<p>Rails has a profusion of resources to help guide you in any upgrade process. There is upgrade documentation, version release notes, and core gem changelogs. For step 2, I spend time reading through each of these as well as returning back to these references in later steps. During this step I’ll make notes of what exactly will need to be changed and what will need a spike of code to determine what should be changed. Below I’ll go through the various resources with explanations to their usefulness. Let’s start with upgrade documentation.</p>
+
+<p>The general upgrade documentation keeps a high-level overview of many of the potentials changes you may
+encounter while upgrading. It even gives you a guide on moving between one version to the next. I always start upgrades by reading the <a href="https://edgeguides.rubyonrails.org/upgrading_ruby_on_rails.html">upgrading to rails guide</a> in its entirety. It’s an excellent starting place for any new upgrade and hits many of the high priority changes that you’ll encounter.</p>
+
+<p>Next up, the version release notes are specific to a given Rails version. They contain a much more detailed list of what’s new in
+this version as well as changes made to core gem’s that Rails relies on. If you don’t know, Rails gemifies things like
+ActiveRecord, ActiveModel, and ActiveSupport. The version release notes give great information on each dependent gem. Here’s the <a href="https://edgeguides.rubyonrails.org/6_0_release_notes.html">Rails 6.0 release notes</a> as an example.</p>
+
+<p><img src="/img/2020/rails-version-release-notes.png" alt="Example or Rails 6 release notes" /></p>
+
+<p>If you look at the above screenshot, you’ll notice that specific gems within Rails (such as Action Cable) have been broken out into sections. The sections titled <strong>Removals</strong> is especially important as it lists out breaking changes in the new version. <strong>Deprecations</strong> give you a heads up that functionality is going to soon be removed in the next version released which gives you time to plan for transitioning to the new standard. <strong>Notable changes</strong> gives you a detailed view of specific changes that may or may not effect your implementation. Each of these is useful in their own domain.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Looking at tagged versions of a gem allows you to see code at a specific point in time.
+  </p>
+
+  
+</blockquote>
+
+<p>Finally, if the version release notes don’t have enough information you can go directly to the changelogs <a href="https://github.com/rails/rails">from the main
+repository</a>. Notice that there are folders in Github for <code class="language-plaintext highlighter-rouge">activemodel</code>, <code class="language-plaintext highlighter-rouge">activerecord</code>, and others. These
+are literally gems consumed by Rails. Clicking into any of these gem folders you’ll notice each has a <code class="language-plaintext highlighter-rouge">Changelog.md</code> which
+can be immensely helpful in understanding what is happening version to version.</p>
+
+<p><img src="/img/2020/rails-actioncable-changelog.png" alt="Example or Action Cable changelog" /></p>
+
+<p>When viewing a changelog you’ll want to be sure that you’re looking at the tagged version that you’re upgrading to (unless of course you’re upgrading to edge in which case look at the master branch). If you look at the top right corner of the screenshot above, you’ll notice that I am looking at the 5.2.0 version of the Action Cable changelog. Looking at tagged versions of a gem allows you to see code at a specific point in time.</p>
+
+<h2 id="3-plan-and-organize-your-work">3. Plan and organize your work</h2>
+
+<p>Now that you have an idea of what you’re up against and the order to which you’ll need to complete it in, I’ve found that using the following as an organization strategy for work to be helpful. It also allows the rest of the team to better visualize how far along the upgrade is (though this should also be communicated). These can be split into separate epics or a single one with tags. However, it works for you these categories are helpful in planning your work.</p>
+
+<ul>
+  <li>Gem upgrades</li>
+  <li>Pre-upgrade</li>
+  <li>Primary upgrade</li>
+  <li>Post-upgrade</li>
+</ul>
+
+<p>I’ve found that starting with the most risky story first is a good way to make unknown scope become known scope.</p>
+
+<p><strong>Gem upgrades</strong> contains all the gems that require their version to be upgraded in order to support the new Rails version.</p>
+
+<p><strong>Pre-upgrade</strong> consists of work required to adjust or fix removed or broken functionality. This can also contain identified stories from the <em>Investigate Rails upgrade guide &amp; core gem changelogs</em> step.</p>
+
+<p><strong>Primary upgrade</strong> is a single pull request that contains at least the Rails version bump but can also contain work that must be deployed at the same time.</p>
+
+<p><strong>Post-upgrade</strong> are stories that aren’t required for the primary upgrade to work but should be completed soon after. These are generally fixing deprecations and opting into new Rails features.</p>
+
+<p>Ready to start making this upgrade happen?</p>
+
+<h2 id="4-create-a-frankenbranch-to-identify-update-necessary-for-rails">4. Create a frankenbranch to identify update necessary for Rails</h2>
+
+<p>Now that we’ve identified major changes from the documentation and started the planning process, we’ll need to make we can begin implementing them on a frankenbranch. When I say frankenbranch, I mean a branch that includes all (yes, all) the necessary changes to upgrade to the next
+version of Rails you’re aiming for. This can help determine which gems need to be upgraded as well as issues that
+have to be fixed prior to upgrading Rails. This branch isn’t designed to be merged (please don’t) but rather be used as an investigative tool for planning. There are several things that are useful goals of this approach:</p>
+
+<ol>
+  <li>Determine what it takes to run <code class="language-plaintext highlighter-rouge">rails server</code> locally</li>
+  <li>Determine what it takes to run <code class="language-plaintext highlighter-rouge">rails server</code> on a staging environment</li>
+  <li>Find all the issues and deprecations that arise in your test suite</li>
+  <li>Organize units of change into categories: gem upgrades, pre-upgrades, primary-upgrade, and post-upgrades</li>
+</ol>
+
+<p>First step, create a new branch. Next adjust your Gemfile to point the Rails version at your target version. Then attempt to run <code class="language-plaintext highlighter-rouge">bundle update rails</code>. When you do this you’ll most likely start seeing version mismatches in your console.</p>
+
+<h3 id="gem-dependency-mismatches">Gem dependency mismatches</h3>
+
+<p>Here’s an example of the rails-controller-testing gem having a mistmatch in version from running the previous command</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  rails-controller-testing (~&gt; 1.0.1) was resolved to 1.0.2, which depends on
+    actionpack (~&gt; 5.x, &gt;= 5.0.1)
+</code></pre></div></div>
+
+<p>This one indicates that rails-controller-testing relies on ActionPack being greater than or equal to 5.0.1 but not greater than 5.x. Since
+we’re trying to upgrade to Rails 6, having a constraint of <strong>~&gt; 5.x</strong> won’t work for us.</p>
+
+<p>Now that we know rails-controller-testing has a version mismatch, we can peek at its <strong>.gemspec</strong> file, <a href="https://github.com/rails/rails-controller-testing/blob/v1.0.1/rails-controller-testing.gemspec#L21">here</a>. What we’ll find is that for the gem’s 1.0.1 version the Actionpack dependency is locked to everything before Rails 6’s version. Using the tag filtering in Github we can incrementally move through the versions until we find one that satisfies the new dependency requirement.</p>
+
+<p><img src="/img/2020/rails-controller-testing-gemspec.png" alt="Github gem version tags" title="Github gem version tags" /></p>
+
+<p>By filtering a repository by a version tag you can see a snapshot of what the code looked like at the time of release. This also can help you move backwards through time on the Changelog or Gemspec. I’ve also used this to directly look through code for particulary challenging conflicts where I needed to understand exactly what changed between versions.</p>
+
+<p>Now we can go back to <a href="https://github.com/rails/rails-controller-testing/blob/v1.0.2/rails-controller-testing.gemspec">rails-controller-testing.gemspec</a> and see the following on the 1.0.2 version.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  s.add_dependency "actionpack", "~&gt; 5.x", "&gt;= 5.0.1"
+  s.add_dependency "actionview", "~&gt; 5.x", "&gt;= 5.0.1"
+  s.add_dependency "activesupport", "~&gt; 5.x"
+
+  s.add_development_dependency "railties", "~&gt; 5.x"
+</code></pre></div></div>
+
+<p>Two options here: We can read the gem’s changelog to see if a specific version calls out support for Rails 6 or we can incrementally change the tagged version while viewing the gemspec to see which version relaxes the dependency constraint. Luckily for us the <a href="https://github.com/rails/rails-controller-testing/blob/v1.0.3/rails-controller-testing.gemspec">next version 1.0.3</a> does just that.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  s.add_dependency "actionpack", "&gt;= 5.0.1.x"
+  s.add_dependency "actionview", "&gt;= 5.0.1.x"
+  s.add_dependency "activesupport", "&gt;= 5.0.1.x"
+
+  s.add_development_dependency "railties", "&gt; 5.0.1.x"
+</code></pre></div></div>
+
+<p>Now we know that one of our Gem Upgrade category tasks will be <em>Upgrade rails-controller-testing to 1.0.3</em>. Like I mentioned above this will become a single pull request change.</p>
+
+<p>From what we now know above about this gem, we can run the following command on our frankenbranch <code class="language-plaintext highlighter-rouge">bundle update rails-controller-testing --conservative</code>. The <strong>–conservative</strong> flag says when updating this gem do no update any of its dependencies. Using the <strong>–conservative</strong> flag with bundle is really useful for minimizing changesets as well as avoiding upgrading things that you don’t need to upgrade.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Using the --conservative flag with bundle is really useful for minimizing changesets as well as avoiding upgrading things that you don't need to upgrade
+  </p>
+
+  
+</blockquote>
+
+<h3 id="fixing-removed-functionality">Fixing removed functionality</h3>
+
+<p>In addition to gem ugprades, you’ll also run into things that just plain don’t work anymore. One such example is using the Arel table <code class="language-plaintext highlighter-rouge">.exists</code> method in order to create existence queries. Previously you could call things like: <code class="language-plaintext highlighter-rouge">Users.where(active: true).exists</code> and return SQL like</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>EXISTS (SELECT "users".* FROM "users" WHERE "users"."deleted_at" IS NULL AND "users"."created_at" IS NOT NULL)
+</code></pre></div></div>
+
+<p>However in Rails 6 calling <code class="language-plaintext highlighter-rouge">.exists</code> directly will return:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NoMethodError: undefined method `exists' for #&lt;User::ActiveRecord_Relation:0x00007fbf68013090&gt;
+Did you mean?  exists?
+</code></pre></div></div>
+
+<p>Now the previous Rails version does tip us off on this issue a bit with a helpful deprecation warning <code class="language-plaintext highlighter-rouge">Delegating exists to arel is deprecated and will be removed in Rails 6.0</code>. Ok so it sounds like delegation was removed for the <code class="language-plaintext highlighter-rouge">.exists</code> method. This presents us with a simple fix in that we can write out the previous delegation in full using <code class="language-plaintext highlighter-rouge">.arel.exists</code>. Now we can properly use an existence query within Rails 6.</p>
+
+<p>The above is another single unit of change to be contained within an individual pull request. Unlike the rails-controller-testing version upgrade above, fixing <strong>arel.exists</strong> falls into the pre-upgrade category for planning purposes. While you’ll discover things that don’t work and have valid fixes prior to upgrading Rails, there are times where trying to fix an issue or upgrade a gem either needs to happen at the same time as the Rails upgrade or post-upgrade. I call these tangled dependencies.</p>
+
+<h3 id="tangled-dependencies">Tangled dependencies</h3>
+
+<p>These are gems and functionality that can’t be fixed prior to upgrading to the next version of Rails. A simple example of this is Rails 6 DNS rebinding in relation to how it effects the development environment. Specifically if you use a custom domain like <code class="language-plaintext highlighter-rouge">.lvh.me</code> or alternative domains outside of localhost, dns rebinding will block the request. This is a new config settings called <code class="language-plaintext highlighter-rouge">hosts</code> that is only available with Rails 6 but will prevent custom domains as soon as Rails 6 is used. In other words this change must be deployed along with Rails 6. As much as you can, it’s good to separate out changes prior to upgrading Rails for ones that must happen simultaneously. In the case of the new configuration value, it should happen at the same time as we upgrade. When we finally get to upgrading Rails we can add the following to our development.rb environment file to enable it for lvh.me:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>config.hosts &lt;&lt; ".lvh.me"
+</code></pre></div></div>
+
+<p>So far we’ve come across straight-forward fixes for the above but there are times when it might be impossible to fix an issue.</p>
+
+<h3 id="unreconcilable-issues">Unreconcilable issues</h3>
+
+<p>These don’t happen often but sometimes there might be a gem or core functionality that just plain won’t work anymore. An example of this is needing a gem version that relaxes its gemspec dependency versions. Like the rails-controller-testing example above, think of a gem that is preventing the Rails upgrade but doesn’t have a version that fixes the mismatch. In these types of cases you have a couple options: look for a pull request on the gem that fixes it, use a different gem, upgrade the gem yourself, or remove the functionality entirely.</p>
+
+<p>If you do find a pull request on a gem that fixes your issue you can point your Gemfile’s gem at that specific branch using the <strong>github</strong> and <strong>branch</strong> attributes.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem "activerecord-session_store", github: "rails/activerecord-session_store", branch: "secure-session-store"
+</code></pre></div></div>
+
+<p>The above is an actual example of a change I had to make in order to continue the upgrade. Note in the above I’m pointing at the github repository for the main gem but in reality it is much safer to instead: fork the gem and point your Gemfile at the forked gem &amp; branch. By forking you ensure that the unmerged branch doesn’t change (as you now control it). I’ve adjusted the above to show off what I mean below. Now my user <strong>joshmfrankel</strong> is the owner of the fork.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem "activerecord-session_store", github: "joshmfrankel/activerecord-session_store", branch: "secure-session-store"
+</code></pre></div></div>
+
+<p>There’s a completely different approach you can take to unreconciable issues. Sometimes remove functionality entirely. In a different case, I noticed that we had search functionality through ElasticSearch for a single feature while the rest of the application used Algolia. Part of the upgrade was going to require me to upgrade ElasticSearch which was proving very complicated and error prone. Eventually I talked to a colleague with experience in Algolia and realized we already had all the proper search indexes in the other search solution. From this I was able to refactor the single feature from ElasticSearch over onto Algolia. Not only did this clear the way for the Rails 6 upgrade but also removed our dependency completely for ElasticSearch. A win win.</p>
+
+<h3 id="repeat-as-necessary">Repeat as necessary</h3>
+
+<p>The rest of this step is to keep repeating the above until you’ve satistifed our original goals. I’ll list them again below:</p>
+
+<ol>
+  <li>Determine what it takes to run <code class="language-plaintext highlighter-rouge">rails server</code> locally</li>
+  <li>Determine what it takes to run <code class="language-plaintext highlighter-rouge">rails server</code> on a staging environment</li>
+  <li>Find all the issues and deprecations that arise in your test suite</li>
+  <li>Organize units of change into categories: gem upgrades, pre-upgrades, primary-upgrade, and post-upgrades</li>
+</ol>
+
+<p>Once you’re at this point you’re ready to start executing on your upgrade plan.</p>
+
+<h2 id="5-execute-an-upgrade-plan">5. Execute an upgrade plan</h2>
+
+<p>With a clear plan in place and knowledge of what needs to happen in order to upgrade, we begin that actual upgrade process. What this means is starting with the <strong>gem upgrades</strong> and <strong>pre-upgrade</strong> categories above and moving through the identified stories. We want each change to be separate to limit the potential of bugs making their way into production. Again this means if you need to change <code class="language-plaintext highlighter-rouge">.exists</code> to <code class="language-plaintext highlighter-rouge">.arel.exists</code>, that you don’t also upgrade a
+gem in the pull request. Keeping work isolated will help the process flow smoothly.</p>
+
+<p>Once you’ve finished out the <strong>gem upgrades</strong> and <strong>pre-upgrade</strong> work, then you get to do the fun step of the <strong>primary upgrade</strong></p>
+
+<h3 id="primary-upgrade">Primary upgrade</h3>
+
+<p>During this step you’ll be running <code class="language-plaintext highlighter-rouge">bundle update rails</code> as well as the rails upgrade command <code class="language-plaintext highlighter-rouge">rails app:update</code>. The upgrade command will ask you if you want to add/ignore/replace any existing framework file it is trying to add. I’m assuming we’re working with an existing app so most of the time you should ignore replacing existing files. One file you’ll want to keep is the <strong>new_framework_defaults_6_0.rb</strong>. This is a new convention from Rails 5 that lists out specific feature flags that can be opted into at a later date allowing for an easier time migrating to new Rails’ versions. Keep these as either commented out or false. Enabling these should be places as individual stories within the <strong>post-upgrade</strong> category.</p>
+
+<p>Something else important to note during the primary upgrade is the need for extensive testing. You’ll want to perform a full regresssion test of every critical pathway in the application. Can users login? Can they buy products you sell? Do they receive email? Anything and everything could potentially break so taking your time with this is worth the investment. What you don’t want to have happen is a new Rails version deploying, finding out there is a bug in production, and rolling back isn’t an option due to differing functionality. If you’re team has a QA tester now’s the time to buy her or him a coffee as this is quite the undertaking. If your team doesn’t, then enlist other engineers to help out will increase the chances of finding any issues before production.</p>
+
+<h2 id="post-upgrade">Post-upgrade</h2>
+
+<p>Congratulations! You are over the major hurtle. With the new Rails version into production you can breathe a little easier.</p>
+
+<p>For the post-upgrade, generally you’ll be fixing deprecation warnings that clutter your test suite logs and slowly enabling the <strong>new_framework_defaults_6.0.rb</strong> one at a time. Additionally, you’ll want to monitor application peformance to see how the app functions post upgrade to identify any application contention in production. Maybe a controller endpoint is much slower now. Or a report is timing out. Things like this are worth going back and looking over.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>While the above process is fairly straight-forward, I can’t over-empahsize enough the importance of keeping your changes small and isolated. This is such an important skill when undergoing an upgrade (one of which I’ve seen the consequences of not following). Don’t be afraid to repeat the steps above as needed. This can only help improve the separation of units of change. Aside from that, the heart of upgrade work is methodically pushing change forward. From reading documentation to discovering the proper gem versions, it’s about the details.</p>
+
+<p>With that we’re done. What did you think about the process above? Have you done a Rails upgrade? Let me know by dropping a comment below.</p>
+
+<p>Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/a-journey-into-writing-union-queries-with-active-record/" alt="A Journey into Writing Union queries with Active Record">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">A Journey into Writing Union queries with Active Record</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/ordinal-abbreviations-for-dates-in-rails/" alt="Ordinal abbreviations for dates in Rails">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Ordinal abbreviations for dates in Rails</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

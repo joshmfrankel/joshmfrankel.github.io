@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Using Hotwire to build a search form with minimal JavaScript | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Using Hotwire to build a search form with minimal JavaScript" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Hotwire is one of the slickest features to come to the development community. It comprises of Turbo, Stimulus, and Strada. It also brings many of the benefits of a single page application into a template rendering server environment. I value the opportunity that this technology presents but have to acknowledge that it was created by Basecamp. You’ve likely read Basecamp’s recent decision to ban discussion of politics in the workplace along with disbanding their Diversity &amp; Inclusion committee. My post is not an endorsement of these decisions. I’m planning to fully address their decision and how I think it impacts workplace inclusivity and company culture in a future post. The purpose of this post is to look at the new technology and I look forward to spending more time and thought reflecting on those decisions." />
+<meta property="og:description" content="Hotwire is one of the slickest features to come to the development community. It comprises of Turbo, Stimulus, and Strada. It also brings many of the benefits of a single page application into a template rendering server environment. I value the opportunity that this technology presents but have to acknowledge that it was created by Basecamp. You’ve likely read Basecamp’s recent decision to ban discussion of politics in the workplace along with disbanding their Diversity &amp; Inclusion committee. My post is not an endorsement of these decisions. I’m planning to fully address their decision and how I think it impacts workplace inclusivity and company culture in a future post. The purpose of this post is to look at the new technology and I look forward to spending more time and thought reflecting on those decisions." />
+<link rel="canonical" href="http://joshfrankel.me/blog/using-hotwire-to-build-a-search-form/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/using-hotwire-to-build-a-search-form/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-03T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2021-05-03T00:00:00+00:00","dateModified":"2021-05-03T00:00:00+00:00","headline":"Using Hotwire to build a search form with minimal JavaScript","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/using-hotwire-to-build-a-search-form/"},"url":"http://joshfrankel.me/blog/using-hotwire-to-build-a-search-form/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Hotwire is one of the slickest features to come to the development community. It comprises of Turbo, Stimulus, and Strada. It also brings many of the benefits of a single page application into a template rendering server environment. I value the opportunity that this technology presents but have to acknowledge that it was created by Basecamp. You’ve likely read Basecamp’s recent decision to ban discussion of politics in the workplace along with disbanding their Diversity &amp; Inclusion committee. My post is not an endorsement of these decisions. I’m planning to fully address their decision and how I think it impacts workplace inclusivity and company culture in a future post. The purpose of this post is to look at the new technology and I look forward to spending more time and thought reflecting on those decisions.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Using Hotwire to build a search form with minimal JavaScript</h1>
+
+    
+      <p class="Banner-information">
+        <time>May 3, 2021</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Hotwire is one of the slickest features to come to the development community. It comprises of Turbo, Stimulus, and Strada. It also brings
+many of the benefits of a single page application into a template rendering server environment.</p>
+
+<p>I value the opportunity that this technology presents but have to acknowledge that it was created by Basecamp. You’ve likely read <a href="https://www.theverge.com/2021/4/27/22406673/basecamp-political-speech-policy-controversy">Basecamp’s recent decision</a> to ban discussion of politics in the workplace along with disbanding their Diversity &amp; Inclusion committee. <strong>My post is not an endorsement of these decisions</strong>. I’m planning to fully address their decision and how I think it impacts workplace inclusivity and company culture in a future post. The purpose of this post is to look at the new technology and I look forward to spending more time and thought reflecting on those decisions.</p>
+
+<!--excerpt-->
+
+<h2 id="setup-turbo-and-stimulus">Setup Turbo and Stimulus</h2>
+<p>First off let’s create a new application using the below generator</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">#</span><span class="w"> </span>Note: This is on Rails 6.1.3.1
+<span class="go">rails new hotwire-search-example --skip-sprockets --skip-turbolinks --webpack=stimulus
+</span></code></pre></div></div>
+
+<p>We’re not planning on using sprockets or turbolinks because webpacker will handle asset loading and hotwire’s turbo is the next evolution of turbolinks. So let’s make that second part happen by adding the turbo-rails gem to our Gemfile.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Gemfile</span>
+<span class="n">gem</span> <span class="s1">'turbo-rails'</span>
+</code></pre></div></div>
+
+<p>Turbo-rails comes with an installer command we can use once we’ve re-bundled.  Since we’ve opted for Webpacker, Turbo will be installed with Yarn or NPM.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bundle install
+rails turbo:install
+</code></pre></div></div>
+
+<h2 id="turbo-drive">Turbo Drive</h2>
+
+<p>This is essentially the new version of turbolinks. All the same features are present such as displaying a progress bar while loading and using the history api. There are also capabilities for form submission and responses instead of just simply links.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Turbo Drive accelerates links and form submissions by negating the need for full page reloads.
+  </p>
+
+  
+    <a href="https://turbo.hotwire.dev/">Turbo Hotwire</a>
+  
+</blockquote>
+
+<p>In this tutorial we’re going to let Turbo Drive just do its thing as it works fine out of the box. For more detailed options check out <a href="https://turbo.hotwire.dev/handbook/drive">Navigating with Turbo Drive</a></p>
+
+<h2 id="turbo-frames">Turbo Frames</h2>
+
+<p>Turbo Frames are ye old frames we all love to hate except with Turbo Frames they are useful. These can be used to selectively update portions of a page (or fragments) without a full page refresh.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Turbo Frames decompose pages into independent contexts, which scope navigation and can be lazily loaded.
+  </p>
+
+  
+    <a href="https://turbo.hotwire.dev/">Turbo Hotwire</a>
+  
+</blockquote>
+
+<p>Turbo Frames decompose pages into independent contexts, which scope navigation and can be lazily loaded.</p>
+
+<p>We’ll need some initial data for us to search. Let’s generate a User model so we can search for a User by their name.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rails g scaffold User name:text
+rails db:migrate
+</code></pre></div></div>
+
+<p>We’ll use <code class="language-plaintext highlighter-rouge">scaffold</code> to give us some quick controller actions and views.</p>
+
+<p>Next start up your server <code class="language-plaintext highlighter-rouge">rails s</code> and open your browser to <code class="language-plaintext highlighter-rouge">localhost:3000/users</code>. You’ll see something like the following:</p>
+
+<p><img src="/img/2021/hotwire-basic-user-listing.png" alt="Basic User listing page" /></p>
+
+<p>Create at least one user with the scaffolded controller. Now click show on the created user and follow up with edit. Notice how each click here is a full page refresh. Now let’s change that.</p>
+
+<p>Replace your <code class="language-plaintext highlighter-rouge">app/views/users/show.html.erb</code> view with the following:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;h1&gt;</span>User Managment<span class="nt">&lt;/h1&gt;</span>
+
+<span class="nt">&lt;</span><span class="err">%=</span> <span class="na">turbo_frame_tag</span> <span class="err">"</span><span class="na">user</span><span class="err">"</span> <span class="na">do</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">"notice"</span><span class="nt">&gt;&lt;</span><span class="err">%=</span> <span class="na">notice</span> <span class="err">%</span><span class="nt">&gt;&lt;/p&gt;</span>
+
+  <span class="nt">&lt;p&gt;</span>
+    <span class="nt">&lt;strong&gt;</span>Name:<span class="nt">&lt;/strong&gt;</span>
+    <span class="nt">&lt;</span><span class="err">%=</span> <span class="err">@</span><span class="na">user.name</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/p&gt;</span>
+
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">link_to</span> <span class="err">'</span><span class="na">Edit</span><span class="err">',</span> <span class="na">edit_user_path</span><span class="err">(@</span><span class="na">user</span><span class="err">)</span> <span class="err">%</span><span class="nt">&gt;</span> |
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">link_to</span> <span class="err">'</span><span class="na">Back</span><span class="err">',</span> <span class="na">users_path</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>Also replace <code class="language-plaintext highlighter-rouge">app/views/users/edit.html.erb</code> with:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">turbo_frame_tag</span> <span class="err">"</span><span class="na">user</span><span class="err">"</span> <span class="na">do</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render</span> <span class="err">'</span><span class="na">form</span><span class="err">',</span> <span class="na">user:</span> <span class="err">@</span><span class="na">user</span> <span class="err">%</span><span class="nt">&gt;</span>
+
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">link_to</span> <span class="err">'</span><span class="na">Show</span><span class="err">',</span> <span class="err">@</span><span class="na">user</span> <span class="err">%</span><span class="nt">&gt;</span> |
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">link_to</span> <span class="err">'</span><span class="na">Back</span><span class="err">',</span> <span class="na">users_path</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>You’ll notice we’re using a turbo flavored ERB tag <code class="language-plaintext highlighter-rouge">turbo_frame_tag</code> courtesy of the <code class="language-plaintext highlighter-rouge">turbo-rails</code> gem. This tag will insert a <code class="language-plaintext highlighter-rouge">&lt;turbo-frame&gt;</code> tag into the HTML. We specify a unique ID for the turbo-frame by passing <code class="language-plaintext highlighter-rouge">"user"</code> as the first argument to the turbo-frame. What this does is create the following HTML code in our view:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;turbo-frame</span> <span class="na">id=</span><span class="s">"user"</span><span class="nt">&gt;</span>
+  ...
+<span class="nt">&lt;/turbo-frame&gt;</span>
+</code></pre></div></div>
+
+<p>We’ve specified in both our show.html.erb and edit.html.erb that the unique ID is “user” by using <code class="language-plaintext highlighter-rouge">turbo_frame_tag "user"</code>. This allows content within the turbo-frame to update.</p>
+
+<p>With that done navigate back to <code class="language-plaintext highlighter-rouge">localhost:3000/users</code>.</p>
+
+<p>Click on “show” for one of the displayed users. Notice how the title of the page is “User Management” based on the <code class="language-plaintext highlighter-rouge">&lt;h1&gt;</code> we added to show.html.erb. Now click “edit”. The page doesn’t refresh but rather the frame is replaced. Additionally, the <code class="language-plaintext highlighter-rouge">&lt;h1&gt;</code> for “User Managment” has remained on the page. This is because that particular <code class="language-plaintext highlighter-rouge">&lt;h1&gt;</code> is outside of the turbo-frame tag.</p>
+
+<p>That is a turbo-frame at its most basic. We’ve made the transition viewing to editing a user seamless.</p>
+
+<p>There’s a catch here though. Try clicking the “back” link on either of those pages. It doesn’t work. The reason is frames capture navigation and act on only that specific frame. So having the back link inside the frame tries to reload the frame but fails. What we want here is for the back link to send us back to the listing page. You can accomplish this by adding the data attribute <code class="language-plaintext highlighter-rouge">, data: { "turbo-frame": "_top" }</code> which will act upon the current loaded page.</p>
+
+<p>Add the following to your edit.html.erb and show.html.erb back button links</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">link_to</span> <span class="err">'</span><span class="na">Back</span><span class="err">',</span> <span class="na">users_path</span><span class="err">,</span> <span class="na">data:</span> <span class="err">{</span> <span class="err">"</span><span class="na">turbo-frame</span><span class="err">"</span><span class="na">:</span> <span class="err">"</span><span class="na">_top</span><span class="err">"</span> <span class="err">}</span> <span class="err">%</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>Now the link properly redirects us back to the listing page. Now you could move the back link outside of the turbo frame which would allow you to avoid the _top data attribute above but for now we’ll stick with what we have. Below I have a screenshot of what is part of the server response when clicking the edit link.</p>
+
+<p><img src="/img/2021/hotwire-turbo-frame-response.png" alt="Turbo Frame network response" /></p>
+
+<p>One last thing before moving onto Turbo Streams. The <code class="language-plaintext highlighter-rouge">&lt;h1&gt;User Management&lt;/h1&gt;</code> text works well if the navigation flow is #show-&gt;#edit. If you navigate to #edit first it won’t displayed because the show view is where it is located. You could remove the #edit link on the listing page to force users to first click #show or you could abstract this <code class="language-plaintext highlighter-rouge">&lt;h1&gt;</code> into a partial for reuse. There are several options here to keep things consistent but we won’t get into the weeds here.</p>
+
+<h2 id="turbo-streams">Turbo Streams</h2>
+
+<p>Now the for the fun part. Let’s make our listing page searchable.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Turbo Streams deliver page changes over WebSocket, SSE or in response to form submissions using just HTML and a set of CRUD-like actions.
+  </p>
+
+  
+    <a href="https://turbo.hotwire.dev/">Turbo Hotwire</a>
+  
+</blockquote>
+
+<p>First create a new controller within the users namespace:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rails g controller users/searches index
+</code></pre></div></div>
+
+<p>Now you don’t have to use a namespaced controller but it allows you to maintain a strict adherence to RESTful actions in the main users_controller.rb. Also it separates the search responsibility to its own controller class.</p>
+
+<p>The above command doesn’t quite get our routes.rb file into the format we want. Make sure yours matches the following:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">resources</span> <span class="ss">:users</span> <span class="k">do</span>
+    <span class="n">collection</span> <span class="k">do</span>
+      <span class="n">post</span> <span class="ss">:search</span><span class="p">,</span> <span class="ss">to: </span><span class="s2">"users/searches#index"</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+<span class="c1">#=&gt; search_users POST    /users/search(.:format) users/searches#index</span>
+<span class="c1"># Note that turbo stream expects POST by default</span>
+</code></pre></div></div>
+
+<p>Next we’ll add a simple search form to our users/index.html.erb file like so:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;h1&gt;</span>Users<span class="nt">&lt;/h1&gt;</span>
+
+<span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form_with</span> <span class="na">url:</span> <span class="na">search_users_path</span> <span class="na">do</span> <span class="err">|</span><span class="na">form</span><span class="err">|</span> <span class="err">%</span><span class="nt">&gt;</span>
+ <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form.text_field</span> <span class="err">'</span><span class="na">search_term</span><span class="err">',</span> <span class="na">placeholder:</span> <span class="err">'</span><span class="na">Enter</span> <span class="na">search</span> <span class="na">terms...</span><span class="err">'</span> <span class="err">%</span><span class="nt">&gt;</span>
+ <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form.submit</span> <span class="err">'</span><span class="na">Search</span><span class="err">',</span> <span class="na">data:</span> <span class="err">{</span> <span class="na">disable_with:</span> <span class="na">false</span> <span class="err">}</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;table&gt;</span>
+  <span class="nt">&lt;thead&gt;</span>
+</code></pre></div></div>
+
+<p>Search forms don’t get much simpler.</p>
+
+<p>One thing to note above is the usage of <code class="language-plaintext highlighter-rouge">, data: { disable_with: false }</code> on the submit button. Without this when we submit our form and wait for the turbo stream, the submit button becomes disabled until refresh. Adding this option opts us out of the detault rails form functionality.</p>
+
+<p>With our route and form in place let’s build out our stream in the controller’s response. We can do this by responding to the new format <code class="language-plaintext highlighter-rouge">turbo_stream</code>. We’ll want to ensure that the previous instance variable <code class="language-plaintext highlighter-rouge">@users</code> which is iterated over on the index.html.erb table is present and contains User records here as well. I’ve implemented a basic search via a SQL LIKE clause but you can certainly get much fancier here.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># /app/controllers/users/searches_controller.rb</span>
+<span class="k">def</span> <span class="nf">index</span>
+  <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
+    <span class="nb">format</span><span class="p">.</span><span class="nf">turbo_stream</span> <span class="k">do</span>
+      <span class="vi">@users</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s2">"name LIKE :name"</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"%</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="ss">:search_term</span><span class="p">]</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
+
+      <span class="c1"># Rendering code will go here</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Upon a successful search request we’ll first look for the turbo-stream format in the request headers. This can be seen as the Content-Type <code class="language-plaintext highlighter-rouge">text/vnd.turbo-stream.html</code> or <code class="language-plaintext highlighter-rouge">format.turbo_stream</code>.</p>
+
+<p>Next we want the server response to render a turbo_stream back to the front-end which replaces an HTML ID  (<code class="language-plaintext highlighter-rouge">:userListing</code> above is the DOM ID target) with a template partial. There are several other turbo-stream operations you can use in addition to replace (append, prepend, replace, update, remove).</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      <span class="n">render</span> <span class="ss">turbo_stream: </span><span class="n">turbo_stream</span><span class="p">.</span><span class="nf">replace</span><span class="p">(</span>
+        <span class="ss">:userListing</span><span class="p">,</span>
+        <span class="ss">partial: </span><span class="s2">"users/listing"</span>
+      <span class="p">)</span>
+    <span class="k">end</span>
+</code></pre></div></div>
+
+<p>With that in place, the full controller action should now look like the following:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># /app/controllers/users/searches_controller.rb</span>
+<span class="k">def</span> <span class="nf">index</span>
+  <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
+    <span class="nb">format</span><span class="p">.</span><span class="nf">turbo_stream</span> <span class="k">do</span>
+      <span class="vi">@users</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s2">"name LIKE :name"</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"%</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="ss">:search_term</span><span class="p">]</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
+
+      <span class="n">render</span> <span class="ss">turbo_stream: </span><span class="n">turbo_stream</span><span class="p">.</span><span class="nf">replace</span><span class="p">(</span>
+        <span class="ss">:userListing</span><span class="p">,</span>
+        <span class="ss">partial: </span><span class="s2">"users/listing"</span>
+      <span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Now right now this won’t do much other than respond with some data. No page elements can be changed because the target of the turbo-stream (the :userListing DOM ID doesn’t yet exist). Let’s fix that by moving the <code class="language-plaintext highlighter-rouge">&lt;tbody&gt;</code> part of the <code class="language-plaintext highlighter-rouge">users/index.html.erb</code> table into a separate ERB partial. Name it <code class="language-plaintext highlighter-rouge">users/_listing.html.erb</code> like we’ve specified above in the render turbo_stream with <code class="language-plaintext highlighter-rouge">partial: "users/listing"</code>. We’ll also add simple empty state for when there are no results returned in the @users variable.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!--app/views/users/_listing.html.erb--&gt;</span>
+<span class="nt">&lt;tbody</span> <span class="na">id=</span><span class="s">"userListing"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%</span> <span class="err">@</span><span class="na">users.each</span> <span class="na">do</span> <span class="err">|</span><span class="na">user</span><span class="err">|</span> <span class="err">%</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+      <span class="nt">&lt;td&gt;&lt;</span><span class="err">%=</span> <span class="na">user.name</span> <span class="err">%</span><span class="nt">&gt;&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;&lt;</span><span class="err">%=</span> <span class="na">link_to</span> <span class="err">'</span><span class="na">Show</span><span class="err">',</span> <span class="na">user</span> <span class="err">%</span><span class="nt">&gt;&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;&lt;</span><span class="err">%=</span> <span class="na">link_to</span> <span class="err">'</span><span class="na">Edit</span><span class="err">',</span> <span class="na">edit_user_path</span><span class="err">(</span><span class="na">user</span><span class="err">)</span> <span class="err">%</span><span class="nt">&gt;&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;&lt;</span><span class="err">%=</span> <span class="na">link_to</span> <span class="err">'</span><span class="na">Destroy</span><span class="err">',</span> <span class="na">user</span><span class="err">,</span> <span class="na">method:</span> <span class="na">:delete</span><span class="err">,</span> <span class="na">data:</span> <span class="err">{</span> <span class="na">confirm:</span> <span class="err">'</span><span class="na">Are</span> <span class="na">you</span> <span class="na">sure</span><span class="err">?'</span> <span class="err">}</span> <span class="err">%</span><span class="nt">&gt;&lt;/td&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span>
+
+  <span class="c">&lt;!-- Blank state --&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%</span> <span class="na">if</span> <span class="err">@</span><span class="na">users.empty</span><span class="err">?</span> <span class="err">%</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+      <span class="nt">&lt;td&gt;&lt;em&gt;</span>No matching users<span class="nt">&lt;/em&gt;&lt;/td&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/tbody&gt;</span>
+</code></pre></div></div>
+
+<p>Make sure to add <code class="language-plaintext highlighter-rouge">id="userListing"</code> onto the top level tag so that turbo-streams knows what to target. Earlier we made sure that our new controller action utilized the same instance variable for the users collection with <code class="language-plaintext highlighter-rouge">@users</code> for both our <strong>UsersController#index</strong> and <strong>Users::SearchesController#index</strong>. Now each controller has a collection of User records available to iterate through.</p>
+
+<p>Lastly, make sure you’re rendering the new partial within index.html.erb so that we have the proper DOM ID on the page.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form_with</span> <span class="na">url:</span> <span class="na">search_users_path</span> <span class="na">do</span> <span class="err">|</span><span class="na">form</span><span class="err">|</span> <span class="err">%</span><span class="nt">&gt;</span>
+ <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form.text_field</span> <span class="err">'</span><span class="na">search_term</span><span class="err">',</span> <span class="na">placeholder:</span> <span class="err">'</span><span class="na">Enter</span> <span class="na">search</span> <span class="na">terms...</span><span class="err">'</span> <span class="err">%</span><span class="nt">&gt;</span>
+ <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form.submit</span> <span class="err">'</span><span class="na">Search</span><span class="err">',</span> <span class="na">data:</span> <span class="err">{</span> <span class="na">disable_with:</span> <span class="na">false</span> <span class="err">}</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span>
+
+<span class="nt">&lt;table&gt;</span>
+  <span class="nt">&lt;thead&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+      <span class="nt">&lt;th&gt;</span>Name<span class="nt">&lt;/th&gt;</span>
+      <span class="nt">&lt;th</span> <span class="na">colspan=</span><span class="s">"3"</span><span class="nt">&gt;&lt;/th&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+  <span class="nt">&lt;/thead&gt;</span>
+
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render</span> <span class="na">partial:</span> <span class="err">"</span><span class="na">users</span><span class="err">/</span><span class="na">listing</span><span class="err">"</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+</code></pre></div></div>
+
+<p>And that’s pretty much it. Check out our example in action below:</p>
+
+<p><img src="/img/2021/turbo-stream-search-example.gif" alt="Turbo Stream search form example" /></p>
+
+<p>There was hardly any code needed to make this happen. Just hooking up various parts of the system together to work in concert.</p>
+
+<p>The response from the browser uses a Turbo Stream template:</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- Browser Turbo Stream response --&gt;</span>
+<span class="nt">&lt;turbo-stream</span> <span class="na">action=</span><span class="s">"replace"</span> <span class="na">target=</span><span class="s">"userListing"</span><span class="nt">&gt;&lt;template&gt;&lt;tbody</span> <span class="na">id=</span><span class="s">"userListing"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+      <span class="nt">&lt;td&gt;</span>yarp
+<span class="nt">&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;&lt;a</span> <span class="na">href=</span><span class="s">"/users/5"</span><span class="nt">&gt;</span>Show<span class="nt">&lt;/a&gt;&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;&lt;a</span> <span class="na">href=</span><span class="s">"/users/5/edit"</span><span class="nt">&gt;</span>Edit<span class="nt">&lt;/a&gt;&lt;/td&gt;</span>
+      <span class="nt">&lt;td&gt;&lt;a</span> <span class="na">data-confirm=</span><span class="s">"Are you sure?"</span> <span class="na">rel=</span><span class="s">"nofollow"</span> <span class="na">data-method=</span><span class="s">"delete"</span> <span class="na">href=</span><span class="s">"/users/5"</span><span class="nt">&gt;</span>Destroy<span class="nt">&lt;/a&gt;&lt;/td&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+
+<span class="nt">&lt;/tbody&gt;</span>
+<span class="nt">&lt;/template&gt;&lt;/turbo-stream&gt;</span>
+</code></pre></div></div>
+
+<h2 id="sprinkling-in-stimulus">Sprinkling in Stimulus</h2>
+
+<p>One thing our above search feature is missing, is the ability to shortcut and bookmark search terms. Search features
+often implement this by using a GET request and moving the search terms into a url query string. This allows for
+bookmarking a specific search query. Turbo Stream injects the format <code class="language-plaintext highlighter-rouge">text/vnd.turbo-stream.html</code> into the headers for POST, PUT, PATCH, and DELETE only. This means that GET requests aren’t supported</p>
+
+<p>Enter Stimulus.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    While Turbo usually takes care of at least 80% of the interactivity that traditionally would have required JavaScript, there are still cases where a dash of custom code is required. Stimulus makes this easy with a HTML-centric approach to state and wiring.
+  </p>
+
+  
+    <a href="https://hotwire.dev/">Hotwire.dev</a>
+  
+</blockquote>
+
+<p>You may remember from the beginning of our tutorial the rails generator line of <code class="language-plaintext highlighter-rouge">--webpack=stimulus</code>. This configured the
+Stimulus JavaScript framework for us. You can see a basic example from the
+framework by navigating to <em>app/javascript/controllers/hello_controller.js</em>. It will look a bit like:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="kd">extends</span> <span class="nx">Controller</span> <span class="p">{</span>
+
+  <span class="nx">connect</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">hi</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Change the name of this file to <code class="language-plaintext highlighter-rouge">search_controller.js</code> since it will be working with our search form. There are a couple steps we’ll need to do here:</p>
+
+<ul>
+  <li>Link our Stimulus controller to the DOM</li>
+  <li>Call Stimulus controller method when user clicks submit</li>
+  <li>Update the url’s query string with the search_term</li>
+</ul>
+
+<p>Now we’ll want to map our <code class="language-plaintext highlighter-rouge">search_controller.js</code> to an element in our HTML.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Identifiers serve as the link between elements and controllers.
+  </p>
+
+  
+    <a href="https://stimulus.hotwire.dev/handbook/hello-stimulus">Stimulus Handbook</a>
+  
+</blockquote>
+
+<p>We can do this by using identifiers as they associate controllers with the DOM. Identifiers use the <code class="language-plaintext highlighter-rouge">data-controller="search"</code> syntax to map to controller names.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form_with</span> <span class="na">url:</span> <span class="na">search_users_path</span><span class="err">,</span> <span class="na">data:</span> <span class="err">{</span> <span class="na">controller:</span> <span class="err">"</span><span class="na">search</span><span class="err">"</span> <span class="err">}</span> <span class="na">do</span> <span class="err">|</span><span class="na">form</span><span class="err">|</span> <span class="err">%</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>With our search form hooked up to our controller, we need to capture the search term when the
+user clicks submit. We can do so using Stimulus actions. These use the <code class="language-plaintext highlighter-rouge">data-action="event-&gt;controller#action"</code> syntax.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">data-action</code> specifies that there is an event method in our controller associated with this element.</li>
+  <li><code class="language-plaintext highlighter-rouge">click-&gt;search#addQueryString</code> says, “When the user clicks this element, call the addQueryString() method from the search controller”</li>
+</ul>
+
+<p>Add this to the submit button.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form.submit</span> <span class="err">'</span><span class="na">Search</span><span class="err">',</span> <span class="na">data:</span> <span class="err">{</span> <span class="na">disable_with:</span> <span class="na">false</span><span class="err">,</span> <span class="na">action:</span> <span class="err">"</span><span class="na">click-</span><span class="nt">&gt;</span>search#addQueryString" } %&gt;
+</code></pre></div></div>
+
+<p>We’ll fill out a stubbed method in our Stimulus controller for now.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="kd">extends</span> <span class="nx">Controller</span> <span class="p">{</span>
+  <span class="nx">addQueryString</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">You clicked me</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You can try this out and notice that every time you click submit there is a message in your browser console.</p>
+
+<p>The last step is to retrieve the value the user supplies in our form. This can be accomplished by using
+Stimulus targets.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Stimulus lets us mark important elements as targets so we can easily reference them in the controller through corresponding properties.
+  </p>
+
+  
+    <a href="https://stimulus.hotwire.dev/handbook/hello-stimulus">Stimulus Handbook</a>
+  
+</blockquote>
+
+<p>A Stimulus target uses the <code class="language-plaintext highlighter-rouge">data-controller-target="name"</code> syntax. For our example we’ll use <code class="language-plaintext highlighter-rouge">data-search-target="term"</code> to capture the user’s input. Add this to our form to finish out its connection to Stimulus.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form_with</span> <span class="na">url:</span> <span class="na">search_users_path</span><span class="err">,</span> <span class="na">data:</span> <span class="err">{</span> <span class="na">controller:</span> <span class="err">"</span><span class="na">search</span><span class="err">"</span> <span class="err">}</span> <span class="na">do</span> <span class="err">|</span><span class="na">form</span><span class="err">|</span> <span class="err">%</span><span class="nt">&gt;</span>
+ <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form.text_field</span> <span class="err">'</span><span class="na">search_term</span><span class="err">',</span> <span class="na">placeholder:</span> <span class="err">'</span><span class="na">Enter</span> <span class="na">search</span> <span class="na">terms...</span><span class="err">',</span> <span class="na">data:</span> <span class="err">{</span> <span class="err">"</span><span class="na">search-target</span><span class="err">"</span> <span class="err">=</span><span class="nt">&gt;</span> "term" } %&gt;
+ <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form.submit</span> <span class="err">'</span><span class="na">Search</span><span class="err">',</span> <span class="na">data:</span> <span class="err">{</span> <span class="na">disable_with:</span> <span class="na">false</span><span class="err">,</span> <span class="na">action:</span> <span class="err">"</span><span class="na">click-</span><span class="nt">&gt;</span>search#addQueryString" } %&gt;
+<span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>With that done, we can create our target back in our Stimulus controller. This will automatically
+build a <code class="language-plaintext highlighter-rouge">this.termTarget</code> property within our controller.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="kd">extends</span> <span class="nx">Controller</span> <span class="p">{</span>
+  <span class="kd">static</span> <span class="nx">targets</span> <span class="o">=</span> <span class="p">[</span> <span class="dl">"</span><span class="s2">term</span><span class="dl">"</span> <span class="p">]</span>
+
+  <span class="nx">addQueryString</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">termTarget</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/img/2021/hotwire-stimulus-targets.gif" alt="Stimulus targets console.log example" /></p>
+
+<p>While having <code class="language-plaintext highlighter-rouge">this.termTarget</code> available to us is really useful it can start to
+clutter your method calls with extra cruft. Luckily the Stimulus tutorial explains
+that we can use a getter method here to clean things up.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">stimulus</span><span class="dl">"</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="kd">class</span> <span class="kd">extends</span> <span class="nx">Controller</span> <span class="p">{</span>
+  <span class="kd">static</span> <span class="nx">targets</span> <span class="o">=</span> <span class="p">[</span> <span class="dl">"</span><span class="s2">term</span><span class="dl">"</span> <span class="p">]</span>
+
+  <span class="nx">addQueryString</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">term</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">get</span> <span class="nx">term</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">termTarget</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now that we have the input value we can build a simple (albeit naive) implementation
+of adding a query string to the url.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nx">addQueryString</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">term</span> <span class="o">===</span> <span class="dl">""</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">cleanURL</span> <span class="o">=</span> <span class="nx">location</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">//</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">host</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span><span class="p">;</span>
+      <span class="nx">history</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">({},</span> <span class="nb">document</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span> <span class="nx">cleanURL</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">history</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">`?search_term=</span><span class="p">${</span><span class="k">this</span><span class="p">.</span><span class="nx">term</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+</code></pre></div></div>
+
+<p>The above says, “Given a user’s search term add it to the query string search_term attribute. When there isn’t a search term them revert the url back to the base domain.”. I won’t go into detail on the history api which is used above. It is likely there is a more efficient way to do this but for this example it works. If you’d like to learn more about the history api check out <a href="https://developer.mozilla.org/en-US/docs/Web/API/History_API">this mozilla article</a>. With the two branches in place our query string will match whatever search term the user enters.</p>
+
+<p>The final step in making our search form bookmarkable is to ensure that our controller respects an existing query string
+request. For example, if I request <code class="language-plaintext highlighter-rouge">localhost:3000/users/?search_term=josh</code> then I would expect my listing to pre-populate with Users that match the term <code class="language-plaintext highlighter-rouge">josh</code>. Doing this is pretty simple as what we need is a conditional check within our UsersController#index.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">index</span>
+    <span class="vi">@users</span> <span class="o">=</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="ss">:search_term</span><span class="p">].</span><span class="nf">present?</span>
+      <span class="c1"># Since we're using this in two controllers now it might be</span>
+      <span class="c1"># wise to abstract it out into a Model method</span>
+      <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s2">"name LIKE :name"</span><span class="p">,</span> <span class="ss">name: </span><span class="s2">"%</span><span class="si">#{</span><span class="n">params</span><span class="p">[</span><span class="ss">:search_term</span><span class="p">]</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="no">User</span><span class="p">.</span><span class="nf">all</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>And with that we’ve got a fully functional search form which is bookmarkable.</p>
+
+<p><img src="/img/2021/hotwire-stimulus-full.gif" alt="Full example of search using Hotwire" /></p>
+
+<h2 id="wheres-strada">Where’s Strada?</h2>
+
+<p>At the writing of this article, Strada has yet to be released. Sounds like sometime
+this year we’ll see it become part of the Hotwire approach.</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    [Strada] standardizes the way that web and native parts of a mobile hybrid application talk to each other via HTML bridge attributes. This makes it easy to progressively level-up web interactions with native replacements.
+  </p>
+
+  
+    <a href="https://hotwire.dev/">Hotwire</a>
+  
+</blockquote>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We used minmal JavaScript and relied primarily on Turbo to make it dynamic. Really this is just the tip of the iceberg into what can be accomplished with Hotwire. Have you used Hotwire on a project? What techniques did you find useful? Hit me up in the comments below as I’d love to discuss.</p>
+
+<p>As always thanks for reading and happy coding.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/add-joy-to-your-test-suite-with-cardi-b/" alt="Add joy to your test suite with Cardi B">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Add joy to your test suite with Cardi B</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/examining-power-and-privilege-in-the-workplace-basecamps-problematic-policies/" alt="Examining power and privilege in the workplace; Basecamp's problematic policies">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Examining power and privilege in the workplace; Basecamp's problematic policies</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

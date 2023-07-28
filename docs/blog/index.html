@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Development Simplified | A blog about ruby, sql, performance, and patterns. By Josh Frankel.</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Development Simplified" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A blog about ruby, sql, performance, and patterns. By Josh Frankel." />
+<meta property="og:description" content="A blog about ruby, sql, performance, and patterns. By Josh Frankel." />
+<link rel="canonical" href="http://joshfrankel.me/blog/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/" />
+<meta property="og:site_name" content="Development Simplified" />
+<link rel="next" href="http://joshfrankel.me/blog/page2/" />
+<script type="application/ld+json">
+{"headline":"Development Simplified","url":"http://joshfrankel.me/blog/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"WebPage","description":"A blog about ruby, sql, performance, and patterns. By Josh Frankel.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Development Simplified</h1>
+
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <div class="w-100">
+  <section class="Listing">
+  <!-- This loops through the paginated posts -->
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#articles">articles</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2023-07-28">July 28, 2023</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Object equality is an interesting topic. You can check for matching values (with or without ordering). You can
+also check to see if the object has the same in-memory id. I’ve written code to diff two arrays before but
+I’ve never sat down to think about all the ways to accomplish this. Also I was able to explore what I believe
+are the most optimal approaches.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#ruby">#ruby</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2023-07-20">July 20, 2023</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>At home, I’m a Linux user but at work most companies use Mac for engineers. It’s been
+a couple years since I’ve used Mac so I’m learning my way back around it along with
+Homebrew. One issue I ran into the other day was postgresql service not starting
+sucessfully. No amount of <code class="language-plaintext highlighter-rouge">brew services restart postgresql</code> would fix it. Turns
+out to be a pretty simple fix.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#mac">#mac</a>
+        
+          <a href="/blog/tags#postgres">#postgres</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#tutorials">tutorials</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2023-01-17">January 17, 2023</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Alright, bit of a clickbait title but if you know me you’ll know my love for
+bad puns. Ensuring a healthy running application is an important part of your
+infrastructure reliability. Site Reliabiltiy is an entire discipline by itself as there
+are a wealth of topics and concepts associated with it. That being said having
+really solid Site Reliability as a start-up isn’t always the first priority.
+This article details some of the steps I’ve taken to have basic application
+monitoring in place easily and cheaply.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#site reliability">#site reliability</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#articles">articles</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2022-08-09">August 9, 2022</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Blurring images is a common style on the web. It can give needed contrast and visual
+interest. Now you can pre-blur an image with a photo editing program, but for the
+purpose of this article we’ll be focused on CSS approaches.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#css">#css</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#tutorials">tutorials</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-09">May 9, 2022</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>If you’ve worked with calendars, then you know the frustration of having two systems not keep events in sync. There are essentially three levels to keeping events in sync. The first is integration with every email provider you wish to support. Not a light initiative. The second is to find a product which aggregates multiple providers into a single API interface. Better solution, but open your wallet. Lastly, build a lightweight system that relies on the iCalendar standard. This last option is the focus of the article. Throughout the remainder of this post, we’ll explore pushing an event to an external provider’s calendar and keeping it in sync across systems without writing a single API request or integration.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#rails">#rails</a>
+        
+          <a href="/blog/tags#calendar">#calendar</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#articles">articles</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-06">May 6, 2022</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Testing your code thoroughly is an important part of a well functioning
+and easy to change application. Lack of adequate test coverage can be frustrating
+when refactoring, upgrading, or tracking down a bug. I’ve always wanted a way
+to ensure that each file maintains
+a minimum test coverage and if not fail continuous integration checks. After much
+searching, I decided to go ahead and build my own. Introducing SimpleCov+ Action
+for use within your Github actions.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#testing">#testing</a>
+        
+          <a href="/blog/tags#github">#github</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/simulating-a-select-dropdown-change-in-jest/">Simulating a select dropdown change in Jest</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2022-04-20">April 20, 2022</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>While building a mobile friendly tab component, I created a select dropdown that allowed the user to control
+the displayed content. This worked in tandem with the existing click the name of the tab setup. Testing a simple
+click event is trivial by using <code class="language-plaintext highlighter-rouge">.click()</code> but I quickly found that simulating a select dropdown change wasn’t as
+straightforward nor as documented. I stumbled on the following solution which hopefully helps someone else stuck.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#jest">#jest</a>
+        
+          <a href="/blog/tags#testing">#testing</a>
+        
+          <a href="/blog/tags#javascript">#javascript</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/how-to-test-redirect-back-or-to/">How to test redirect_back_or_to</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2022-04-11">April 11, 2022</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Have you ever successfully used <code class="language-plaintext highlighter-rouge">redirect_back_or_to</code> in your application only to find out that testing was a challenge? Both methods rely on browser history which is generally not available within controller test and request specs. Recently I ran into this and after digging in came up with a simple solution.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#rails">#rails</a>
+        
+          <a href="/blog/tags#testing">#testing</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/tips-i-learned-working-with-activestorage/">Tips I learned working with ActiveStorage</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#today-i-learned">today i learned</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-30">March 30, 2022</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>ActiveStorage is a great system for configuring your cloud file storage. It takes
+care of much of the details and allows you to focus on the most important parts: file upload and file download. Recently, I had the opportunity to work through an uploader on Rails 7 within the Administrate admin interface. Fun journey that left me with a couple tricks up my sleeve the next time I reach for ActiveStorage.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#rails">#rails</a>
+        
+      </div>
+    </article>
+  
+    <article class="Listing Listing-article">
+      <h1 class="Listing Listing-title"><a href="/blog/automating-accessibility-with-ruby-and-axe-core/">Automating Accessibility with Ruby and Axe Core</a></h1>
+      <h2 class="Listing Listing-category"><em>posted in <a href="/blog/categories#tutorials">tutorials</a></em></h2>
+
+      <p class="Listing Listing-date">
+        <i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<time datetime="2022-03-17">March 17, 2022</time>
+      </p>
+      <div class="Listing Listing-content">
+        <p>Building an accessible application can be challenging. Keeping an application accessible can be impossible. Without dedicated roles or full team support, accessibility regressions are easy to introduce.</p>
+
+<p>In the past, I’ve used <code class="language-plaintext highlighter-rouge">eslint-plugin-jsx-a11y</code> for ensuring React components are accessible, and it helped tremendously. Recently, I’ve dived into Hotwire &amp; Stimulus and needed a solution for ensuring an accessible application. Now as a disclaimer, all automated accessibility checkers have gaps between them and being fully accessible. Striving for a dedicated position or policy to ensure compliance is still something that automation can’t replace. That being said, automation can help keep regresssion at bay.</p>
+
+
+      </div>
+      <div class="Listing Listing-tags">
+        
+          <a href="/blog/tags#accessibility">#accessibility</a>
+        
+          <a href="/blog/tags#testing">#testing</a>
+        
+          <a href="/blog/tags#minitest">#minitest</a>
+        
+      </div>
+    </article>
+  
+</section>
+
+<!-- Pagination links -->
+<section class="Pagination">
+  
+    
+      <li class="selected">
+        <a href="/blog/index.html" title="Development Simplified">1</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page2/index.html" title="Development Simplified">2</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page3/index.html" title="Development Simplified">3</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page4/index.html" title="Development Simplified">4</a>
+      </li>
+    
+      <li >
+        <a href="/blog/page5/index.html" title="Development Simplified">5</a>
+      </li>
+    
+  
+</section>
+
+
+</div>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog"  class="active" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

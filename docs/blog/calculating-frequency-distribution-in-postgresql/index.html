@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Calculating Frequency Distribution in PostgreSQL | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Calculating Frequency Distribution in PostgreSQL" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I’ve always loved statistics. Being a software engineer has allowed me a lot of opportunities to solve complex statistical problems in SQL. With programming, we want to consider the current state of data which means running calculations on demand. Recently, I had the opportunity to calculate frequency distribution in SQL and wanted to share what I’ve learned with you." />
+<meta property="og:description" content="I’ve always loved statistics. Being a software engineer has allowed me a lot of opportunities to solve complex statistical problems in SQL. With programming, we want to consider the current state of data which means running calculations on demand. Recently, I had the opportunity to calculate frequency distribution in SQL and wanted to share what I’ve learned with you." />
+<link rel="canonical" href="http://joshfrankel.me/blog/calculating-frequency-distribution-in-postgresql/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/calculating-frequency-distribution-in-postgresql/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-02-27T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2019-02-27T00:00:00+00:00","dateModified":"2019-02-27T00:00:00+00:00","headline":"Calculating Frequency Distribution in PostgreSQL","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/calculating-frequency-distribution-in-postgresql/"},"url":"http://joshfrankel.me/blog/calculating-frequency-distribution-in-postgresql/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"I’ve always loved statistics. Being a software engineer has allowed me a lot of opportunities to solve complex statistical problems in SQL. With programming, we want to consider the current state of data which means running calculations on demand. Recently, I had the opportunity to calculate frequency distribution in SQL and wanted to share what I’ve learned with you.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Calculating Frequency Distribution in PostgreSQL</h1>
+
+    
+      <p class="Banner-information">
+        <time>February 27, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>I’ve always loved statistics. Being a software engineer has allowed me a lot of opportunities
+to solve complex statistical problems in SQL. With programming, we want to consider the current state of data which
+means running calculations on demand. Recently, I had the opportunity to calculate
+frequency distribution in SQL and wanted to share what I’ve learned with you.
+<!--excerpt--></p>
+
+<h2 id="an-example">An example</h2>
+
+<p>Alright so before we just dive in, first we need an example. A good example…</p>
+
+<p>While walking down a dirt path, a gentle breeze brushes against your neck. Suddenly,
+out of nowhere a grizzled old bridgekeeper blocks your way. “Stop!” he exclaims.</p>
+
+<p>His breath reeks of elderberry and he smells faintly of hamster. As he stares
+at you with milky white eyes he states the following:</p>
+
+<p>“Who would cross the Bridge of Death must answer me these questions three, ere the other side he see.”</p>
+
+<p>To which you of course respond, “Ask me the questions, bridgekeeper. I’m not afraid.”. So ask away
+he does:</p>
+
+<blockquote>
+  <ul>
+    <li>What is your favorite color?</li>
+    <li>What is your quest?</li>
+    <li>What is the airspeed velocity of an unladen swallow?</li>
+  </ul>
+</blockquote>
+
+<p>As you stare at him puzzled, he (helpfully) gives you multiple choices for each question.
+Each question now has a set of options: a, b, c, and d. Considering your options you answer
+that your favorite color is indeed B) fuschia, your quest is A) not being hassled by creepy
+bridgekeepers, and you answer for the airspeed velocity of an unladen swallow with A) An 
+African or European swallow?</p>
+
+<p>While certainly an unsettling experience, you’re now really curious as to how other 
+travelers before you answered the questions. So curious in fact that you’re thinking 
+about finding out what the frequency distribution for each question’s choice was.</p>
+
+<p>Ok, ok, ok. So this wasn’t an actual situation I ran into at work but work with me here.</p>
+
+<h2 id="basic-frequency-distribution">Basic Frequency Distribution</h2>
+
+<blockquote class="Info Info-right"><strong>What is Frequency Distribution?</strong><br />
+  Frequency distribution is calculating the frequency (also known as rate or occurence) of 
+  which question choice was selected 
+</blockquote>
+
+<p>Think back on the Bridgekeeper’s questions, there are a set number of options: a, b, c, and d
+for each question and a set number of travelers whom answered. <strong>Frequency
+distribution is measuring the total times that each multiple choice option was selected.</strong> You can think of each option (a, b, c, d) as a different category that we’d like
+to group travelers into based on their answer.</p>
+
+<p>Now that we’re interested in analyzed previous traveler’s responses we’ll want
+to know how well they answered. From looking at the frequency distribution, we
+could also hypothesize if a question was too hard or too easy.</p>
+
+<p>First let’s write some SQL to gather traveler responses across all three
+questions.</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="k">SELECT</span> 
+  <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> 
+  <span class="k">COUNT</span><span class="p">(</span><span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_answers</span>
+<span class="k">FROM</span> <span class="n">traveler_answers</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span> <span class="c1">-- To ensure the order is a, b, c, d</span></code></pre></figure>
+
+<p>The above query returns the choice (a, b, c, or d) along with a count of
+how many times a traveler selected it. We group the above by <code class="language-plaintext highlighter-rouge">traveler_answers.choice</code> 
+as this ensures that the aggregate function <code class="language-plaintext highlighter-rouge">COUNT()</code> returns a result for each type 
+of choice. The query above nets us a basic frequency distribution
+which you can see below:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>choice</th>
+      <th>total_answers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>a</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <td>b</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <td>c</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <td>d</td>
+      <td>75</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Since this is frequency distribution at its most basic, it is pretty straight forward
+to write the supporting SQL. However, it isn’t really useful in its current form. What
+does 25 total answers for choice A really tell us? Well, across the five questions… I mean
+three questions, 25 travelers select choice A. Not real compelling stuff.</p>
+
+<p>“Well, lets get going! Come along, Patsy”</p>
+
+<h2 id="frequency-distribution-for-two-categories">Frequency Distribution for two categories</h2>
+
+<p>What might be more useful than frequency distribution across all questions? How
+about frequency distribution based on a single question? Specifically let’s calculate how many travelers
+selected a <strong>given choice</strong> for a <strong>given question</strong>. You could also think about this
+as comparing two categories within frequency distribution.</p>
+
+<p>To accomplish this we follow along with our above example by adding a new <code class="language-plaintext highlighter-rouge">GROUP BY</code>
+clause to ensure that we are grouping categories into traveler’s answered choice
+(<code class="language-plaintext highlighter-rouge">traveler_answers.choice</code>)
+and the Bridgekeeper’s question (<code class="language-plaintext highlighter-rouge">bridgekeeper_questions.question_text</code>).</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="k">SELECT</span> 
+  <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">question_text</span><span class="p">,</span>
+  <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> 
+  <span class="k">COUNT</span><span class="p">(</span><span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_answers</span>
+<span class="k">FROM</span> <span class="n">traveler_answers</span>
+<span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">bridgekeeper_questions</span> <span class="k">ON</span> <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">exam_question_id</span>
+<span class="k">GROUP</span> <span class="k">BY</span> 
+  <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> 
+  <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">question_text</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span></code></pre></figure>
+
+<p>Since we’re grouping the results by <code class="language-plaintext highlighter-rouge">traveler_answers.choice</code> and <code class="language-plaintext highlighter-rouge">bridgekeeper_questions.question_text</code>, we end
+up with multiple results per question text (1 per choice / question pair). You can see
+what the resulting query would return below.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Question text</th>
+      <th>choice</th>
+      <th>total_answers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>a</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>b</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>c</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>d</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>a</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>b</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>c</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>d</td>
+      <td>40</td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>a</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>b</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>c</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>d</td>
+      <td>25</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Now we have frequency distribution for each question. This is starting to look like useful data.</p>
+
+<h2 id="frequency-distribution-with-descriptive-statistics">Frequency Distribution with Descriptive Statistics</h2>
+
+<blockquote class="Info Info-right clearfix"><strong>What is Descriptive Statistics?</strong><br />
+  "A descriptive statistic (in the count noun sense) is a summary statistic that quantitatively describes or summarizes features of a collection of information"
+<cite><a href="https://en.wikipedia.org/wiki/Descriptive_statistics">- Wikipedia</a></cite>
+</blockquote>
+
+<p>At this point we’ve forgotten something. Who cares about a previous traveler’s answer
+unless we know if their selection was correct or not. “Who are
+ you, who are so wise in the ways of science?”. Totally normally if you’re thinking that. 
+ Well… probably not, but don’t ruin my delusions.</p>
+
+<p>Here’s our new analysis goals:</p>
+
+<ol>
+  <li>What is the total number of correct answers per question?</li>
+  <li>What is the percentage of correct answers per question?</li>
+</ol>
+
+<p>Now these won’t make a lot of sense if for each row in the above table we return
+total number and percentage of total correct. Really we want these in the format of:</p>
+
+<p><code class="language-plaintext highlighter-rouge">Question text | choice | total answers | total correct answers | percentage correct answers</code></p>
+
+<p>So you might say that the sh<strong>rub</strong>bery here is that we need to condense the multi-row format above
+into a single line per question.</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="k">SELECT</span> 
+  <span class="n">inner_query</span><span class="p">.</span><span class="n">question_text</span><span class="p">,</span> 
+  <span class="k">SUM</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">total_answers</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_answers</span><span class="p">,</span>
+  <span class="k">SUM</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">total_correct_answers</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_correct_answers</span><span class="p">,</span> 
+  <span class="p">(</span><span class="k">SUM</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">total_correct_answers</span><span class="p">)</span> <span class="o">/</span> <span class="k">SUM</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">total_answers</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">as</span> <span class="n">percentage_correct_answer</span>
+<span class="k">FROM</span> <span class="p">(</span>
+  <span class="k">SELECT</span> 
+    <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">question_text</span><span class="p">,</span>
+    <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> 
+    <span class="k">COUNT</span><span class="p">(</span><span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_answers</span>
+    <span class="k">COUNT</span><span class="p">(</span><span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">)</span> <span class="n">FILTER</span> <span class="p">(</span><span class="k">WHERE</span> <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">correct_choice</span> <span class="o">=</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_correct_answers</span>
+  <span class="k">FROM</span> <span class="n">traveler_answers</span>
+  <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">bridgekeeper_questions</span> <span class="k">ON</span> <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">exam_question_id</span>
+  <span class="k">GROUP</span> <span class="k">BY</span> 
+    <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> 
+    <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">question_text</span>
+  <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span>
+<span class="p">)</span> <span class="n">inner_query</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">inner_query</span><span class="p">.</span><span class="n">question_text</span></code></pre></figure>
+
+<blockquote class="Info Info-right"><strong>What's the Difference between sum and count?</strong><br /><br />
+  <strong>COUNT</strong> - returns the <strong>total number</strong> of rows in the current group<br /><br />
+  <strong>SUM</strong> - returns the <strong>total value</strong> from a column in the current group
+</blockquote>
+
+<p>You’ll notice that from the above query we used the syntax
+<code class="language-plaintext highlighter-rouge">SELECT columns FROM (inner_query)</code> in order to select and aggregate already existing
+aggregate values. Think of this like querying a query. This is necessary for us
+to calculate an aggregate based on a group of multiple aggregates. It also allows
+us to return a single row again per question.</p>
+
+<p>To understand how we’re back to returning a single row, let’s look at what is happening behind the scenes by calculating the percentage
+of correct answers. The formula for calculating percentage of correct answers is:</p>
+
+<blockquote>
+  ( total_correct_answers / total_answers ) * 100
+</blockquote>
+
+<p>First the inner query calculates the individual number of answers
+per question. <code class="language-plaintext highlighter-rouge">COUNT(traveler_answers.choice)</code> returns:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Question text</th>
+      <th>choice</th>
+      <th>total_answers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>a</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>b</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>c</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>d</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Additionally, we’re counting correct answers by choice using a FILTER clause: 
+<code class="language-plaintext highlighter-rouge">COUNT(traveler_answers.choice) FILTER (WHERE bridgekeeper_questions.correct_choice = traveler_answers.choice)</code>. The
+results within the inner query here are a bit strange but will become useful once we aggregate its
+results in the outer query.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Question text</th>
+      <th>choice</th>
+      <th>total_answers</th>
+      <th>total_correct_answers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>a</td>
+      <td>12</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>b</td>
+      <td>20</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>c</td>
+      <td>10</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>d</td>
+      <td>5</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Think about the above as building out raw data that we want to perform calculations on in
+the outer query. This is exactly what we’ll do by leaning on the <code class="language-plaintext highlighter-rouge">SUM()</code> function 
+with the following: <code class="language-plaintext highlighter-rouge">(SUM(inner_query.total_correct_answers) / SUM(inner_query.total_answers)) * 100</code>.</p>
+
+<blockquote class="Info Info-right"><strong>PostgreSQL FILTER clause</strong><br /><br />
+  Something else you may have noticed is the `FILTER` syntax. This is an excellent way
+  of extending an aggregate function with an additional `WHERE` clause. 
+  <cite><a href="https://modern-sql.com/feature/filter">- Modern-sql.com</a></cite>
+</blockquote>
+
+<p>We use <code class="language-plaintext highlighter-rouge">SUM()</code> instead of <code class="language-plaintext highlighter-rouge">COUNT()</code> because <code class="language-plaintext highlighter-rouge">COUNT()</code> would only give us how many rows were returned 
+while we want to know what the running total is based on a column’s value.</p>
+
+<p>Looking back we can 
+see that we’re right at the step for using our formula for calculating the
+percentage.</p>
+
+<p>Here’s it written out in full:</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">total_correct_answers: 0 + 20 + 0 + 0 = 20
+total_answers: 12 + 20 + 10 + 5 = 47
+(total_correct_answers / total_answers): (20 / 47) = 0.425532
+(0.425532) * 100 = 42.5532%</code></pre></figure>
+
+<p>Given our newest SQL changes above, here’s the end result:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Question text</th>
+      <th>total_correct_answers</th>
+      <th>percentage_correct_answer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>20</td>
+      <td>42.5532</td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>40</td>
+      <td>55.5555</td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>1</td>
+      <td>1.78571</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Unfortunately, by running the aggregate for
+total correct and percentage correct, we lost the frequency distribution for 
+each question. It’s a bit tricky to get this back but where there’s a way…</p>
+
+<p>“The Black Knights always triumph!”</p>
+
+<p>Ahem, excuse me. Sorry about that.</p>
+
+<h2 id="frequency-distribution-as-a-single-row">Frequency Distribution as a single row</h2>
+
+<blockquote class="Info Info-right"><strong>PostgreSQL JSONB methods</strong><br /><br />
+  <strong>jsonb_agg</strong> - aggregates values as a JSON array<br /><br />
+  <strong>jsonb_build_object</strong> - Builds a JSON object out of a variadic argument list. By convention, the argument list consists of alternating keys and values.
+  <cite><a href="https://www.postgresql.org/docs/9.5/functions-json.html">- Postgresql.org</a></cite>
+</blockquote>
+
+<p>Since we still want to return a single row per question, we need a way to format
+the distribution into a single value. JSONB is a perfect solution for this problem
+as it allows us to use key-value pairs to describe the value in a single column. 
+We’ll be using <code class="language-plaintext highlighter-rouge">jsonb_agg()</code> and <code class="language-plaintext highlighter-rouge">jsonb_build_object()</code> PostgreSQL methods to accomplish this.</p>
+
+<p>Just like we did above while calculating <strong>total_correct_answers</strong> and <strong>percentage_correct_answer</strong>, 
+the aggregate of the inner query is utilized as an aggregate of the outer query.</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="k">SELECT</span> 
+  <span class="n">inner_query</span><span class="p">.</span><span class="n">question_text</span><span class="p">,</span>
+  <span class="k">SUM</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">total_answers</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_answers</span><span class="p">,</span> 
+  <span class="k">SUM</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">total_correct_answers</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_correct_answers</span><span class="p">,</span> 
+  <span class="p">(</span><span class="k">SUM</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">total_correct_answers</span><span class="p">)</span> <span class="o">/</span> <span class="k">SUM</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">total_answers</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">as</span> <span class="n">percentage_correct_answer</span><span class="p">,</span>
+  <span class="n">jsonb_agg</span><span class="p">(</span><span class="n">inner_query</span><span class="p">.</span><span class="n">frequency_distribution</span><span class="p">)</span> <span class="k">as</span> <span class="n">frequency_distribution_json</span>
+<span class="k">FROM</span> <span class="p">(</span>
+  <span class="k">SELECT</span> 
+    <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">question_text</span><span class="p">,</span>
+    <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> 
+    <span class="k">COUNT</span><span class="p">(</span><span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_answers</span><span class="p">,</span>
+    <span class="k">COUNT</span><span class="p">(</span><span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">)</span> <span class="n">FILTER</span> <span class="p">(</span><span class="k">WHERE</span> <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">correct_choice</span> <span class="o">=</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_correct_answers</span><span class="p">,</span>
+    <span class="n">jsonb_build_object</span><span class="p">(</span><span class="s1">'choice'</span><span class="p">,</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> <span class="s1">'frequency'</span><span class="p">,</span> <span class="k">COUNT</span><span class="p">(</span><span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">))</span> <span class="k">as</span> <span class="n">frequency_distribution</span>
+  <span class="k">FROM</span> <span class="n">traveler_answers</span>
+  <span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">bridgekeeper_questions</span> <span class="k">ON</span> <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">exam_question_id</span>
+  <span class="k">GROUP</span> <span class="k">BY</span> 
+    <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> 
+    <span class="n">bridgekeeper_questions</span><span class="p">.</span><span class="n">question_text</span>
+  <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span>
+<span class="p">)</span> <span class="n">inner_query</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">inner_query</span><span class="p">.</span><span class="n">question_text</span></code></pre></figure>
+
+<p>“Oh,look. There’s some lovely filth over here.”</p>
+
+<p>The resulting dataset below is pretty ugly but gathers the proper key-value pairs
+we need in order to show frequency distribution.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Question text</th>
+      <th>total_correct_answers</th>
+      <th>percentage_correct_answer</th>
+      <th>frequency_distribution_json</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>20</td>
+      <td>42.5532</td>
+      <td><code class="language-plaintext highlighter-rouge">[{ "choice": "a", "frequency": 12 }, { "choice": "b", "frequency": 20 }, { "choice": "c", "frequency": 10 }, { "choice": "d", "frequency": 5 }]</code></td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>40</td>
+      <td>55.5555</td>
+      <td><code class="language-plaintext highlighter-rouge">[{ "choice": "a", "frequency": 12 }, { "choice": "b", "frequency": 5 }, { "choice": "c", "frequency": 15 }, { "choice": "d", "frequency": 40 }]</code></td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>1</td>
+      <td>1.78571</td>
+      <td><code class="language-plaintext highlighter-rouge">[{ "choice": "a", "frequency": 1 }, { "choice": "b", "frequency": 25 }, { "choice": "c", "frequency": 5 }, { "choice": "d", "frequency": 25 }]</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>With that being our final modification to the query, we now have a table that contains:</p>
+
+<blockquote class="Info Info-right"><strong>PostgreSQL alternative method</strong><br /><br />
+  `width_bucket()` allows you to specify a column that has a minimum and maximum range and then split it into
+  buckets (categories). <a href="https://www.postgresql.org/docs/9.1/functions-math.html">Check out the following documentation</a>
+</blockquote>
+
+<ol>
+  <li>The total correct answers per question</li>
+  <li>The percentage of correct answers per question</li>
+  <li>A frequency distribution per question</li>
+</ol>
+
+<p>So what does the inner query look like with the new <code class="language-plaintext highlighter-rouge">jsonb_build_object()</code> method?</p>
+
+<p>If we were to back track to the table that contained a result per question per 
+choice and look at what the following SQL returns it would look like this:</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql">  <span class="n">jsonb_build_object</span><span class="p">(</span><span class="s1">'choice'</span><span class="p">,</span> <span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">,</span> <span class="s1">'frequency'</span><span class="p">,</span> <span class="k">COUNT</span><span class="p">(</span><span class="n">traveler_answers</span><span class="p">.</span><span class="n">choice</span><span class="p">))</span> <span class="k">as</span> <span class="n">frequency_distribution</span></code></pre></figure>
+
+<table>
+  <thead>
+    <tr>
+      <th>Question text</th>
+      <th>choice</th>
+      <th>total_answers</th>
+      <th>frequency_distribution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>a</td>
+      <td>12</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "a", "frequency": 12 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>b</td>
+      <td>20</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "b", "frequency": 20 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>c</td>
+      <td>10</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "c", "frequency": 10 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is your favorite color?”</td>
+      <td>d</td>
+      <td>5</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "d", "frequency": 5 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>a</td>
+      <td>12</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "a", "frequency": 12 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>b</td>
+      <td>5</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "b", "frequency": 5 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>c</td>
+      <td>15</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "c", "frequency": 15 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is your quest?”</td>
+      <td>d</td>
+      <td>40</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "d", "frequency": 40 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>a</td>
+      <td>1</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "a", "frequency": 1 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>b</td>
+      <td>25</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "b", "frequency": 25 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>c</td>
+      <td>5</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "c", "frequency": 5 }</code></td>
+    </tr>
+    <tr>
+      <td>“What is the airspeed velocity of an unladen swallow?”</td>
+      <td>d</td>
+      <td>25</td>
+      <td><code class="language-plaintext highlighter-rouge">{ "choice": "d", "frequency": 25 }</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The magic… “I’m not a witch, I’m not a witch”… of this happens in the outer query with <code class="language-plaintext highlighter-rouge">jsonb_agg()</code> which
+aggregates all the inner frequency distribution columns into an array
+of jsonb key-value pairs like we see in the above final query. This allows
+for both Descriptive Statistics on the entire dataset while providing Frequency Distribution
+for a single question.</p>
+
+<blockquote>
+  "What if you get a question wrong?"<br />
+  "Then you are cast into the Gorge of Eternal Peril."
+</blockquote>
+
+<p><img src="/img/2019/monty-python-bridge.gif" alt="Monty Python Bridgekeeper" /></p>
+
+<p>Got a different SQL statistics trick? How about an improved approach to the above? 
+Just love Monty Python? I’d love to hear about it in the comments.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/formatting-enum-columns-into-a-human-readable-format-with-sql/" alt="Formatting Enum columns into a human readable format with SQL">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Formatting Enum columns into a human readable format with SQL</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/fix-selenium-webdriver-error-unknownerror-for-capybara-chromedriver/" alt="Fix Selenium::WebDriver::Error::UnknownError for Capybara chromedriver-helper">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Fix Selenium::WebDriver::Error::UnknownError for Capybara chromedriver-helper</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

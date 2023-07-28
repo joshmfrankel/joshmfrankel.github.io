@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Saving Script Output From Heroku to a Local File | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Saving Script Output From Heroku to a Local File" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Have you ever needed to gather a large amount of data from your production server but didn&#39;t have the script available on the server? You could remote into the server and write the script in rails console but what if the volume of data was in the hundreds of thousands? And you needed it in CSV format? Well, recently I recently discovered a great little command for gathering remote data and saving it to a local file." />
+<meta property="og:description" content="Have you ever needed to gather a large amount of data from your production server but didn&#39;t have the script available on the server? You could remote into the server and write the script in rails console but what if the volume of data was in the hundreds of thousands? And you needed it in CSV format? Well, recently I recently discovered a great little command for gathering remote data and saving it to a local file." />
+<link rel="canonical" href="http://joshfrankel.me/blog/saving-script-output-from-heroku-to-a-local-file/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/saving-script-output-from-heroku-to-a-local-file/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-03-28T19:45:24+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2017-03-28T19:45:24+00:00","dateModified":"2017-03-28T19:45:24+00:00","headline":"Saving Script Output From Heroku to a Local File","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/saving-script-output-from-heroku-to-a-local-file/"},"url":"http://joshfrankel.me/blog/saving-script-output-from-heroku-to-a-local-file/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Have you ever needed to gather a large amount of data from your production server but didn&#39;t have the script available on the server? You could remote into the server and write the script in rails console but what if the volume of data was in the hundreds of thousands? And you needed it in CSV format? Well, recently I recently discovered a great little command for gathering remote data and saving it to a local file.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Saving Script Output From Heroku to a Local File</h1>
+
+    
+      <p class="Banner-information">
+        <time>March 28, 2017</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Have you ever needed to gather a large amount of data from your production server but didn't have the script available on the server? You could remote into the server and write the script in rails console but what if the volume of data was in the hundreds of thousands? And you needed it in CSV format? Well, recently I recently discovered a great little command for gathering remote data and saving it to a local file.</p>
+<!--excerpt-->
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">heroku</span> <span class="n">run</span> <span class="n">rails</span> <span class="n">runner</span> <span class="s1">'Your full script pasted here'</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">app</span><span class="o">-</span><span class="nb">name</span> <span class="o">&gt;</span> <span class="n">data</span><span class="p">.</span><span class="nf">txt</span> <span class="c1"># Stores the return data into a file called data.txt</span></code></pre></figure>
+<p>If you are exporting to a CSV you'll need to make sure that the script uses <code>puts</code> before the generated data. This will properly print out the CSV string and save it to the data.txt file listed in the above snippet.</p>
+<p>In one of my previous posts, <a href="/blog/fast-reports-exporting-to-csv-in-rails/">Exporting to a CSV</a>, I mentioned how to go about exporting data into CSV format. Building upon that lesson let's see what the the new command would look like.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Multi-line scripts are not a problem</span>
+<span class="c1"># Try classes as well</span>
+<span class="n">heroku</span> <span class="n">run</span> <span class="n">rails</span> <span class="n">runner</span> <span class="s1">'users = User.all
+headers = ["Name", "Email", "Role"]
+
+csv = CSV.generate do |csv|
+  csv &lt;&lt; headers # Add the headers to the csv
+
+  users.each do |user|
+    csv &lt;&lt; [user.name, user.email, user.role]
+  end
+end
+
+puts csv'</span> <span class="o">-</span><span class="n">a</span> <span class="n">my</span><span class="o">-</span><span class="n">app</span><span class="o">-</span><span class="nb">name</span> <span class="o">&gt;</span> <span class="n">data</span><span class="p">.</span><span class="nf">txt</span> <span class="c1"># We now have production data in a local file</span></code></pre></figure>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/what-it-means-to-stub-the-system-under-test/" alt="What It Means to Stub the System Under Test">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">What It Means to Stub the System Under Test</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/lessons-learned-from-using-capybara-for-feature-testing/" alt="Lessons learned from using Capybara for feature testing">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Lessons learned from using Capybara for feature testing</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

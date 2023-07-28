@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>A Journey into Writing Union queries with Active Record | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="A Journey into Writing Union queries with Active Record" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Active record has a multitude of features and niceties. From merging scopes to performing complex joins. However, sometimes it falls short. One shortcoming is a Union query. When I’ve got a roadblock with active record, I reach for either raw SQL or Arel Tables. Both of these work well but tend to produce verbose code. That’s why it’s nice to to stay in Active record for readability. Ok, so let’s actually look at how to accomplish this." />
+<meta property="og:description" content="Active record has a multitude of features and niceties. From merging scopes to performing complex joins. However, sometimes it falls short. One shortcoming is a Union query. When I’ve got a roadblock with active record, I reach for either raw SQL or Arel Tables. Both of these work well but tend to produce verbose code. That’s why it’s nice to to stay in Active record for readability. Ok, so let’s actually look at how to accomplish this." />
+<link rel="canonical" href="http://joshfrankel.me/blog/a-journey-into-writing-union-queries-with-active-record/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/a-journey-into-writing-union-queries-with-active-record/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-16T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2020-06-16T00:00:00+00:00","dateModified":"2020-06-16T00:00:00+00:00","headline":"A Journey into Writing Union queries with Active Record","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/a-journey-into-writing-union-queries-with-active-record/"},"url":"http://joshfrankel.me/blog/a-journey-into-writing-union-queries-with-active-record/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Active record has a multitude of features and niceties. From merging scopes to performing complex joins. However, sometimes it falls short. One shortcoming is a Union query. When I’ve got a roadblock with active record, I reach for either raw SQL or Arel Tables. Both of these work well but tend to produce verbose code. That’s why it’s nice to to stay in Active record for readability. Ok, so let’s actually look at how to accomplish this.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">A Journey into Writing Union queries with Active Record</h1>
+
+    
+      <p class="Banner-information">
+        <time>June 16, 2020</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Active record has a multitude of features and niceties. From merging scopes to performing complex joins. However, sometimes it falls short. One shortcoming is a Union query.</p>
+
+<p>When I’ve got a roadblock with active record, I reach for either raw SQL or Arel Tables. Both of these work well but tend to produce verbose code. That’s why it’s nice to to stay in Active record for readability. Ok, so let’s actually look at how to accomplish this.
+<!--excerpt--></p>
+
+<h2 id="potential-solutions">Potential solutions</h2>
+
+<p>Throughout this adventure I looked into several solutions to this conundrum. I considered using raw SQL. I dug into Arel Tables which have several promising approaches. I searched for a gem that handled union queries. In the
+end I ruled each of these out in favor of rolling my own solution.</p>
+
+<p><a href="http://joshfrankel.me/blog/a-journey-into-writing-union-queries-with-active-record#full-solution">If you’re just looking for the solution click here.</a></p>
+
+<h3 id="raw-sql-shouldnt-this-work">Raw SQL, shouldn’t this work?</h3>
+
+<p>Yes!</p>
+
+<p>This approach would work for union queries. Something like the following:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">result</span> <span class="o">=</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">connection</span><span class="p">.</span><span class="nf">execute</span><span class="p">(</span><span class="s2">"SELECT users.* FROM users WHERE users.active = 't' UNION SELECT users.* FROM users WHERE users.manager = 't'"</span><span class="p">)</span>
+<span class="n">result</span><span class="p">.</span><span class="nf">to_a</span> <span class="c1">#=&gt; Collection of users from the union query</span>
+</code></pre></div></div>
+
+<p>There are some downsides to this approach. Most importably you have to call <code class="language-plaintext highlighter-rouge">.to_a</code> on the result as otherwise you can’t work with it. This means no ActiveRecord chaining or helper methods work on the result. <a href="http://joshfrankel.me/blog/constructing-a-sql-select-from-subquery-in-activerecord/">For more information see my older post on the topic.</a></p>
+
+<p>Moving onto Arel tables next…</p>
+
+<h3 id="can-we-use-arel-tables">Can we use Arel tables?</h3>
+
+<p>Recently, I did run into a roadblock with Active Record. In this case it was an upgrade to a newer version of Rails. The application had relied on
+a custom method that dug deeply into Arel Tables (bind_keys I believe). Unfortunately, the features it was using became a private method rendering
+the current solution unworkable for union queries. A rule I follow while adding code on top of a gem or third-party library, is
+to only use the public api for exactly this reason. You can’t depend on library features where you don’t control that library unless
+it is going to stick around for some time.</p>
+
+<p>There are a lot of other Arel table solutions out there (many of which work) but I wanted to keep my solution high-level and for lack of better
+phrasing a bit dumb. Some of the best solutions are clear, explicit code that is straightforward. Arel Tables add a layer
+of complexity that is unnecessary due to its potentially shifting api.</p>
+
+<p>So Arel Table solutions are out. Before we write our own solution, what about any gems?</p>
+
+<h2 id="what-about-a-gem">What about a gem?</h2>
+
+<p>I searched for a replacement gem for union in ActiveRecord and suprisingly didn’t find anything recent that fit the bill except one. ActiveRecordExtended. <a href="https://github.com/GeorgeKaraszi/ActiveRecordExtended/">ActiveRecordExtended</a> it does a nice job of extending many of the underlying
+Postgres features into ActiveRecord-land. Since Rails is database agnostic it includes many previously unsupported features. It even supports union queries!</p>
+
+<p>So why did I not go with this option? Unfortunately, while a really stellar gem, it has 1 pretty nasty gotcha associated with
+union queries. That is merging of scopes. I’ll show you what I mean.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">.</span><span class="nf">not</span><span class="p">(</span><span class="ss">updated_at: </span><span class="kp">nil</span><span class="p">).</span><span class="nf">merge</span><span class="p">(</span>
+  <span class="no">User</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">name: </span><span class="s2">"Jon"</span><span class="p">)</span>
+  <span class="p">).</span><span class="nf">union</span><span class="p">(</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+  <span class="p">)</span>
+<span class="p">).</span><span class="nf">order</span><span class="p">(</span><span class="ss">start_date: :desc</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>From above, you might expect the resulting SQL to look like:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">users</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span> <span class="p">(</span>
+  <span class="k">SELECT</span> <span class="n">users</span><span class="p">.</span><span class="o">*</span>
+  <span class="k">FROM</span> <span class="n">users</span>
+  <span class="k">WHERE</span> <span class="n">users</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">'Jon'</span>
+  <span class="k">UNION</span>
+  <span class="k">SELECT</span> <span class="n">users</span><span class="p">.</span><span class="o">*</span>
+  <span class="k">FROM</span> <span class="n">users</span>
+  <span class="k">WHERE</span> <span class="n">users</span><span class="p">.</span><span class="n">active</span> <span class="o">=</span> <span class="s1">'t'</span>
+<span class="p">)</span> <span class="n">subquery</span>
+<span class="k">WHERE</span> <span class="n">subquery</span><span class="p">.</span><span class="n">updated_at</span> <span class="k">IS</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">subquery</span><span class="p">.</span><span class="n">start_date</span> <span class="k">DESC</span>
+</code></pre></div></div>
+
+<p>Unfortunately, ActiveRecord has a hell of a time deciding what to do with a passed in union to a merged scope. It ends
+up generating:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">users</span>
+<span class="k">WHERE</span> <span class="n">users</span><span class="p">.</span><span class="n">updated_at</span> <span class="k">IS</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">users</span><span class="p">.</span><span class="n">start_date</span> <span class="k">DESC</span>
+</code></pre></div></div>
+
+<p>Effectively swallowing the union query and producing a defective query. And this doesn’t raise an error when it happens
+meaning it is silently excluding results. Ouch!</p>
+
+<p><a href="https://github.com/GeorgeKaraszi/ActiveRecordExtended/issues/35">For more details see the open issue here.</a></p>
+
+<p>Alright, gems are out. Guess we’ll have to write our own.</p>
+
+<h2 id="writing-a-simple-activerecord-union-helper">Writing a simple ActiveRecord Union helper</h2>
+
+<p>Let’s line up our goals for this helper.</p>
+
+<ol>
+  <li>Method exists within ActiveRecord for ease-of-use</li>
+  <li>Method that can be called to union two relations together</li>
+  <li>Method supports merging of ActiveRecord scopes</li>
+</ol>
+
+<p>Now before we dig into writing an ActiveRecord helper, let’s briefly describe our
+goal we’re looking to achieve by defining a Union.</p>
+
+<h3 id="anatomy-of-a-union">Anatomy of a Union</h3>
+
+<p>When working with SQL unions, the goal is to combine multiple datasets into one collection as a single query. Generally, they follow the format of:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">table_a</span><span class="p">.</span><span class="n">column_1</span><span class="p">,</span> <span class="n">table_a</span><span class="p">.</span><span class="n">column_2</span>
+<span class="k">FROM</span> <span class="n">table_a</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span> <span class="n">table_b</span><span class="p">.</span><span class="n">column_1</span><span class="p">,</span> <span class="n">table_b</span><span class="p">.</span><span class="n">column_2</span>
+<span class="k">FROM</span> <span class="n">table_b</span>
+</code></pre></div></div>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    UNION removes duplicate rows but UNION ALL does not remove duplicate rows. UNION ALL just merges all the rows that satisfy all the conditions.
+  </p>
+
+  
+    <a href="https://kb.objectrocket.com/postgresql/postgresql-union-vs-union-all-534">Object Rocket</a>
+  
+</blockquote>
+
+<p>The requirements of a <strong>UNION</strong> say that each side of the union selects the same number of columns with the same names. This also means that any aliased columns must also match. Along with <strong>UNION</strong> there is also <strong>UNION ALL</strong>. The difference between these two is that <strong>UNION</strong> returns distinct results while <strong>UNION ALL</strong> returns duplicates.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">table_a</span><span class="p">.</span><span class="n">column_1</span> <span class="k">as</span> <span class="n">cheezeburger</span>
+<span class="p">...</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span> <span class="n">table_b</span><span class="p">.</span><span class="n">column_1</span> <span class="k">as</span> <span class="n">cheezeburger</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<p>Now that we’ve got basic UNION knowledge we can jump back into writing our own
+implementation</p>
+
+<h3 id="extending-activerecord">Extending ActiveRecord</h3>
+
+<p>Our first stop is to create a initializer so we can utilize the new method anywhere within ActiveRecord.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># config/initializers/active_record_union.rb</span>
+<span class="k">module</span> <span class="nn">ActiveRecordUnion</span>
+  <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Concern</span>
+
+  <span class="n">class_methods</span> <span class="k">do</span>
+    <span class="k">def</span> <span class="nf">union</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># Inject our module into the top level ActiveRecord::Base class</span>
+<span class="c1"># This allows us to to write functionality for ActiveRecord objects</span>
+<span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:include</span><span class="p">,</span> <span class="no">ActiveRecordUnion</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The above satisfies our first requirement, <em>Method exists within ActiveRecord for ease-of-use</em>. We can now call something like <code class="language-plaintext highlighter-rouge">Model.union</code> and have it return
+<code class="language-plaintext highlighter-rouge">nil</code> instead of method missing.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">User</span><span class="p">.</span><span class="nf">union</span> <span class="c1">#=&gt; nil</span>
+<span class="no">User</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">union</span> <span class="c1">#=&gt; nil</span>
+</code></pre></div></div>
+
+<p>We’ve included ActiveSupport concerns, in order to gain the nice <strong>class_methods</strong> syntax. All this does is include the new union method as a class level method that
+can be called directly on a model or relation.</p>
+
+<p>Additionally, at the end of the file we call the include method on <strong>ActiveRecord::Base</strong> which effectively allows us to inject the new module into
+ActiveRecord. This is what makes the union method available.</p>
+
+<p>Here comes the fun part. Now we have to construct the union query.</p>
+
+<h3 id="unioning-multivariate-relations">Unioning multivariate relations</h3>
+
+<p>The basic premise here is that we want to craft a union query by combining the
+output SQL from multiple relations of the same data type. Or rather, we can
+create a stupid builder method that calls <code class="language-plaintext highlighter-rouge">.to_sql</code> and joins it together
+into valid SQL. Simple right?</p>
+
+<p>Here’s the naive first attempt to make it work (we’ll go through this line-by-line)</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">ActiveRecordUnion</span>
+  <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Concern</span>
+
+  <span class="n">class_methods</span> <span class="k">do</span>
+    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="o">*</span><span class="n">relations</span><span class="p">)</span>
+      <span class="n">mapped_sql</span> <span class="o">=</span> <span class="n">relations</span>
+        <span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_sql</span><span class="p">)</span>
+        <span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s2">") UNION ("</span><span class="p">)</span>
+
+      <span class="n">unionized_sql</span> <span class="o">=</span> <span class="s2">"((</span><span class="si">#{</span><span class="n">mapped_sql</span><span class="si">}</span><span class="s2">)) </span><span class="si">#{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">"</span>
+
+      <span class="n">from</span><span class="p">(</span><span class="n">unionized_sql</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:include</span><span class="p">,</span> <span class="no">ActiveRecordUnion</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote class="Info Info--full">
+  
+    <h2 class="Info__title">Watch the database calls</h2>
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    ActiveRecord doesn't execute SQL until right before it it used. We leverage this optimization by calling `.to_sql` on relations which DOES NOT make a database call. Rather it deciphers the underlying Arel representation of final SQL.
+  </p>
+
+  
+</blockquote>
+
+<p>First off we specify that the method definition accepts a splatted parameter <code class="language-plaintext highlighter-rouge">union(*relations)</code>. This allows us to pass in an infinite number of relations with
+each separated by a a comma: <code class="language-plaintext highlighter-rouge">User.union(n1, n2, n3, ...)</code>. Useful for variable number of relations to add to the union.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mapped_sql</span> <span class="o">=</span> <span class="n">relations</span>
+  <span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_sql</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s2">") UNION ("</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Above we iterate through available relations and call <code class="language-plaintext highlighter-rouge">to_sql</code> on them to convert
+them into an array full of stringified SQL results. ActiveRecord responds to <code class="language-plaintext highlighter-rouge">to_sql</code> by producing the
+resulting SQL. Here’s an example call:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="no">User</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">name: </span><span class="s2">"Nic Cage"</span><span class="p">),</span> <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">false</span><span class="p">))</span>
+<span class="n">mapped_sql</span> <span class="o">=</span> <span class="n">relations</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_sql</span><span class="p">)</span>
+<span class="c1">#=&gt; ["SELECT * FROM users WHERE name = 'Nic Cage'", "SELECT * FROM users WHERE active = 'f'"]</span>
+</code></pre></div></div>
+
+<p>We can use this array as a temporary storage solution for generating our new SQL statement.</p>
+
+<p>The next part <code class="language-plaintext highlighter-rouge">.join(") UNION (")</code> looks bananas. Really we just join
+our array back into a single string where each element has <code class="language-plaintext highlighter-rouge">) UNION (</code> between
+them. What we want is a sql fragment. Here’s an example output:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s2">"SELECT * FROM users WHERE name = 'Nic Cage') UNION (SELECT * FROM users WHERE active = 'f'"</span>
+</code></pre></div></div>
+
+<p>This ensures that we can programatically build the union for as many elements
+are in the relations array. Next comes the outer parenthesis setup.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">unionized_sql</span> <span class="o">=</span> <span class="s2">"((</span><span class="si">#{</span><span class="n">mapped_sql</span><span class="si">}</span><span class="s2">)) </span><span class="si">#{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<p>First we surround the UNION sql with a <code class="language-plaintext highlighter-rouge">( ... )</code> as we want the end result part of the same statement such as: <code class="language-plaintext highlighter-rouge">SELECT * FROM ( ...union... )</code>.</p>
+
+<p>Next there’s a another bit of parenthesis interpolation.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(#{mapped_sql})
+</code></pre></div></div>
+<p>Since we’re inside a string we had to interpolate
+<code class="language-plaintext highlighter-rouge">mapped_sql</code>. We’ve also specified an opening and closing parenthesis. These correspond
+directly to the partially constructed sql above. The previous <code class="language-plaintext highlighter-rouge">sql...) UNION (...sql</code> string
+from the joined array now fits into the opening/closing parenthesis and becomes valid
+SQL.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s2">"... </span><span class="si">#{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<p>We use an ActiveRecord method called <code class="language-plaintext highlighter-rouge">table_name</code> which returns the database
+representation of the table. This is based on the calling relation. So for <code class="language-plaintext highlighter-rouge">User.union</code> the plural version would be (users) of the model (User). This works
+because <code class="language-plaintext highlighter-rouge">self</code> in the above intializer context is the model. The importance of this is that the inner SQL string will be identifying its base
+table to query from. By also specifying that the union is aliased
+as <code class="language-plaintext highlighter-rouge">table_name</code> we can ensure we select properly from the union without naming collisions.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">unionized_sql</span> <span class="o">=</span> <span class="s2">"((</span><span class="si">#{</span><span class="n">mapped_sql</span><span class="si">}</span><span class="s2">)) </span><span class="si">#{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="c1">#=&gt; "((SELECT * FROM users WHERE name = 'Nic Cage') UNION (SELECT * FROM users WHERE active = 'f')) users"</span>
+</code></pre></div></div>
+
+<p>The final line <code class="language-plaintext highlighter-rouge">from(unionized_sql)</code> also relies on the calling relation to determine
+where it will be selecting from. In other words we can substitute the table to query from to instead be the result of our union sql. Running with our <code class="language-plaintext highlighter-rouge">User.union</code> example this would
+translate to:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="no">User</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">name: </span><span class="s2">"Nic Cage"</span><span class="p">),</span> <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">false</span><span class="p">)).</span><span class="nf">to_sql</span>
+<span class="c1">#=&gt; SELECT * FROM ((SELECT * FROM users WHERE name = 'Nic Cage') UNION (SELECT * FROM users WHERE active = 'f')) users</span>
+</code></pre></div></div>
+
+<p>Notice that both the inner queries along with the alias for the <code class="language-plaintext highlighter-rouge">FROM (...union...) alias</code> both refer to the same table name. This is a little trick to allow the outer query to request records from the inner unioned query. Without this the syntax
+will be invalid and you’ll end up with errors such as:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># PG::SyntaxError:
+#   ERROR:  subquery in FROM must have an alias
+</code></pre></div></div>
+
+<p>Now with the above we can run code like the following and gather results from
+a union. This preserves the <code class="language-plaintext highlighter-rouge">where.not(updated_at: nil)</code> line effectively filtering
+out the results of the inner union query by the outer condition.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">.</span><span class="nf">not</span><span class="p">(</span><span class="ss">updated_at: </span><span class="kp">nil</span><span class="p">).</span><span class="nf">merge</span><span class="p">(</span>
+  <span class="no">User</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">name: </span><span class="s2">"Jon"</span><span class="p">)</span>
+  <span class="p">).</span><span class="nf">union</span><span class="p">(</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">active: </span><span class="kp">true</span><span class="p">)</span>
+  <span class="p">)</span>
+<span class="p">).</span><span class="nf">order</span><span class="p">(</span><span class="ss">start_date: :desc</span><span class="p">)</span>
+
+<span class="c1">#=&gt; SELECT users.* FROM ((SELECT users.* FROM users WHERE name = 'Jon') UNION (SELECT users.* FROM users WHERE active = 't')) users WHERE users.updated_at IS NOT NULL</span>
+</code></pre></div></div>
+
+<p>This fulfills our last condition <em>Method supports merging of ActiveRecord scopes</em>.</p>
+
+<p>So we’re done right? Well not quite.</p>
+
+<h2 id="gotcha">Gotcha!</h2>
+
+<p>Anytime you bake new functionality into a library you don’t control you run
+the risk of having to support everything the library supports. Above we have
+a couple issues that aren’t super evident but I’ll run through them with examples below.</p>
+
+<h3 id="no-arguments">No arguments</h3>
+
+<p>First up, anytime you use the splat (*) operator as a parameter you are essentially
+saying that the parameter is optional. So <code class="language-plaintext highlighter-rouge">User.union(nil)</code> won’t raise an error. Unlike traditional parameters, we’ll want
+to add the following code in order to prevent method calls without parameters:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="o">*</span><span class="n">relations</span><span class="p">)</span>
+  <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"wrong number of arguments (given 0, expected 1+)"</span> <span class="k">if</span> <span class="n">relations</span><span class="p">.</span><span class="nf">empty?</span>
+
+  <span class="c1"># mapped_sql = relations</span>
+  <span class="c1">#  .map(&amp;:to_sql)</span>
+  <span class="c1">#  .join(") UNION (")</span>
+
+  <span class="c1"># unionized_sql = "((#{mapped_sql})) #{table_name}"</span>
+
+  <span class="c1"># from(unionized_sql)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="activerecordnone-method">ActiveRecord.none method</h3>
+
+<p>What happens if you run the valid ActiveRecord method <code class="language-plaintext highlighter-rouge">.none</code> within our
+union method? <code class="language-plaintext highlighter-rouge">User.union(User.active, User.none)</code>. Well bad things. User.none returns an empty relation. What’s worse is that User.none.to_sql is simply just <code class="language-plaintext highlighter-rouge">""</code>. Having one side of a union be empty will result in:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">User</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="no">User</span><span class="p">.</span><span class="nf">none</span><span class="p">).</span><span class="nf">first</span>
+<span class="c1"># ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR:  syntax error at or near ")"</span>
+<span class="c1"># LINE 1: SELECT  "users".* FROM (()) users</span>
+</code></pre></div></div>
+
+<p>We’ll solve this by only using relations that produce SQL strings and ignoring the rest. The <strong>select</strong> block below does this by checking to see if to_sql produces
+something other than an empty string.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="o">*</span><span class="n">relations</span><span class="p">)</span>
+  <span class="c1"># raise ArgumentError, "wrong number of arguments (given 0, expected 1+)" if relations.empty?</span>
+
+  <span class="n">valid_relations</span> <span class="o">=</span> <span class="n">relations</span>
+    <span class="p">.</span><span class="nf">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">relation</span><span class="o">|</span>
+      <span class="n">relation</span><span class="p">.</span><span class="nf">to_sql</span><span class="p">.</span><span class="nf">present?</span>
+    <span class="k">end</span>
+
+  <span class="c1"># mapped_sql = valid_relations</span>
+  <span class="c1">#   .map(&amp;:to_sql)</span>
+  <span class="c1">#   .join(") UNION (")</span>
+
+  <span class="c1"># unionized_sql = "((#{mapped_sql})) #{table_name}"</span>
+
+  <span class="c1"># from(unionized_sql)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>You might be thinking why not use something like <code class="language-plaintext highlighter-rouge">relation.respond_to?(:to_sql)</code> here. We don’t use this because <code class="language-plaintext highlighter-rouge">User.none</code> responds to <strong>to_sql</strong>. We
+want to make sure that when it does respond that it is something other than an empty string.</p>
+
+<h3 id="data-type-mismatch">Data type mismatch</h3>
+
+<p>How about the case where someone uses a different model as either the base model
+or the ones inside the union?</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">User</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="no">OtherModel</span><span class="p">.</span><span class="nf">all</span><span class="p">,</span> <span class="no">OtherModel</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">some: </span><span class="kp">true</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>In this case our previous trick for <strong>table_name</strong> will cease to work as the database tables for each of the models above are different. We’ll want to handle this situation with a helpful error message.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="o">*</span><span class="n">relations</span><span class="p">)</span>
+  <span class="c1"># raise ArgumentError, "wrong number of arguments (given 0, expected 1+)" if relations.empty?</span>
+
+  <span class="n">valid_relations</span> <span class="o">=</span> <span class="n">relations</span>
+    <span class="p">.</span><span class="nf">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">relation</span><span class="o">|</span>
+      <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"type mismatch. Base model table </span><span class="si">#{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> does not match table </span><span class="si">#{</span><span class="n">relation</span><span class="p">.</span><span class="nf">table_name</span><span class="si">}</span><span class="s2"> of at least one relation"</span> <span class="k">if</span> <span class="n">table_name</span> <span class="o">!=</span> <span class="n">relation</span><span class="p">.</span><span class="nf">table_name</span>
+
+      <span class="n">relation</span><span class="p">.</span><span class="nf">to_sql</span><span class="p">.</span><span class="nf">present?</span>
+    <span class="k">end</span>
+
+  <span class="c1"># mapped_sql = valid_relations</span>
+  <span class="c1">#   .map(&amp;:to_sql)</span>
+  <span class="c1">#   .join(") UNION (")</span>
+
+  <span class="c1"># unionized_sql = "((#{mapped_sql})) #{table_name}"</span>
+
+  <span class="c1"># from(unionized_sql)</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>This will help guide future engineers on proper usage of the method.</p>
+
+<h3 id="merging-associations">Merging associations</h3>
+
+<p>This is a nasty one. The situation is that we have a model which we’re working
+from an association to merge in a union query. Hopefully doesn’t happen
+often but I did run into it. Here’s what this might look like:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">User</span>
+  <span class="p">.</span><span class="nf">joins</span><span class="p">(</span><span class="ss">:posts</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">merge</span><span class="p">(</span>
+    <span class="no">Post</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span>
+      <span class="no">Post</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">published: </span><span class="kp">true</span><span class="p">),</span>
+      <span class="no">Post</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">has_comments: </span><span class="kp">true</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+</code></pre></div></div>
+
+<p>The above is trying to constructs some conditions on the <code class="language-plaintext highlighter-rouge">inner join</code> from User to
+Posts. The goal with a query like this is to return Users which have at least one Post associated with them and are either published or have comments. The published and have comments conditions are merged into the result. Translated to SQL this is what the above is attempting to accomplish:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">users</span>
+<span class="k">INNER</span> <span class="k">JOIN</span> <span class="n">posts</span> <span class="n">p</span> <span class="k">ON</span> <span class="n">p</span><span class="p">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">u</span><span class="p">.</span><span class="n">id</span>
+<span class="k">WHERE</span> <span class="n">posts</span><span class="p">.</span><span class="n">id</span> <span class="k">IN</span><span class="p">(</span>
+  <span class="k">SELECT</span> <span class="n">posts</span><span class="p">.</span><span class="n">id</span>
+  <span class="k">FROM</span> <span class="p">(</span>
+    <span class="p">(</span>
+      <span class="k">SELECT</span> <span class="n">posts</span><span class="p">.</span><span class="o">*</span>
+      <span class="k">FROM</span> <span class="n">posts</span>
+      <span class="k">WHERE</span> <span class="n">posts</span><span class="p">.</span><span class="n">published</span> <span class="o">=</span> <span class="s1">'t'</span>
+    <span class="p">)</span>
+    <span class="k">UNION</span>
+    <span class="p">(</span>
+      <span class="k">SELECT</span> <span class="n">posts</span><span class="p">.</span><span class="o">*</span>
+      <span class="k">FROM</span> <span class="n">posts</span>
+      <span class="k">WHERE</span> <span class="n">posts</span><span class="p">.</span><span class="n">has_comments</span> <span class="o">=</span> <span class="s1">'t'</span>
+    <span class="p">)</span>
+  <span class="p">)</span> <span class="n">posts</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>Unfortunately, our code current produces the following SQL exception.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PG::DuplicateAlias: ERROR:  table name "posts" specified more than once
+ :
+ SELECT "users".*
+FROM (
+  (
+    SELECT "posts".*
+    FROM "posts"
+    WHERE "posts"."name" = 'keyword'
+  )
+  UNION
+  (
+    SELECT "posts".*
+    FROM "posts"
+    WHERE "posts"."name" = 'matched'
+  )
+) posts
+INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
+</code></pre></div></div>
+
+<p>Notably the resulting SQL is nonsensical. Look at the following: <code class="language-plaintext highlighter-rouge">SELECT "users".* FROM ((SELECT "posts".* FROM ...)) posts</code>. This is problematic because
+we being selecting from the <code class="language-plaintext highlighter-rouge">users.*</code> alias on a FROM clause that is aliased as
+<code class="language-plaintext highlighter-rouge">posts</code>. Additionally, <code class="language-plaintext highlighter-rouge">posts</code> is seen as specified more than once in the query
+because it is the alias used for the from clause as well as an inner join onto
+the table. Due to this SQL can’t figure out which table is the correct one and
+throws an exception.</p>
+
+<p>So how do we fix this?</p>
+
+<p>A key piece of information is that merged scopes work well with where clauses. Often
+you’ll see scopes defined in models used directly for <code class="language-plaintext highlighter-rouge">.merge</code>. An example can
+be seen above:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">.</span><span class="nf">merge</span><span class="p">(</span>
+    <span class="no">Post</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span>
+      <span class="no">Post</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="ss">published: </span><span class="kp">true</span><span class="p">),</span>
+      <span class="o">...</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+</code></pre></div></div>
+
+<p>We can leverage this fact with our implementation’s output. Above we noticed that
+the from clause was nonsensical. Combining both of these facts we can still
+gather unioned relations albeit in a slightly different format.</p>
+
+<p>Previously I stated, “we can substitute the table to query from to instead be the result of our union sql”. Taking this to the next logical step from what we’ve learned, we can transition to using the better supported <code class="language-plaintext highlighter-rouge">.where(id: ...)</code> syntax
+here.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">from</span><span class="p">(</span><span class="n">unionized_sql</span><span class="p">)</span>
+<span class="c1">#=&gt; SELECT "users".*</span>
+<span class="c1">#=&gt; FROM ((...union 1...) union (...union 2...)) union_table_name</span>
+<span class="c1">#=&gt; INNER JOIN union_table_name ...</span>
+
+<span class="c1"># Updated</span>
+<span class="n">where</span><span class="p">(</span><span class="ss">id: </span><span class="n">unionized_sql</span><span class="p">)</span>
+<span class="c1">#=&gt; SELECT "users".*</span>
+<span class="c1">#=&gt; FROM users</span>
+<span class="c1">#=&gt; INNER JOIN posts ON posts.user_id = users.id</span>
+<span class="c1">#=&gt; WHERE posts.id IN (... unionized_sql ...)</span>
+</code></pre></div></div>
+
+<p>Now instead of the from clause specifying where we’re querying data from, we instead use a subquery for selecting out the available ids of the table. The resulting
+SQL works and better supports the <code class="language-plaintext highlighter-rouge">.merge(scope)</code> syntax due to its reliance on
+the where id subquery approach. I’d like to mention that the subquery approach may be less performance than the from approach but it is more versatile so I went with it.</p>
+
+<h3 id="full-solution">Full Solution</h3>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">ActiveRecordUnion</span>
+  <span class="kp">extend</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">Concern</span>
+
+  <span class="n">class_methods</span> <span class="k">do</span>
+    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="o">*</span><span class="n">relations</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"wrong number of arguments (given 0, expected 1+)"</span> <span class="k">if</span> <span class="n">relations</span><span class="p">.</span><span class="nf">empty?</span>
+
+      <span class="n">valid_relations</span> <span class="o">=</span> <span class="n">relations</span>
+        <span class="p">.</span><span class="nf">select</span> <span class="k">do</span> <span class="o">|</span><span class="n">relation</span><span class="o">|</span>
+          <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s2">"type mismatch. Base model table </span><span class="si">#{</span><span class="n">table_name</span><span class="si">}</span><span class="s2"> does not match table </span><span class="si">#{</span><span class="n">relation</span><span class="p">.</span><span class="nf">table_name</span><span class="si">}</span><span class="s2"> of at least one relation"</span> <span class="k">if</span> <span class="n">table_name</span> <span class="o">!=</span> <span class="n">relation</span><span class="p">.</span><span class="nf">table_name</span>
+
+          <span class="n">relation</span><span class="p">.</span><span class="nf">to_sql</span><span class="p">.</span><span class="nf">present?</span>
+        <span class="k">end</span>
+
+      <span class="n">mapped_sql</span> <span class="o">=</span> <span class="n">valid_relations</span>
+        <span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_sql</span><span class="p">)</span>
+        <span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s2">") UNION ("</span><span class="p">)</span>
+
+      <span class="n">unionized_sql</span> <span class="o">=</span> <span class="s2">"((</span><span class="si">#{</span><span class="n">mapped_sql</span><span class="si">}</span><span class="s2">)) </span><span class="si">#{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">"</span>
+
+      <span class="n">where</span><span class="p">(</span><span class="ss">id: </span><span class="n">from</span><span class="p">(</span><span class="n">unionized_sql</span><span class="p">))</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="ss">:include</span><span class="p">,</span> <span class="no">ActiveRecordUnion</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Here’s our task list that we set out to do at the beginning.</p>
+
+<ol>
+  <li>(Completed) Method exists within ActiveRecord for ease-of-use</li>
+  <li>(Completed) Method that can be called to union two relations together</li>
+  <li>(Completed) Method supports merging of ActiveRecord scopes</li>
+</ol>
+
+<p>And that’s it!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That’s how I solved a ActiveRecord union problem with some simple ruby code. Nothing
+fancy, just straight to the point. This was focused on using public api methods that
+are unlikely to change making it more resilient to future changes.</p>
+
+<p>I did leave out one important piece which is I used Test Driven Development throughout
+this entire process to ensure that no regressions occured. That’s one of the ways
+I tracked down several of those gotcha cases. Testing this was an interesting case
+as well because a requirement of it was to not rely on any existing models so that
+the tests would be independent of the active record layer. I’d be happy to write
+a follow-up or discuss what I learned from testing the above.</p>
+
+<p>What’d you think about this approach? I’d love to discuss any questions you have
+on it.</p>
+
+<p>Thanks for reading!</p>
+
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/fix-missing-template-for-request-format-and-variant-while-testing-ajax-request-in-request-spec/" alt="Fix "missing template for request format and variant" while testing Ajax request in a Request Spec">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Fix "missing template for request format and variant" while testing Ajax request in a Request Spec</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/a-guide-for-upgrading-to-rails-6/" alt="A Guide for Upgrading to Rails 6">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">A Guide for Upgrading to Rails 6</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

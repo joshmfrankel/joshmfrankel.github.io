@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>When is an Array an Array? Strategies for checking Array equality in Ruby | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="When is an Array an Array? Strategies for checking Array equality in Ruby" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Object equality is an interesting topic. You can check for matching values (with or without ordering). You can also check to see if the object has the same in-memory id. I’ve written code to diff two arrays before but I’ve never sat down to think about all the ways to accomplish this. Also I was able to explore what I believe are the most optimal approaches." />
+<meta property="og:description" content="Object equality is an interesting topic. You can check for matching values (with or without ordering). You can also check to see if the object has the same in-memory id. I’ve written code to diff two arrays before but I’ve never sat down to think about all the ways to accomplish this. Also I was able to explore what I believe are the most optimal approaches." />
+<link rel="canonical" href="http://joshfrankel.me/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-07-28T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2023-07-28T00:00:00+00:00","dateModified":"2023-07-28T00:00:00+00:00","headline":"When is an Array an Array? Strategies for checking Array equality in Ruby","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/"},"url":"http://joshfrankel.me/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Object equality is an interesting topic. You can check for matching values (with or without ordering). You can also check to see if the object has the same in-memory id. I’ve written code to diff two arrays before but I’ve never sat down to think about all the ways to accomplish this. Also I was able to explore what I believe are the most optimal approaches.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">When is an Array an Array? Strategies for checking Array equality in Ruby</h1>
+
+    
+      <p class="Banner-information">
+        <time>July 28, 2023</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Object equality is an interesting topic. You can check for matching values (with or without ordering). You can
+also check to see if the object has the same in-memory id. I’ve written code to diff two arrays before but
+I’ve never sat down to think about all the ways to accomplish this. Also I was able to explore what I believe
+are the most optimal approaches.</p>
+
+<!--excerpt-->
+
+<h2 id="basic-equality">Basic equality</h2>
+<p>The most basic example of checking two objects is the equality method <code class="language-plaintext highlighter-rouge">==</code>. This is a common check done between Ruby
+objects and Array is no different. So what exactly does it do? According to the documentation, it will check the <code class="language-plaintext highlighter-rouge">.size</code>
+of both arrays along with each individual index value against the other array. Looking at the <a href="https://ruby-doc.org/3.2.2/Array.html#method-i-3D-3D">source code for == in Ruby 3.2.2</a>
+we can see this at work:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rb_ary_equal</span><span class="p">(</span><span class="no">VALUE</span> <span class="n">ary1</span><span class="p">,</span> <span class="no">VALUE</span> <span class="n">ary2</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ary1</span> <span class="o">==</span> <span class="n">ary2</span><span class="p">)</span> <span class="k">return</span> <span class="no">Qtrue</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="no">RB_TYPE_P</span><span class="p">(</span><span class="n">ary2</span><span class="p">,</span> <span class="no">T_ARRAY</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">rb_respond_to</span><span class="p">(</span><span class="n">ary2</span><span class="p">,</span> <span class="n">idTo_ary</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="no">Qfalse</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">rb_equal</span><span class="p">(</span><span class="n">ary2</span><span class="p">,</span> <span class="n">ary1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="no">RARRAY_LEN</span><span class="p">(</span><span class="n">ary1</span><span class="p">)</span> <span class="o">!=</span> <span class="no">RARRAY_LEN</span><span class="p">(</span><span class="n">ary2</span><span class="p">))</span> <span class="k">return</span> <span class="no">Qfalse</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="no">RARRAY_CONST_PTR_TRANSIENT</span><span class="p">(</span><span class="n">ary1</span><span class="p">)</span> <span class="o">==</span> <span class="no">RARRAY_CONST_PTR_TRANSIENT</span><span class="p">(</span><span class="n">ary2</span><span class="p">))</span> <span class="k">return</span> <span class="no">Qtrue</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">rb_exec_recursive_paired</span><span class="p">(</span><span class="n">recursive_equal</span><span class="p">,</span> <span class="n">ary1</span><span class="p">,</span> <span class="n">ary2</span><span class="p">,</span> <span class="n">ary2</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The first conditional checks to see if the arrays are identical in memory:</p>
+
+<p><code class="language-plaintext highlighter-rouge">if (ary1 == ary2) return Qtrue;</code></p>
+
+<p>The third conditional is an early return false if the size of the two array’s doesn’t match:</p>
+
+<p><code class="language-plaintext highlighter-rouge">if (RARRAY_LEN(ary1) != RARRAY_LEN(ary2)) return Qfalse;</code></p>
+
+<p>The last line is a recursive call which I assume is the iteratively check every index’s value
+against the other array. The remainder of the method (conditional 2 and 4) I’m less sure about but looking
+at the code they both can perform early returns to break out of the recursive method call. Assumedly either
+when there are no more indexes to check against or the arrays are found not to match.</p>
+
+<p>Now working our way back to the higher-level Ruby implementation, what does a practical example of this look like?</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array_1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="n">array_1</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1">#=&gt; true</span>
+</code></pre></div></div>
+
+<p>The above checks the two arrays against each other and finds them identical.</p>
+
+<p>There are two other strategies you can take here. Both the <code class="language-plaintext highlighter-rouge">Array#eql?</code> and <code class="language-plaintext highlighter-rouge">Array#&lt;=&gt;</code> methods will allow you to check array equality. They work
+  slightly differently from each other:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Array#eql?</code> - Similiar to Array#== but utilizes Object#== internally</li>
+  <li><code class="language-plaintext highlighter-rouge">Array#&lt;=&gt;</code> - Generally used within sort_by blocks to check difference in arrays. Returns 0 for matching, 1 when there are extra indexes, and -1 when there are missing indexes.</li>
+</ul>
+
+<p>Here’s a quick example of each:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array_1</span><span class="p">.</span><span class="nf">eql?</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="c1">#=&gt; true</span>
+
+<span class="c1"># Spaceship operator returns: 0 (equal), -1 (elements less than other array), 1 (elements more than other array)</span>
+<span class="p">(</span><span class="n">array_1</span> <span class="o">&lt;=&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span> <span class="c1">#=&gt; true</span>
+</code></pre></div></div>
+
+<p>Personally, I find <code class="language-plaintext highlighter-rouge">==</code> to be the easiest to read. This is all well and good but what happens if the arrays are in different orders?</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array_1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">array_2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">array_1</span> <span class="o">==</span> <span class="n">array_2</span> <span class="c1">#=&gt; false</span>
+</code></pre></div></div>
+
+<p>Now they are no longer equivalent according to <code class="language-plaintext highlighter-rouge">==</code>. So from this we can infer that <code class="language-plaintext highlighter-rouge">==</code> is order-dependent. We’ll need
+another strategy in order, ;-), to test for equality properly.</p>
+
+<h2 id="equality-without-order-dependence">Equality without order dependence</h2>
+
+<p>Using our above example, let’s say we want the two arrays to return true when checking equality. We don’t care if they
+are in the same order just that they contain the same elements. We can achieve that simply by first sorting the arrays.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array_1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">array_2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">array_1</span><span class="p">.</span><span class="nf">sort</span> <span class="o">==</span> <span class="n">array_2</span><span class="p">.</span><span class="nf">sort</span> <span class="c1">#=&gt; true</span>
+</code></pre></div></div>
+
+<p>The above ensures that the array elements are sorted using the same algorithm keeping them in identical ordering.</p>
+
+<p>Now there is the additional processing overhead of having to first sort the arrays (1 iteration per array) and then check the index
+values against the other array (another iteration). This means that it will be slightly less efficient in checking since it
+needs to iterate once on each array and then another time to check for equality.</p>
+
+<p>Before we improve efficiency, let’s throw another challenge in the mix. What happens if one of the array’s contains duplicate elements?</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array_1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">array_2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">array_1</span><span class="p">.</span><span class="nf">sort</span> <span class="o">==</span> <span class="n">array_2</span><span class="p">.</span><span class="nf">sort</span> <span class="c1">#=&gt; false</span>
+</code></pre></div></div>
+
+<p>Even though array_1 and array_2 have the exact same values within them, array_2 contains duplicates of the value 2. This
+fails the equality check.</p>
+
+<h2 id="equality-without-duplicates">Equality without duplicates</h2>
+
+<p>Taking a line from the above approach we can add yet another iteration to our arrays ontop of the existing <code class="language-plaintext highlighter-rouge">.sort</code> to
+remove the duplicate values. We achieve this by using <code class="language-plaintext highlighter-rouge">.uniq</code> which iterates through the array and removes duplicates.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array_1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">array_2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">array_1</span><span class="p">.</span><span class="nf">uniq</span><span class="p">.</span><span class="nf">sort</span> <span class="o">==</span> <span class="n">array_2</span><span class="p">.</span><span class="nf">uniq</span><span class="p">.</span><span class="nf">sort</span> <span class="c1">#=&gt; true</span>
+</code></pre></div></div>
+
+<p>We’ve now succeeded in checking the equality between two arrays without regard for order or duplicate values. Internally sort and uniq work like so:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">#uniq</code> - “self is traversed in order, and the <a href="https://apidock.com/ruby/Array/first">first</a> occurrence is kept.”</li>
+  <li><code class="language-plaintext highlighter-rouge">#sort</code> - “Comparisons for the <a href="https://apidock.com/ruby/Array/sort">sort</a> will be done using the &lt;=&gt; operator”</li>
+</ul>
+
+<p>Now each array undergoes two iterations (sort and uniq) before finally having an equality iteration. This becomes even
+less efficient and requires a bit more overhead to understand. There’s one more Array strategy I want to discuss next regarding
+array intersections before moving onto my preferred strategy.</p>
+
+<h2 id="equality-with-array-intersection">Equality with Array intersection</h2>
+
+<p>This approach utilizes a lesser used syntax to perform an <a href="https://ruby-doc.org/3.2.2/Array.html#method-i-26">array intersection</a>. An array intersection means to take
+two arrays and find the common elements without duplicates. It utilizes the <code class="language-plaintext highlighter-rouge">Array#&amp;</code> syntax like I’ve demostrated below:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array_1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">array_2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="p">(</span><span class="n">array_1</span> <span class="o">&amp;</span> <span class="n">array_2</span><span class="p">)</span> <span class="c1">#=&gt; [1, 2, 3]</span>
+<span class="p">(</span><span class="n">array_1</span> <span class="o">&amp;</span> <span class="n">array_2</span><span class="p">)</span> <span class="o">==</span> <span class="n">array_1</span> <span class="c1">#=&gt; true</span>
+</code></pre></div></div>
+
+<p>I’ve split the above into two steps. The first is performing the intersection on the two arrays. The result of doing this
+is a new array that contains common values using the ordering of the first array utilizes. By using that last statement,
+we know that if the ordering of the first array is used and duplicates are removed then if the result is equal to the
+first array the arrays must be equivalent. Shown as <code class="language-plaintext highlighter-rouge">(array_1 &amp; array_2) == array_1</code>.</p>
+
+<p>Internally this is iterating through values along with checking for duplicates with <code class="language-plaintext highlighter-rouge">eql?</code>.</p>
+
+<p>Outside of the Array class there is an alternative which I find to be highly readable in code. Let’s take a look at an
+improved readability approach.</p>
+
+<h2 id="array-equality-with-sets">Array Equality with Sets</h2>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Set implements a collection of unordered values with no duplicates. This is a hybrid of Array's intuitive inter-operation facilities and Hash's fast lookup.
+  </p>
+
+  
+    <a href="https://ruby-doc.org/stdlib-2.7.1/libdoc/set/rdoc/Set.html">https://ruby-doc.org/</a>
+  
+</blockquote>
+
+<p>A Set is like an array but by definition is an enumerable without duplicates and order independent. Therefore we can convert
+our arrays to Sets and achieve the same effect as we did with the chained <code class="language-plaintext highlighter-rouge">.uniq.sort</code> above.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array_1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">array_2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="no">Set</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">array_1</span><span class="p">)</span> <span class="o">==</span> <span class="no">Set</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">array_2</span><span class="p">)</span> <span class="c1">#=&gt; true</span>
+<span class="n">array_1</span><span class="p">.</span><span class="nf">to_set</span> <span class="o">==</span> <span class="n">array_2</span><span class="p">.</span><span class="nf">to_set</span> <span class="c1">#=&gt; true</span>
+</code></pre></div></div>
+
+<p>Very clean looking and readable. Interestingly enough, <code class="language-plaintext highlighter-rouge">Set#==</code> internally uses <code class="language-plaintext highlighter-rouge">Object#==</code> identically to have <code class="language-plaintext highlighter-rouge">Array#eql?</code> achieves
+equality checks. <a href="https://ruby-doc.org/stdlib-2.7.1/libdoc/set/rdoc/Set.html#method-i-3D-3D">Here’s the documentation for <code class="language-plaintext highlighter-rouge">Set#==</code></a>.</p>
+
+<h2 id="so-which-strategy-is-the-best">So which strategy is the best?</h2>
+
+<p>Honestly, it depends. Personally I believe that the <code class="language-plaintext highlighter-rouge">Set.new</code> approach above is the most elegant and simplest solution to understand, though there
+are merits to the explict straightforwardness of <code class="language-plaintext highlighter-rouge">.uniq.sort</code> or the slickness of array intersection. Ultimately, its up to you to decide which is best for
+your own coding style. I will say that one of the above strategies may prove to be more performant than another. My guess would be
+that <code class="language-plaintext highlighter-rouge">Set.new</code> is the fastest strategy but I have not performed benchmarks to verify this.</p>
+
+<p>Do you have another Array equality strategy I missed? Know of a more efficient method? I’d love to discuss in the comments below.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/how-to-fix-homebrew-postgres-error-256/" alt="How to fix homebrew postgres error 256">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">How to fix homebrew postgres error 256</div></a>
+    
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

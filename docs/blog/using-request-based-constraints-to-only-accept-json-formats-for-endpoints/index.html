@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Using request-based constraints to only accept JSON formats for endpoints | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Using request-based constraints to only accept JSON formats for endpoints" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I prefer doing things The Rails Waytm whenever possible. Oftentimes when you are working with web requests, your controllers expect to respond to specific content formats. Formats that are outside of this expected format are generally handled within the controller layer. There’s nothing wrong with this approach BUT we can do better here by using request-based constraints in the Routing layer." />
+<meta property="og:description" content="I prefer doing things The Rails Waytm whenever possible. Oftentimes when you are working with web requests, your controllers expect to respond to specific content formats. Formats that are outside of this expected format are generally handled within the controller layer. There’s nothing wrong with this approach BUT we can do better here by using request-based constraints in the Routing layer." />
+<link rel="canonical" href="http://joshfrankel.me/blog/using-request-based-constraints-to-only-accept-json-formats-for-endpoints/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/using-request-based-constraints-to-only-accept-json-formats-for-endpoints/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-04-22T17:50:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2019-04-22T17:50:00+00:00","dateModified":"2019-04-22T17:50:00+00:00","headline":"Using request-based constraints to only accept JSON formats for endpoints","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/using-request-based-constraints-to-only-accept-json-formats-for-endpoints/"},"url":"http://joshfrankel.me/blog/using-request-based-constraints-to-only-accept-json-formats-for-endpoints/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"I prefer doing things The Rails Waytm whenever possible. Oftentimes when you are working with web requests, your controllers expect to respond to specific content formats. Formats that are outside of this expected format are generally handled within the controller layer. There’s nothing wrong with this approach BUT we can do better here by using request-based constraints in the Routing layer.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Using request-based constraints to only accept JSON formats for endpoints</h1>
+
+    
+      <p class="Banner-information">
+        <time>April 22, 2019</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>I prefer doing things The Rails Way<sup>tm</sup> whenever possible. Oftentimes when you are working
+with web requests, your controllers expect to respond to specific content formats. Formats that are
+outside of this expected format are generally handled within the controller
+layer. There’s nothing wrong with this approach BUT we can do better here by using 
+request-based constraints in the Routing layer.
+<!--excerpt--></p>
+
+<h2 id="a-simple-json-endpoint">A simple JSON endpoint</h2>
+
+<p>Here’s a typical controller setup where we want to accomplish the following things:</p>
+
+<ul>
+  <li>users#index endpoint</li>
+  <li>return a relation of users in json format</li>
+  <li>return a 200 success status</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">UsersController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">all</span>
+
+    <span class="n">render</span> <span class="ss">json: </span><span class="n">users</span><span class="p">,</span> <span class="ss">status: :ok</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>So this endpoint will only ever care about JSON responses. What happens if a client
+requests HTML?</p>
+
+<p>The request succeeds and returns the jsonified user relation above. What should have
+been a failed request actually succeeds. Certainly not ideal but what if we use respond_to with a specific format?</p>
+
+<h2 id="using-respond_to-to-enforce-format">Using respond_to to enforce format</h2>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">UsersController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">all</span>
+
+    <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
+      <span class="nb">format</span><span class="p">.</span><span class="nf">json</span> <span class="p">{</span> <span class="n">render</span> <span class="ss">json: </span><span class="n">users</span><span class="p">,</span> <span class="ss">status: :ok</span> <span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The result here is more expected. The above raises a <code class="language-plaintext highlighter-rouge">ActionController::UnknownFormat</code> when we make an HTML request to an endpoint that
+expects only JSON. This makes sense because HTML isn’t a handled format and therefore the controller doesn’t know what to do.</p>
+
+<p>We could stop here (and that would be a perfectly acceptable way of crafting the
+controller action) but we’ve added 2 lines of code plus two blocks for what the original <code class="language-plaintext highlighter-rouge">render json: users</code> does in one. So how can we have a simple controller while still enforcing format?</p>
+
+<h2 id="request-based-constraints-for-the-routing-layer">Request-based constraints for the routing layer</h2>
+
+<blockquote class="Info Info-right"><strong>What is a Lambda?</strong><br />
+A lambda is equivalent to an anonymous function in other languages. This means that you can specific logic within one without providing it a name.
+</blockquote>
+
+<p>By specifying the valid formats directly in our routes.rb file, we ensure that at
+the routing layer that using an unsupported format will respond with a failed status. This is accomplishing by using a lambda to specify valid request formats using the following syntax <code class="language-plaintext highlighter-rouge">lambda { |request| request.format == :json }</code></p>
+
+<p>So let’s adjust our <strong>routes.rb</strong> file to add the new constraint and revert our UsersController to use the original <code class="language-plaintext highlighter-rouge">render json</code> format:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">draw</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">only: :index</span><span class="p">,</span> <span class="ss">constraints: </span><span class="nb">lambda</span> <span class="p">{</span> <span class="o">|</span><span class="n">request</span><span class="o">|</span> <span class="n">request</span><span class="p">.</span><span class="nf">format</span> <span class="o">==</span> <span class="ss">:json</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="c1"># app/controllers/users_controller.rb</span>
+<span class="k">class</span> <span class="nc">UsersController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">all</span>
+
+    <span class="n">render</span> <span class="ss">json: </span><span class="n">users</span><span class="p">,</span> <span class="ss">status: :ok</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Now when we make HTML requests to the endpoint the we recieve a routing error
+that looks like: <code class="language-plaintext highlighter-rouge">ActionController::RoutingError: No route matches [GET] "/users"</code>. Basically this is saying that the above route doesn’t even exist which is true; the HTML version of the above route isn’t defined.</p>
+
+<p>In addition to using the simpler render syntax in the controller we no longer need to handle invalid request formats directly inside the controller.</p>
+
+<p>Want to get even fancier? We can use the shorthand “stabby” lambda syntax to achieve the same results with:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">draw</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">only: :index</span><span class="p">,</span> <span class="ss">constraints: </span><span class="o">-&gt;</span> <span class="n">request</span> <span class="p">{</span> <span class="n">request</span><span class="p">.</span><span class="nf">format</span> <span class="o">==</span> <span class="ss">:json</span> <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>So, now you’re thinking, “This is great and all, but I have 200 other json only endpoints. Am I going to need to repeat this pattern for each of them?”. Of course not! Rails doesn’t leave you hanging on this.</p>
+
+<h2 id="advanced-constraints">Advanced Constraints</h2>
+
+<p>For cases where we want to apply the same constraint to several routes, we can use a dedicated class. This class must respond to the <code>#matches?</code> message. With this we have ourselves a highly reusable format constraint.</p>
+
+<p>For the below example I’ve added a couple extra routes for demonstration purposes.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/initializers/routes/format_constraints.rb</span>
+<span class="k">module</span> <span class="nn">Routes</span>
+  <span class="k">class</span> <span class="nc">FormatConstraints</span>
+    <span class="nb">attr_reader</span> <span class="ss">:formats</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">formats</span><span class="p">)</span>
+      <span class="c1"># This coerces formats into an array</span>
+      <span class="vi">@formats</span> <span class="o">=</span> <span class="no">Array</span><span class="p">(</span><span class="n">formats</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">matches?</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+      <span class="c1"># This checks to see the request format matches the array</span>
+      <span class="c1"># Useful for multi formats like Routes::FormatConstraints.new([:html, :json])</span>
+      <span class="n">formats</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="nf">format</span><span class="p">.</span><span class="nf">symbol</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># config/routes.rb</span>
+<span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">draw</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">only: :index</span><span class="p">,</span> <span class="ss">constraints: </span><span class="no">Routes</span><span class="o">::</span><span class="no">FormatConstraints</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:json</span><span class="p">)</span>
+  <span class="n">resources</span> <span class="ss">:posts</span><span class="p">,</span> <span class="ss">constraints: </span><span class="no">Routes</span><span class="o">::</span><span class="no">FormatConstraints</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:json</span><span class="p">)</span>
+  <span class="n">resources</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">constraints: </span><span class="no">Routes</span><span class="o">::</span><span class="no">FormatConstraints</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:json</span><span class="p">)</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>We’re still repeating ourselves a bit with the above example. Luckily, the <code>constraints</code> syntax also has a block form which makes
+it even easier to group your routes by JSON only endpoints.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">draw</span> <span class="k">do</span>
+  <span class="n">constraints</span> <span class="no">Routes</span><span class="o">::</span><span class="no">FormatConstraints</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:json</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">resources</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">only: :index</span>
+    <span class="n">resources</span> <span class="ss">:posts</span>
+    <span class="n">resources</span> <span class="ss">:comments</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>I’ve also built the above to allow for arrays of formats to match against. This is
+useful for grouping routes that have multiple formats.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="no">Rails</span><span class="p">.</span><span class="nf">application</span><span class="p">.</span><span class="nf">routes</span><span class="p">.</span><span class="nf">draw</span> <span class="k">do</span>
+  <span class="n">constraints</span> <span class="no">Routes</span><span class="o">::</span><span class="no">FormatConstraints</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:json</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">resources</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">only: :index</span>
+    <span class="n">resources</span> <span class="ss">:posts</span>
+    <span class="n">resources</span> <span class="ss">:comments</span>
+  <span class="k">end</span>
+
+  <span class="c1"># This allows requests from html, json, and csv to the </span>
+  <span class="c1"># tags resource below</span>
+  <span class="n">constraints</span> <span class="no">Routes</span><span class="o">::</span><span class="no">FormatConstraints</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="ss">:html</span><span class="p">,</span> <span class="ss">:json</span><span class="p">,</span> <span class="ss">:csv</span><span class="p">])</span> <span class="k">do</span>
+    <span class="n">resources</span> <span class="ss">:tags</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Now we’re grouping all of our JSON routes behind a formatting constraint. Nice!</p>
+
+<blockquote class="Info"><strong>Acknowledgments</strong><br /><br />
+  <a href="https://twitter.com/stevegrossi" title="@SteveGrossi">Steve Grossi</a> for the idea of using a dedicated constraint class<br />
+  <a href="https://twitter.com/unixmonkey" title="@unixmonkey">Dave Jones</a> for pointing me at the concept wrapping routes within a constraint
+  block.
+</blockquote>
+
+<h2 id="wrapping-up">Wrapping Up</h2>
+
+<p>This is just one type of routing constraint that Rails allows for. If you’d like to
+learn more about request-based constraints <a href="https://guides.rubyonrails.org/routing.html#request-based-constraints">here’s the documentation on the subject</a>.</p>
+
+<p>What did you think about this method? Does it make controller code cleaner at the price of hiding formatting logic? Tell me about it below.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/prevent-css-transitions-on-page-load-with-es6/" alt="Prevent CSS transitions on page load with ES6">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Prevent CSS transitions on page load with ES6</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/testing-request-specs-for-invalid-formats-pundit-authorization-and-activerecord-failures/" alt="Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Testing request specs for invalid formats, Pundit authorization, and ActiveRecord failures</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

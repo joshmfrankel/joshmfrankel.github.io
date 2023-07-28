@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Re-sequencing primary keys in Rails to fix uniqueness violations | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Re-sequencing primary keys in Rails to fix uniqueness violations" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Recently, I ran into an issue with migrating data from one table to another incorrectly set the sequence for the new table’s primary key. The issue stemmed from inserting all the data from one table into another." />
+<meta property="og:description" content="Recently, I ran into an issue with migrating data from one table to another incorrectly set the sequence for the new table’s primary key. The issue stemmed from inserting all the data from one table into another." />
+<link rel="canonical" href="http://joshfrankel.me/blog/2017-09-28-re-sequencing-primary-keys-in-rails-to-fix-uniqueness-violations/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/2017-09-28-re-sequencing-primary-keys-in-rails-to-fix-uniqueness-violations/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-09-28T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2017-09-28T00:00:00+00:00","dateModified":"2017-09-28T00:00:00+00:00","headline":"Re-sequencing primary keys in Rails to fix uniqueness violations","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/2017-09-28-re-sequencing-primary-keys-in-rails-to-fix-uniqueness-violations/"},"url":"http://joshfrankel.me/blog/2017-09-28-re-sequencing-primary-keys-in-rails-to-fix-uniqueness-violations/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Recently, I ran into an issue with migrating data from one table to another incorrectly set the sequence for the new table’s primary key. The issue stemmed from inserting all the data from one table into another.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Re-sequencing primary keys in Rails to fix uniqueness violations</h1>
+
+    
+      <p class="Banner-information">
+        <time>September 28, 2017</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Recently, I ran into an issue with migrating data from one table to another incorrectly set the sequence for the new table’s primary key. The issue stemmed from inserting all the data from one table into another.
+<!--excerpt--></p>
+
+<p>Here’s the offending migration that caused the issue:</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="o">#</span> <span class="k">Copy</span> <span class="k">all</span> <span class="n">the</span> <span class="k">data</span> <span class="k">from</span> <span class="n">first_tables</span> <span class="k">into</span> <span class="n">second_tables</span>
+<span class="k">execute</span> <span class="o">&lt;&lt;-</span><span class="k">SQL</span>
+  <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">second_tables</span> <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">first_tables</span><span class="p">;</span>
+<span class="k">SQL</span></code></pre></figure>
+
+<p>The above works great for copying data but unfortunately doesn’t actually properly set the sequence for the primary key. Because of this trying to create new records in rails console was throwing uniqueness violation errors.</p>
+
+<figure class="highlight"><pre><code class="language-sql" data-lang="sql"><span class="n">ActiveRecord</span><span class="p">::</span><span class="n">RecordNotUnique</span><span class="p">:</span> <span class="n">PG</span><span class="p">::</span><span class="n">UniqueViolation</span><span class="p">:</span> <span class="n">ERROR</span><span class="p">:</span>  <span class="n">duplicate</span> <span class="k">key</span> <span class="n">value</span> <span class="n">violates</span> <span class="k">unique</span> <span class="k">constraint</span> <span class="nv">"second_tables"</span>
+<span class="n">DETAIL</span><span class="p">:</span>  <span class="k">Key</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">already</span> <span class="k">exists</span><span class="p">.</span></code></pre></figure>
+
+<p>Essentially, what the error translates to is that activerecord is attempting to insert a record with a primary key value of 1 but that value already exists. This violates the uniqueness constraint which every primary key has in usage.</p>
+
+<p>Luckily, there was a fairly easy way to fix my bluster by calling <code>reset_pk_sequence!</code> on the table. This properly re-sequences the primary key so that the next time you insert a record it uses the appropriate value.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">connection</span><span class="p">.</span><span class="nf">reset_pk_sequence!</span><span class="p">(</span><span class="s2">"second_tables"</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="s2">"8"</span></code></pre></figure>
+
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/resetting-your-elasticsearch-indices-on-heroku-staging-when-you-ve-reached-the-maximum-index-count-for-the-current-plan/" alt="Resetting your Elasticsearch indices on heroku staging when you've reached the maximum index count for the current plan">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Resetting your Elasticsearch indices on heroku staging when you've reached the maximum index count for the current plan</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/deploying-a-jekyll-blog-to-github-pages-with-custom-plugins-and-travisci/" alt="Deploying a jekyll blog to github pages with custom plugins and TravisCI">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Deploying a jekyll blog to github pages with custom plugins and TravisCI</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

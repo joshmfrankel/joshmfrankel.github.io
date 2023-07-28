@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Getting up and Running with Minitest, Guard, Sass, and Bootstrap for Ruby on Rails Development | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Getting up and Running with Minitest, Guard, Sass, and Bootstrap for Ruby on Rails Development" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I&#39;ve always felt that getting up and running with a new web development project should be as easy as possible. A good example of this is a Rails app. As Ruby on Rails accomplishes a high degree of ease of use straight out of the box, this article will focus on setting up an automated testing environment and sprucing up your CSS with bootstrap-sass." />
+<meta property="og:description" content="I&#39;ve always felt that getting up and running with a new web development project should be as easy as possible. A good example of this is a Rails app. As Ruby on Rails accomplishes a high degree of ease of use straight out of the box, this article will focus on setting up an automated testing environment and sprucing up your CSS with bootstrap-sass." />
+<link rel="canonical" href="http://joshfrankel.me/blog/getting-up-and-running-with-minitest-guard-sass-bootstrap-for-ruby-on-rails-development/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/getting-up-and-running-with-minitest-guard-sass-bootstrap-for-ruby-on-rails-development/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-06-03T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2015-06-03T00:00:00+00:00","dateModified":"2015-06-03T00:00:00+00:00","headline":"Getting up and Running with Minitest, Guard, Sass, and Bootstrap for Ruby on Rails Development","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/getting-up-and-running-with-minitest-guard-sass-bootstrap-for-ruby-on-rails-development/"},"url":"http://joshfrankel.me/blog/getting-up-and-running-with-minitest-guard-sass-bootstrap-for-ruby-on-rails-development/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"I&#39;ve always felt that getting up and running with a new web development project should be as easy as possible. A good example of this is a Rails app. As Ruby on Rails accomplishes a high degree of ease of use straight out of the box, this article will focus on setting up an automated testing environment and sprucing up your CSS with bootstrap-sass.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Getting up and Running with Minitest, Guard, Sass, and Bootstrap for Ruby on Rails Development</h1>
+
+    
+      <p class="Banner-information">
+        <time>June 3, 2015</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>I've always felt that getting up and running with a new web development project should be as easy as possible. A good example of this is a Rails app. As Ruby on Rails accomplishes a high degree of ease of use straight out of the box, this article will focus on setting up an automated testing environment and sprucing up your CSS with bootstrap-sass.</p>
+<!--excerpt-->
+
+<p>I'm going to assume that you already have the following items installed: <mark>Ruby on Rails</mark> and <mark>Git</mark>. You will need both of these before going further into this setup.</p>
+
+<h2>The Gemfile</h2>
+<p>The first thing we need to do is add all the necessary gems. The bootstrap-sass gem neatly encapsulates most of the configuration for us with a small config caveat that I will go into later. To get smooth automated testing up and running with Minitest we need a number of other gems.</p>
+
+<p>Add the following to your Gemfile. Once added we need to run <code>bundle install</code> to install the newly added gems.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">gem</span> <span class="s1">'bootstrap-sass'</span><span class="p">,</span> <span class="s1">'3.3.3'</span>
+
+<span class="n">group</span> <span class="ss">:test</span> <span class="k">do</span>
+    <span class="n">gem</span> <span class="s1">'minitest-reporters'</span><span class="p">,</span> <span class="s1">'1.0.10'</span>
+    <span class="n">gem</span> <span class="s1">'mini_backtrace'</span><span class="p">,</span> <span class="s1">'0.1.3'</span>
+    <span class="n">gem</span> <span class="s1">'libnotify'</span><span class="p">,</span> <span class="s1">'0.9.1'</span> <span class="c1"># Optional notification plugin for linux</span>
+    <span class="n">gem</span> <span class="s1">'guard'</span><span class="p">,</span> <span class="s1">'2.11.1'</span> <span class="c1"># Guard task runner</span>
+    <span class="n">gem</span> <span class="s1">'guard-minitest'</span><span class="p">,</span> <span class="s1">'2.4.3'</span> <span class="c1"># Guard minitest support</span>
+    <span class="n">gem</span> <span class="s1">'spring'</span><span class="p">,</span> <span class="s1">'1.2.0'</span> <span class="c1"># Optional testing server for guard</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>With the gems now installed it's time to start configuring them with our environment. Let's first deal with our Bootstrap-sass configuration.</p>
+
+<h2>Bootstrap-sass</h2>
+<p>As I mentioned earlier, the gem will do most of the work for us. If you look at /app/assets/javascripts/application.js and /app/assets/stylesheets/application.css you should see some comments that say <code>//= require bootstrap-sprockets</code>. For our application.js file we can leave these alone as they will work as expected. However, with Sass files the problem with the comments is that not only does it include our new bootstrap-sass gem but they also load all .css or .scss files in the assets/stylesheets directory. This makes it problematic for spliting Sass files into partials as the order they are included isn't specific.</p>
+<p>To fix this we need to remove all the comments from application.css. Also make sure that you rename the file to application.css.scss to use the sass file ending (or .sass if you like the indent version). Once the comments are removed and the file renamed we can now use Sass's built in @import statement to structure our files however we want. While we do lose the ability to automatically load all the stylesheets at once we are now able to load them with their partials in the proper order. It should look like the following code.</p>
+
+<figure class="highlight"><pre><code class="language-scss" data-lang="scss"><span class="c1">// We need to manually import the bootstrap-sass gem Sass files</span>
+<span class="k">@import</span> <span class="s2">"bootstrap-sprockets"</span><span class="p">;</span>
+<span class="k">@import</span> <span class="s2">"bootstrap"</span><span class="p">;</span>
+
+<span class="c1">// Add your Sass files here or just write sass</span>
+<span class="k">@import</span> <span class="s2">"pages"</span><span class="p">;</span>
+
+<span class="nc">.red</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>We now have a working system for including Sass files and partials in a specific order. Sass is excellent at compiling multiple @imports together so no need to worry about the site running slower. Additionally, since we used the gem it has the Bootstrap framework built-in which is awesome!</p>
+
+<h2>Minitest</h2>
+<p>There are a lot of different testing solutions for using Rails. You have Rspec, Cucumber, Test::Unit, and Minitest. <strong>Rspec</strong> is really powerful but can be quite tricky to get working right. <strong>Cucumber</strong> is great for its easy to read tests that could allow your clients to write the application specs as tests. For starting out though I would recommend <strong>Minitest</strong> because of how easy it is setup and also that it is the preferred unit testing framework packaged with Rails.</p>
+<p>There are two gems from the Gemfile section that are associated with getting minitest looking sweet: <strong>minitest-reporters</strong>, and <strong>mini_backtrace</strong>. Minitest reporters adds hooks for better display output from tests. Mini backtrace add supports for backtrace cleaner to prevent really long error messages while running your test suite.</p>
+
+<p>To setup <strong>minitest-reporters</strong> open your test_helper.rb file and add the following code above the line <code>class ActiveSupport::TestCase</code>.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">    <span class="nb">require</span> <span class="s2">"minitest/reporters"</span>
+    <span class="no">Minitest</span><span class="o">::</span><span class="no">Reporters</span><span class="p">.</span><span class="nf">use!</span></code></pre></figure>
+<p>Next <strong>mini_backtrace</strong> needs the following code added to it. This will suppress some messages regarding rvm in the console. You may need to adjust this depending on your Rails environment setup (rvm or rbenv).</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">    <span class="no">Rails</span><span class="p">.</span><span class="nf">backtrace_cleaner</span><span class="p">.</span><span class="nf">add_silencer</span> <span class="p">{</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span> <span class="n">line</span> <span class="o">=~</span> <span class="sr">/rvm/</span> <span class="p">}</span></code></pre></figure>
+
+<p>Awesome! You can now run tests on your app with clean output using <code>rake test</code>. Of course manually running tests is so un-hip so let's setup our automated testing suite with Guard.</p>
+
+<h2>Automated testing: Guard</h2>
+<p>Guard is an awesome event handler for the command line. Built in native ruby it integrates well into the Rails workflow. Setting up Guard is pretty easy just run <code>guard init minitest</code> to create a basic Minitest Guardfile.</p>
+<p>The Guardfile is similiar to gulp or grunt in that it watches for particular events to occur and then performs an action. Your Guardfile should looking something like the following code</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">guard</span> <span class="ss">:minitest</span><span class="p">,</span>
+  <span class="ss">spring: </span><span class="kp">false</span><span class="p">,</span>
+  <span class="ss">all_on_start: </span><span class="kp">false</span><span class="p">,</span>
+  <span class="ss">all_after_pass: </span><span class="kp">false</span> <span class="k">do</span>
+
+  <span class="c1"># with Minitest::Unit</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^test/(.*)</span><span class="se">\/</span><span class="sr">?test_(.*)</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^lib/(.*/)?([^/]+)</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span>     <span class="p">{</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span> <span class="s2">"test/</span><span class="si">#{</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">test_</span><span class="si">#{</span><span class="n">m</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">.rb"</span> <span class="p">}</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^test/test_helper</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span>      <span class="p">{</span> <span class="s1">'test'</span> <span class="p">}</span>
+
+  <span class="c1"># Rails 4</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^app/(.+)</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span>                               <span class="p">{</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span> <span class="s2">"test/</span><span class="si">#{</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_test.rb"</span> <span class="p">}</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^app/controllers/application_controller</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span> <span class="p">{</span> <span class="s1">'test/controllers'</span> <span class="p">}</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^app/controllers/(.+)_controller</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span>        <span class="p">{</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span> <span class="s2">"test/integration/</span><span class="si">#{</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_test.rb"</span> <span class="p">}</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^app/views/(.+)_mailer/.+}</span><span class="p">)</span>                   <span class="p">{</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span> <span class="s2">"test/mailers/</span><span class="si">#{</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_mailer_test.rb"</span> <span class="p">}</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^lib/(.+)</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span>                               <span class="p">{</span> <span class="o">|</span><span class="n">m</span><span class="o">|</span> <span class="s2">"test/lib/</span><span class="si">#{</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_test.rb"</span> <span class="p">}</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^test/.+_test</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span>
+  <span class="n">watch</span><span class="p">(</span><span class="sr">%r{^test/test_helper</span><span class="se">\.</span><span class="sr">rb$}</span><span class="p">)</span> <span class="p">{</span> <span class="s1">'test'</span> <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+<p>Basically we have all the particular watched files within the guard block. These will essentially fire off your unit tests depending on which files are being modified. To start Guard just run <code>guard</code> in the terminal from your Rails project directory. It will take a few seconds and then should start polling for events. Super handy and cuts down on the time it takes to manually run unit tests. The only issue is that the test suite runs really, really slowly. This is where the Spring preloader gem comes in handy by reducing the execution time of your test suite.</p>
+<h2>Spring</h2>
+<p>Spring is a preloader meaning that your application assets will become loaded before your tests so that Guard doesn't need to re-build them everytime you run your test suite. The reduction in run time can be quite impressive from 5 seconds to almost instantaneously. Spring with Guard makes Test-Driven Development a dream. To setup Spring you first need to add Spring to your app's executables by running <code>bundle exec spring binstub --all</code>. Next make sure the Spring attribute is marked as true in your Guardfile.</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">    <span class="n">guard</span> <span class="ss">:minitest</span><span class="p">,</span> <span class="ss">spring: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">all_on_start: </span><span class="kp">false</span><span class="p">,</span> <span class="ss">all_after_pass: </span><span class="kp">true</span> <span class="k">do</span></code></pre></figure>
+<p>We now have all the basics of a proper automated testing environment setup. System notifications in the next section add another layer of convenience with testing.</p>
+<h2>Notifications</h2>
+<p>Having notifications from your test suite is just another way to increase your productivity by not having to pull up terminal every 5 seconds. Since I am using Linux the gem I choose was <strong>Libnotify</strong> to add notifications. There are a number of different <strong>system notifiers</strong>. To find out which one is available for your OS check out the <a href="https://github.com/guard/guard/wiki/System-notifications" target="_blank">system notifications faq page</a>. This page also includes install instructions or further documentation pages.</p>
+
+<h2>Git</h2>
+<p>Lastly, is version control. It is recommended to follow the useful gitignore file located <a href="https://github.com/github/gitignore" target="_blank">here</a> for your programming language. Look at the ruby and rails sections for preferred ignored files. Additionally, since we are using Spring for preloading make sure to ignore spring files by adding <code>/spring/*.pid</code> to your .gitignore file. Here is a basic .gitignore file below</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># See https://help.github.com/articles/ignoring-files for more about ignoring files.</span>
+<span class="c1">#</span>
+<span class="c1"># If you find yourself ignoring temporary files generated by your text editor</span>
+<span class="c1"># or operating system, you probably want to add a global ignore instead:</span>
+<span class="c1">#   git config --global core.excludesfile '~/.gitignore_global'</span>
+
+<span class="c1"># Ignore bundler config.</span>
+<span class="sr">/.bundle
+
+# Ignore the default SQLite database.
+/</span><span class="n">db</span><span class="o">/*</span><span class="p">.</span><span class="nf">sqlite3</span>
+<span class="sr">/db/</span><span class="o">*</span><span class="p">.</span><span class="nf">sqlite3</span><span class="o">-</span><span class="n">journal</span>
+
+<span class="c1"># Ignore all logfiles and tempfiles.</span>
+<span class="sr">/log/</span><span class="o">*</span>
+<span class="o">!</span><span class="sr">/log/</span><span class="p">.</span><span class="nf">keep</span>
+<span class="sr">/tmp
+
+# Ignore Spring files.
+/s</span><span class="n">pring</span><span class="o">/*</span><span class="p">.</span><span class="nf">pid</span>
+
+<span class="c1"># Ignore secrets</span>
+<span class="n">config</span><span class="o">/</span><span class="n">secrets</span><span class="p">.</span><span class="nf">yml</span></code></pre></figure>
+
+<p>And there you have it! A fully functional Ruby on Rails environment utilizing the bootstrap front-end framework with sass, an automated testing suite with Guard, Minitest, Spring, and System notifications, and a ready to go Git setup. This is a great starting place for new Rails applications. Have a suggestion or comment? Leave me a comment below.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/gruntjs-or-how-i-learned-to-stop-worrying-and-automate-everything/" alt="Grunt.js or How I learned to Stop Worrying and Automate Everything.">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Grunt.js or How I learned to Stop Worrying and Automate Everything.</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/how-to-configure-sublime-text-3-for-rubocop-and-ruby-coding-standards/" alt="How to configure Sublime Text 3 for Rubocop and Ruby coding standards">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">How to configure Sublime Text 3 for Rubocop and Ruby coding standards</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

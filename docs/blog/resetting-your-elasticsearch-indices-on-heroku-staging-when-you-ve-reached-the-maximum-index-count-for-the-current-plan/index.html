@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Resetting your Elasticsearch indices on heroku staging when you’ve reached the maximum index count for the current plan | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Resetting your Elasticsearch indices on heroku staging when you’ve reached the maximum index count for the current plan" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="If you’ve ever used Heroku’s low cost staging plan for Bonsai Elasticsearch you may have ran into the following error: reached maximum index count for current plan. Since in most cases your staging indices aren’t as critical as say production (don’t use the fix below in production, please!), you can safely follow the procedure below for removing and reindexing your search enabled models." />
+<meta property="og:description" content="If you’ve ever used Heroku’s low cost staging plan for Bonsai Elasticsearch you may have ran into the following error: reached maximum index count for current plan. Since in most cases your staging indices aren’t as critical as say production (don’t use the fix below in production, please!), you can safely follow the procedure below for removing and reindexing your search enabled models." />
+<link rel="canonical" href="http://joshfrankel.me/blog/resetting-your-elasticsearch-indices-on-heroku-staging-when-you-ve-reached-the-maximum-index-count-for-the-current-plan/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/resetting-your-elasticsearch-indices-on-heroku-staging-when-you-ve-reached-the-maximum-index-count-for-the-current-plan/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-09-08T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2017-09-08T00:00:00+00:00","dateModified":"2017-09-08T00:00:00+00:00","headline":"Resetting your Elasticsearch indices on heroku staging when you’ve reached the maximum index count for the current plan","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/resetting-your-elasticsearch-indices-on-heroku-staging-when-you-ve-reached-the-maximum-index-count-for-the-current-plan/"},"url":"http://joshfrankel.me/blog/resetting-your-elasticsearch-indices-on-heroku-staging-when-you-ve-reached-the-maximum-index-count-for-the-current-plan/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"If you’ve ever used Heroku’s low cost staging plan for Bonsai Elasticsearch you may have ran into the following error: reached maximum index count for current plan. Since in most cases your staging indices aren’t as critical as say production (don’t use the fix below in production, please!), you can safely follow the procedure below for removing and reindexing your search enabled models.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Resetting your Elasticsearch indices on heroku staging when you've reached the maximum index count for the current plan</h1>
+
+    
+      <p class="Banner-information">
+        <time>September 8, 2017</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>If you’ve ever used Heroku’s low cost staging plan for Bonsai Elasticsearch you may have
+ran into the following error: <code>reached maximum index count for current plan</code>.</p>
+
+<p>Since in most cases your staging indices aren’t as critical as say production (don’t use
+the fix below in production, please!), you can safely follow the procedure below for
+removing and reindexing your search enabled models.
+<!--excerpt--></p>
+
+<h2 id="find-your-elasticsearch-url">Find your Elasticsearch URL</h2>
+<p>First you’ll need to find your Elasticsearch url. If you are using the Bonsai
+addon from Heroku you can do so in your terminal with:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Where BONSAI_IVORY_URL is an environment variable set on heroku that</span>
+<span class="c1"># points at your Elasticsearch url</span>
+<span class="c1"># Note: Your specific plan might be different than IVORY</span>
+<span class="n">heroku</span> <span class="n">config</span><span class="ss">:get</span> <span class="no">BONSAI_IVORY_URL</span> <span class="o">-</span><span class="n">a</span> <span class="n">your</span><span class="o">-</span><span class="n">staging</span><span class="o">-</span><span class="n">application</span></code></pre></figure>
+
+<p>If you don’t know what your environment variable is for BONSAI then you’ll need
+to go into Heroku’s web UI and look at the config variables for it. It should
+be in the format of <code>BONSAI_PLANNAME_URL</code>.</p>
+
+<h2 id="delete-all-available-indices">Delete all available indices</h2>
+<p>The next step is to remove all the available Elasticsearch indices.</p>
+
+<p><strong>WARNING</strong> DO NOT RUN THIS IN PRODUCTION! PLEASE, PLEASE, PLEASE DON’T DO THIS.</p>
+
+<blockquote>We offer a low cost staging plan for development and testing - Heroku</blockquote>
+
+<p>You can read more on this in <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-delete-index.html">Elasticsearch’s documentation</a>. 
+This can be accomplished via cURL, which you’ll also need installed, from the following:</p>
+
+<figure class="highlight"><pre><code class="language-terminal" data-lang="terminal"><span class="gp">#</span><span class="w"> </span>_all - refers to all available indices
+<span class="gp">#</span><span class="w"> </span><span class="k">*</span> - also works like _all
+<span class="go">curl -XDELETE 'https://[bonsai_url_goes_here]/_all'</span></code></pre></figure>
+
+<h2 id="reindex-all-search-enabled-models">Reindex all search enabled models</h2>
+<p>Lastly, we need to reindex all of your available models. If you are using Searchkick you can accomplish this
+by running the following command. This will run through all of your searchkick
+models 1-by-1 and reindex them. Otherwise, you’ll need to reindex your content
+based on whatever method you have configured.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># All models with searchkick enabled</span>
+<span class="no">Searchkick</span><span class="p">.</span><span class="nf">models</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">model</span><span class="o">|</span>
+  <span class="n">model</span><span class="p">.</span><span class="nf">reindex</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>That’s it! You now have removed all the current indices and reindexed with new ones. Start searching!</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/lessons-learned-from-using-capybara-for-feature-testing/" alt="Lessons learned from using Capybara for feature testing">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Lessons learned from using Capybara for feature testing</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/2017-09-28-re-sequencing-primary-keys-in-rails-to-fix-uniqueness-violations/" alt="Re-sequencing primary keys in Rails to fix uniqueness violations">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Re-sequencing primary keys in Rails to fix uniqueness violations</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

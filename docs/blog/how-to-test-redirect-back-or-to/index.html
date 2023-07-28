@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>How to test redirect_back_or_to | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="How to test redirect_back_or_to" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Have you ever successfully used redirect_back_or_to in your application only to find out that testing was a challenge? Both methods rely on browser history which is generally not available within controller test and request specs. Recently I ran into this and after digging in came up with a simple solution." />
+<meta property="og:description" content="Have you ever successfully used redirect_back_or_to in your application only to find out that testing was a challenge? Both methods rely on browser history which is generally not available within controller test and request specs. Recently I ran into this and after digging in came up with a simple solution." />
+<link rel="canonical" href="http://joshfrankel.me/blog/how-to-test-redirect-back-or-to/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/how-to-test-redirect-back-or-to/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-04-11T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-04-11T00:00:00+00:00","dateModified":"2022-04-11T00:00:00+00:00","headline":"How to test redirect_back_or_to","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/how-to-test-redirect-back-or-to/"},"url":"http://joshfrankel.me/blog/how-to-test-redirect-back-or-to/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Have you ever successfully used redirect_back_or_to in your application only to find out that testing was a challenge? Both methods rely on browser history which is generally not available within controller test and request specs. Recently I ran into this and after digging in came up with a simple solution.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">How to test redirect_back_or_to</h1>
+
+    
+      <p class="Banner-information">
+        <time>April 11, 2022</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Have you ever successfully used <code class="language-plaintext highlighter-rouge">redirect_back_or_to</code> in your application only to find out that testing was a challenge? Both methods rely on browser history which is generally not available within controller test and request specs. Recently I ran into this and after digging in came up with a simple solution.
+<!--excerpt--></p>
+
+<h2 id="first-what-is-redirect_back_or_to">First what is redirect_back_or_to</h2>
+
+<p><code class="language-plaintext highlighter-rouge">redirect_back_or_to</code> and its deprecated alias <code class="language-plaintext highlighter-rouge">redirect_back</code> both have the goal
+of request flow control. Depending on what information is available in browser history they can either redirect to the previously visited page or to a specified fallback location. In both cases, the fallback location is required. This was the primary issue I ran into while testing.</p>
+
+<p>Let’s take a look at an example. Note: We’ll be looking at Minitest as a testing framework but the concepts explored here should function for RSpec as well.</p>
+
+<h2 id="quick-example">Quick example</h2>
+
+<p>Let’s say you have the following Minitest controller test. Our desired behavior
+is that when a user updates their password but does not include a number it should
+redirect them and display a error message.</p>
+
+<p>We’re using <code class="language-plaintext highlighter-rouge">redirect_back_or_to</code> in our code with a fallback location of <code class="language-plaintext highlighter-rouge">root_path</code></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">redirect_back_or_to</span> <span class="n">root_path</span>
+</code></pre></div></div>
+
+<p>Our controller test looks like the following:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">context</span> <span class="s2">"PATCH #update"</span> <span class="k">do</span>
+    <span class="n">should</span> <span class="s2">"be invalid with password in wrong format"</span> <span class="k">do</span>
+      <span class="n">sign_in</span> <span class="vi">@user</span>
+
+      <span class="n">patch</span> <span class="n">user_passwords_path</span><span class="p">,</span> <span class="ss">params: </span><span class="p">{</span> <span class="ss">id: </span><span class="vi">@user</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span> <span class="ss">user: </span><span class="p">{</span> <span class="ss">password: </span><span class="s2">"invalid without numbers"</span> <span class="p">}</span> <span class="p">}</span>
+
+      <span class="n">assert_redirected_to</span> <span class="n">edit_user_passwords_path</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>Now the above looks accurate but the problem with controller tests there is no
+context as the user’s last visited location. We’re essentially sending a request directly to an endpoint above without first visiting the <code class="language-plaintext highlighter-rouge">edit_user_passwords_path</code> which is typically how a user would interact. The result of the above is a failing test as instead of being redirected to the edit page we end up on the <code class="language-plaintext highlighter-rouge">root_path</code>. Not ideal.</p>
+
+<p>We know the issue is a lack of browser history for <code class="language-plaintext highlighter-rouge">redirect_back_or_to</code> to utilize. This is the first nod to how the method works. Also, the documentation gives a great hint as well:</p>
+
+<blockquote class="Info Info--full">
+  
+
+  <p>
+    <i class="fas fa-quote-left"></i>
+    Redirects the browser to the page that issued the request (the referrer) if possible, otherwise redirects to the provided default fallback location. The referrer information is pulled from the HTTP Referer (sic) header on the request. This is an optional header and its presence on the request is subject to browser security settings and user preferences. If the request is missing this header, the fallback_location will be used.
+  </p>
+
+  
+    <a href="https://api.rubyonrails.org/classes/ActionController/Redirecting.html#method-i-redirect_back">api.rubyonrails.org</a>
+  
+</blockquote>
+
+<p>Basically the only way that <code class="language-plaintext highlighter-rouge">redirect_back_or_to</code> can reliably navigate the user back in history is to look at the <code class="language-plaintext highlighter-rouge">Referer</code> header. With that knowledge we’ve got a solution.</p>
+
+<h2 id="the-solution">The solution</h2>
+
+<p>We only need to adjust the original test slightly to get the desired result. Focusing on including the <code class="language-plaintext highlighter-rouge">referer</code> header when making the endpoint request ensures that we redirect to the correct location.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">patch</span> <span class="n">user_passwords_path</span><span class="p">,</span> <span class="ss">params:
+  </span><span class="p">{</span>
+    <span class="ss">id: </span><span class="vi">@user</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span>
+    <span class="ss">user: </span><span class="p">{</span>
+      <span class="ss">password: </span><span class="s2">"invalid without numbers"</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="ss">headers: </span><span class="p">{</span>
+    <span class="ss">referer: </span><span class="n">edit_user_passwords_url</span>
+  <span class="p">}</span>
+</code></pre></div></div>
+
+<p>Note that instead of using <code class="language-plaintext highlighter-rouge">edit_user_passwords_path</code> we instead utilize the fully qualified url with the <code class="language-plaintext highlighter-rouge">_url</code> helper. This ensures that our test behaves the same way that the browser would.</p>
+
+<p>With that everything is green and good to go.</p>
+
+<p>Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/tips-i-learned-working-with-activestorage/" alt="Tips I learned working with ActiveStorage">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Tips I learned working with ActiveStorage</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/simulating-a-select-dropdown-change-in-jest/" alt="Simulating a select dropdown change in Jest">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Simulating a select dropdown change in Jest</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

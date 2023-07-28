@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Introducing SimpleCov+ Action: A Github action for ensuring test coverage | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Introducing SimpleCov+ Action: A Github action for ensuring test coverage" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Testing your code thoroughly is an important part of a well functioning and easy to change application. Lack of adequate test coverage can be frustrating when refactoring, upgrading, or tracking down a bug. I’ve always wanted a way to ensure that each file maintains a minimum test coverage and if not fail continuous integration checks. After much searching, I decided to go ahead and build my own. Introducing SimpleCov+ Action for use within your Github actions." />
+<meta property="og:description" content="Testing your code thoroughly is an important part of a well functioning and easy to change application. Lack of adequate test coverage can be frustrating when refactoring, upgrading, or tracking down a bug. I’ve always wanted a way to ensure that each file maintains a minimum test coverage and if not fail continuous integration checks. After much searching, I decided to go ahead and build my own. Introducing SimpleCov+ Action for use within your Github actions." />
+<link rel="canonical" href="http://joshfrankel.me/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-06T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2022-05-06T00:00:00+00:00","dateModified":"2022-05-06T00:00:00+00:00","headline":"Introducing SimpleCov+ Action: A Github action for ensuring test coverage","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/"},"url":"http://joshfrankel.me/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Testing your code thoroughly is an important part of a well functioning and easy to change application. Lack of adequate test coverage can be frustrating when refactoring, upgrading, or tracking down a bug. I’ve always wanted a way to ensure that each file maintains a minimum test coverage and if not fail continuous integration checks. After much searching, I decided to go ahead and build my own. Introducing SimpleCov+ Action for use within your Github actions.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</h1>
+
+    
+      <p class="Banner-information">
+        <time>May 6, 2022</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Testing your code thoroughly is an important part of a well functioning
+and easy to change application. Lack of adequate test coverage can be frustrating
+when refactoring, upgrading, or tracking down a bug. I’ve always wanted a way
+to ensure that each file maintains
+a minimum test coverage and if not fail continuous integration checks. After much
+searching, I decided to go ahead and build my own. Introducing SimpleCov+ Action
+for use within your Github actions.
+<!--excerpt--></p>
+
+<h2 id="why-use-it">Why use it</h2>
+
+<p>So why would you want to use this in your build workflow?</p>
+
+<p>SimpleCov+ Action provides a mechanism for reading SimpleCov results and using them
+to either pass or fail your Github workflow. Many of the solutions I came across concerned me, as failing a build based on test coverage could become a blocker for new work. I wanted a solution that was configurable based on coverage threshold and was accurate for my test suite. In general, averages (as in average test coverage), are easily influenced by outlier results. This was another concern I had with using such a system.</p>
+
+<p><img src="/img/2022/simple-cov-check-basic.png" alt="SimpleCov Basic line view" /></p>
+
+<p>So here are the basic functions that I’ve built-in to this Github action.</p>
+
+<h3 id="minimum-coverage-threshold">Minimum coverage threshold</h3>
+
+<p>By default, it will fail builds, if the overall test suite coverage is lower than 90%.
+This can be configured using the <code class="language-plaintext highlighter-rouge">minimum_coverage</code> key and an integer value. Since
+you can configure the value, you can slowly raise it as you cover more and more code.</p>
+
+<p><img src="/img/2022/simple-cov-check-basic-detailed.png" alt="SimpleCov Basic line view" /></p>
+
+<h3 id="line-vs-branch">Line vs Branch</h3>
+
+<p>As in the name, it relies on the SimpleCov gem, so that needs to be both
+installed and configured correctly. With the newer versions of SimpleCov, you can
+specify line vs branch coverage. This allows you to specify how well tested things
+like conditional logic branches are vs simple line-by-line coverage.</p>
+
+<p>The configuration value to change coverage type is called <code class="language-plaintext highlighter-rouge">minimum_coverage_type</code></p>
+
+<h3 id="per-file-test-coverage">Per file test coverage</h3>
+
+<p>If you also utilize the simplecov-json gem, you can activate the advanced mode, which will
+fail builds based on file coverage percentage. This is really useful for
+avoiding some well tested files throwing the results of our overall test suite.</p>
+
+<h2 id="why-its-awesome">Why it’s awesome</h2>
+
+<p>Test coverage is an important, albeit overlooked, part of a great test suite and healthy application.
+SimpleCov+ Action helps in several key ways to improve overall confidence in your testing suite.</p>
+
+<h3 id="it-is-incremental">It is incremental</h3>
+
+<p>Let’s say you’re adding test coverage to your application for the first time.
+You’re likely going to find many files that are lacking adequate test coverage (or if you’re lucky just a few). By using <code class="language-plaintext highlighter-rouge">minimum_coverage</code> configuration, you can incrementally increase
+test coverage a little, a bit at a time. I’ve personally used this to identify what my lowest covered file is and then set the <code class="language-plaintext highlighter-rouge">minimum_coverage</code> to 10% greater. This way you can chunk out the work necessary to increase overall test suite coverage a little at a time.</p>
+
+<h3 id="it-gives-accurate-results">It gives accurate results</h3>
+
+<p>Using the advanced version via simplecov-json, gives the ability to avoid situations where
+one file is 100% covered and another is 20% covered, skewing your overall test suite coverage. Let’s say your minimum coverage threshold is 50%. In the case above, the coverage would calculate to 60%, but you’ve got a file at 20%. That isn’t a great metric for ensuring good test coverage when outliers throw results. That’s why I recommend using the advanced file-by-file coverage version. Now for the above situation we’ll keep the same threshold of 50%. Applied to the example, the build would now fail and display the file that only has 20% coverage as the failure point. This is much more useful for ensuring quality code coverage.</p>
+
+<p><img src="/img/2022/simple-cov-check-advanced-detailed.png" alt="SimpleCov Advanced detail view" /></p>
+
+<p>The screenshot above shows the result panel of the action, which will display each file
+that failed to meet the minimum test coverage.</p>
+
+<h3 id="it-ensures-new-features-are-well-tested">It ensures new features are well tested</h3>
+
+<p>Having a minimum coverage necessary to deploy code, locks your application into a
+base level of coverage. This means that if new features want to be released to production
+they must contain proper test coverage. With this action in place, your code coverage
+never drops below your minimum coverage threshold.</p>
+
+<h3 id="it-increases-test-suite-confidence">It increases test suite confidence</h3>
+
+<p>Good test coverage ensures that refactoring code goes smoothly. There’s nothing more
+frustrating than realizing a large section of the codebase needs reworking only to find
+out there is no test coverage of it. Now you have two jobs: refactoring the feature and adding the missing test coverage.
+With test coverage becoming a priority, you reduce engineer frustration as well as make the system easier to change.</p>
+
+<h2 id="so-what-are-you-waiting-for">So what are you waiting for?</h2>
+
+<p>Go ahead and try it out. You can start with a low <code class="language-plaintext highlighter-rouge">minimum_coverage</code> and work your way
+up to a larger percentage. Every bit of coverage helps in the longevity of
+an application.</p>
+
+<p>The current version can be found in the <a href="https://github.com/marketplace/actions/simplecov-action">Github marketplace</a>. SimpleCov+ Action also utilizes itself to ensure the action’s code maintains adequate test coverage. Because of this, there is a great example for how to set this up in your workflow. <a href="https://github.com/marketplace/actions/simplecov-action#example-configuration">Check out example configurations here</a>.</p>
+
+<p>If you end up using this in your project, let me know how it goes in the comments below! Thanks for reading.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/simulating-a-select-dropdown-change-in-jest/" alt="Simulating a select dropdown change in Jest">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Simulating a select dropdown change in Jest</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/" alt="Lemme pencil you in: Using iCalendar and Rails to sync calendar events">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

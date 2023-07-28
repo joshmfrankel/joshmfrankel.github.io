@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Advanced Techniques - Part 2 | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Advanced Techniques - Part 2" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Since the last Sass article in this series was published over a year ago, here is a quick refresher. We covered the setup of Sass apps including: Guard, Compass, Prepross, and Scout. There was also info on variables and rule nesting. And we talked about why Sass is so awesome. In this article we are going to go through some more advanced techniques specifically: Functions, Mixins, Placeholders, Parent selector, Calculations, and conditional statements." />
+<meta property="og:description" content="Since the last Sass article in this series was published over a year ago, here is a quick refresher. We covered the setup of Sass apps including: Guard, Compass, Prepross, and Scout. There was also info on variables and rule nesting. And we talked about why Sass is so awesome. In this article we are going to go through some more advanced techniques specifically: Functions, Mixins, Placeholders, Parent selector, Calculations, and conditional statements." />
+<link rel="canonical" href="http://joshfrankel.me/blog/leveling-up-css-with-sass-advanced-techniques-part-2/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/leveling-up-css-with-sass-advanced-techniques-part-2/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2014-07-22T00:00:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2014-07-22T00:00:00+00:00","dateModified":"2014-07-22T00:00:00+00:00","headline":"Advanced Techniques - Part 2","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/leveling-up-css-with-sass-advanced-techniques-part-2/"},"url":"http://joshfrankel.me/blog/leveling-up-css-with-sass-advanced-techniques-part-2/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"Since the last Sass article in this series was published over a year ago, here is a quick refresher. We covered the setup of Sass apps including: Guard, Compass, Prepross, and Scout. There was also info on variables and rule nesting. And we talked about why Sass is so awesome. In this article we are going to go through some more advanced techniques specifically: Functions, Mixins, Placeholders, Parent selector, Calculations, and conditional statements.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Advanced Techniques - Part 2</h1>
+
+    
+      <p class="Banner-information">
+        <time>July 22, 2014</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>Since the last Sass article in this series was published over a year ago, here is a quick refresher. We covered the setup of Sass apps including: Guard, Compass, Prepross, and Scout. There was also info on variables and rule nesting. And we talked about why Sass is so awesome. In this article we are going to go through some more advanced techniques specifically: Functions, Mixins, Placeholders, Parent selector, Calculations, and conditional statements.</p>
+<!--excerpt-->
+
+<div class="Post Post-series">
+  <h3>This is the second article in the series.</h3>
+  <nav>
+    <a href="/blog/leveling-up-css-with-sass-basics-setup-part-1/">Part 1 - Basics</a>
+    <a href="/blog/leveling-up-css-with-sass-advanced-techniques-part-2/">Part 2 - Advanced Techniques</a>
+  </nav>
+</div>
+
+<p>At its core, the goal of Sass is to avoid repetitive CSS styles. One efficient Sass practice is the use of variables which allow for a single location, or source of truth, on specific styles or values. These variables are easily reusable across multiple files. The next step to removing repetition in your styles is through the use of functions, mixins, and placeholders. These techniques allow you to use large blocks of code without duplicating it.</p>
+
+<h2>Functions, Mixins, and Placeholders. What is the difference?</h2>
+<p>Before we get into the differences lets get into a quick review of what each one is. If you have ever used a backend programming language like php or rails, then you already know the <em>function</em> of functions. If this is a new concept for you, then a function basically performs an operation and then explicitly returns a value for usage. Think of it like the addition button on a calculator. Mixins are very similar to functions except they do not have to explicitly return a value. They can instead return Sass styles directly to the file. Essentially a Mixin can output multiple styles within a selector while a function can only return a single value. Placeholders are a little more tricky. A placeholder provides a style or group of styles that can be extended or <em>included</em> into other styles. Let's take some time and break down each of these further.</p>
+
+<h3>Functions</h3>
+<p>As I mentioned before a function must explicitly return a value. Functions use the keyword <code>@return</code> to define what value is being output. When building a function a good rule to follow is that it should only perform a single operation or action. An example would be calculating a letter-spacing, a single CSS value, from a Photoshop design. A function that is specific can be used across more projects. Functions can also optionally take arguments as seen below <code>($value)</code>. These instance variables can then be used within the function. Functions are called just by using the declared function name in this instance <code>letter-spacing(50)</code>.</p>
+<figure class="highlight"><pre><code class="language-scss" data-lang="scss"><span class="cm">/**
+ * Letter spacing function declaration
+ *
+ * Function accepts a value and then calculates the letter-spacing in em units
+ *
+ * @author Josh Frankel &lt;josh@joshfrankel.me&gt;
+ */</span>
+<span class="k">@function</span> <span class="nf">letter-spacing</span> <span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1">// If the letter-spacing $value is negative</span>
+    <span class="k">@if</span> <span class="nv">$value</span> <span class="o">&lt;</span> <span class="m">0</span> <span class="p">{</span>
+
+        <span class="c1">// Convert to negative and then change unit type to em</span>
+        <span class="k">@return</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">*</span> <span class="m">-1</span> <span class="o">/</span> <span class="m">1000</span><span class="p">)</span> <span class="o">*</span> <span class="m">-1em</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// If the letter-spacing $value is equal to zero</span>
+    <span class="k">@else</span> <span class="n">if</span> <span class="nv">$value</span> <span class="o">==</span> <span class="m">0</span><span class="p">{</span>
+
+        <span class="c1">// return value unaltered</span>
+        <span class="k">@return</span> <span class="nv">$value</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Else the $value must be positive</span>
+    <span class="k">@else</span> <span class="p">{</span>
+
+        <span class="c1">// Calculate the letter-spacing and change unit to em</span>
+        <span class="k">@return</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">/</span> <span class="m">1000</span><span class="p">)</span> <span class="o">*</span> <span class="m">1em</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Example Styles</span>
+<span class="nt">h1</span> <span class="p">{</span>
+    <span class="c1">// Call the letter-spacing function and pass in 50 as the $value</span>
+    <span class="nl">letter-spacing</span><span class="p">:</span> <span class="nf">letter-spacing</span><span class="p">(</span><span class="m">50</span><span class="p">);</span>
+<span class="p">}</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/* The calculated letter spacing */</span>
+<span class="nt">h1</span> <span class="p">{</span>
+    <span class="nl">letter-spacing</span><span class="p">:</span> <span class="m">0.05em</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<p>In the function above I have also used conditional statements in the form of <code>@if</code>, <code>@else if</code>, and <code>@else</code>. These work in the same manner as other languages and allow for more functionality.</p>
+<p>Additionally, the function uses standard operators to perform math calculations. If you look at this line of code <code>@return ($value / 1000) * 1em;</code> it follows the order of operations with the parenthesis to find the correct letter-spacing value. The <code> * 1em</code> at the end of the line is a trick to convert a non-unit value into a unit of your choice.</p>
+
+<h3>Mixins</h3>
+<p>Mixins share a very similiar responsibility as functions do. They essentially could be used the same way, e.g. you could build a Mixin that outputs single value. The difference here is that Mixins don't use the <code>@return</code> keyword and Mixins can directly output styles when the are included into your Sass.</p>
+<p>Additionally like functions, Mixins can also accept arguments, which allow for some added functionality. To call a Mixin you use the <code>@include</code> keyword and then the mixin name. To declare a Mixin you use the <code>@mixin</code> keyword followed by any arguments.</p>
+<figure class="highlight"><pre><code class="language-scss" data-lang="scss"><span class="cm">/**
+ * Pseudo Content Mixin
+ *
+ * Allows for easy pseudo elements
+ * @author Josh Frankel &lt;josh@joshfrankel.me&gt;
+ */</span>
+<span class="k">@mixin</span> <span class="nf">pseudo-content</span> <span class="p">(</span><span class="nv">$pseudo</span><span class="o">,</span> <span class="nv">$url</span><span class="o">,</span> <span class="nv">$width</span><span class="o">,</span> <span class="nv">$height</span><span class="o">,</span> <span class="nv">$position</span><span class="o">:</span> <span class="m">0</span> <span class="m">0</span> <span class="nb">no-repeat</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Make sure the parent is relative or else we will be positioning</span>
+        <span class="c1">// absolute for the pseudo element on the page width</span>
+        <span class="nl">position</span><span class="p">:</span> <span class="nb">relative</span><span class="p">;</span>
+
+        <span class="c1">// String interpolation and parent selector</span>
+        <span class="k">&amp;</span><span class="nd">:</span><span class="si">#{</span><span class="nv">$pseudo</span><span class="si">}</span> <span class="p">{</span>
+                <span class="nl">background</span><span class="p">:</span> <span class="sx">url($url)</span> <span class="nv">$position</span><span class="p">;</span>
+                <span class="nl">content</span><span class="p">:</span> <span class="s1">''</span><span class="p">;</span>
+                <span class="nl">display</span><span class="p">:</span> <span class="n">inline-block</span><span class="p">;</span>
+                <span class="nl">position</span><span class="p">:</span> <span class="nb">absolute</span><span class="p">;</span>
+                <span class="nl">height</span><span class="p">:</span> <span class="nv">$height</span><span class="p">;</span>
+                <span class="nl">width</span><span class="p">:</span> <span class="nv">$width</span><span class="p">;</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Example usage</span>
+<span class="nc">.sidebar</span> <span class="p">{</span>
+    <span class="k">@include</span> <span class="nd">pseudo-content</span> <span class="p">(</span><span class="s1">'before'</span><span class="o">,</span> <span class="s1">'images/icon-twitter.png'</span><span class="o">,</span> <span class="m">20px</span><span class="o">,</span> <span class="m">20px</span><span class="o">,</span> <span class="m">0</span> <span class="m">0</span> <span class="nb">no-repeat</span><span class="p">);</span>
+<span class="p">}</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css">    <span class="c">/* The mixin creates both of these rules by being placed inside .sidebar */</span>
+    <span class="nc">.sidebar</span> <span class="p">{</span>
+        <span class="nl">position</span><span class="p">:</span> <span class="nb">relative</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c">/* The parent selector output */</span>
+    <span class="nc">.sidebar</span><span class="nd">:before</span> <span class="p">{</span>
+        <span class="nl">background</span><span class="p">:</span> <span class="sx">url(images/icon-twitter.png)</span> <span class="m">0</span> <span class="m">0</span> <span class="nb">no-repeat</span><span class="p">;</span>
+        <span class="nl">content</span><span class="p">:</span> <span class="s2">''</span><span class="p">;</span>
+        <span class="nl">display</span><span class="p">:</span> <span class="n">inline-block</span><span class="p">;</span>
+        <span class="nl">position</span><span class="p">:</span> <span class="nb">absolute</span><span class="p">;</span>
+        <span class="nl">height</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+        <span class="nl">width</span><span class="p">:</span> <span class="m">20px</span><span class="p">;</span>
+    <span class="p">}</span></code></pre></figure>
+<p>There is an important line in the pseudo-content Mixin that I glossed over. If you look at the code <code>&:#{$pseudo} {</code> it seems like a bunch of gibberish. I've actually utilized two Sass features on the same line: string interpolation and the parent selector.</p>
+<p><strong>String Interpolation</strong> is a method of outputting a value or variable so that Sass doesn't perform any operations on it. This is useful for inputting names into selectors as I have done above. The portion of the code <code>#{$pseudo}</code> says output the <code>$pseudo</code> variable directly at this location. So <code>#{$pseudo} {</code> is equal to <code>before {</code>. Since the original variable for $pseudo was a string, using string interpolation removes this formatting allowing us to use it as a selector.</p>
+<p>The <strong>parent selector</strong> is the first part of the line <code>&:</code> which tells the proceeding selector that it is the child of the current selector. Essentially, <code>.sidebar</code> is the parent selector so calling <code>&:#{$pseudo}</code> says that the new selector is the child of <code>.sidebar</code> and has a string interpolated variable as its name. The parent selector is not limiting to pseudo classes, you can also use <code>&.some-class-name</code> or <code>&:hover</code> for child classes and child pseudo selectors respectively.</p>
+
+<h3>Placeholders</h3>
+<p>Placeholders are basically super classes in CSS. Unlike, Mixins and Functions, placeholders do not allow for arguments to be passed in. They do directly output styles similar to Mixins. Placeholders are declared by using a <code>%</code> symbol and are called using the <code>@extend</code> keyword. Take a look at the below example.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nc">.color-red</span> <span class="p">{</span>
+    <span class="nl">color</span><span class="p">:</span> <span class="no">red</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<p>We could now declare html elements with the class of <code>.color-red</code> to make their font color red. This could then be reused on any number of elements. The downside is that we need to actually place this into the html. Sass solves this issue through Placeholders. Additionally by using Placeholders all the styles that extend them will be placed together into a single rule.</p>
+<figure class="highlight"><pre><code class="language-scss" data-lang="scss"><span class="cm">/**
+ * Flexible Images
+ */</span>
+<span class="nv">%flexible-images</span> <span class="p">{</span>
+    <span class="nt">height</span><span class="nd">:auto</span><span class="p">;</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Example calls to the placeholder</span>
+<span class="nc">.container</span> <span class="nt">img</span> <span class="p">{</span>
+    <span class="k">@extend</span> <span class="nv">%flexible-images</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nc">.sidebar</span> <span class="nt">img</span> <span class="p">{</span>
+    <span class="k">@extend</span> <span class="nv">%flexible-images</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nt">footer</span> <span class="nc">.menu</span> <span class="nt">img</span> <span class="p">{</span>
+    <span class="k">@extend</span> <span class="nv">%flexible-images</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/* All styles are combined since they all use the same placeholder */</span>
+<span class="nc">.container</span> <span class="nt">img</span><span class="o">,</span>
+<span class="nc">.sidebar</span> <span class="nt">img</span><span class="o">,</span>
+<span class="nt">footer</span> <span class="nc">.menu</span> <span class="nt">img</span> <span class="p">{</span>
+    <span class="nl">height</span><span class="p">:</span><span class="nb">auto</span><span class="p">;</span>
+    <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<p>As you can see above the placeholder combines all the styles using the current placeholder into a single rule. This drastically reduces the amount of CSS your webpage will be loading. Also you no longer have to keep adding classes to the html as you can now just write Sass. There are some bugs with using placeholder and media queries but the newer version of Sass should fix these.</p>
+<h2>Wrap up</h2>
+<p>I have talked about the differences of Functions, Mixins, and Placeholders. We have seen the power in using parent selectors and the utility of string interpolation. We briefly went over math calculations and how they follow the order of operations like other programming languages. In my next article we will step away from style techniques and focus on project and file organization.</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/How-to-configure-sublime-text-for-psr-standards/" alt="How to configure Sublime Text for PSR Standards">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">How to configure Sublime Text for PSR Standards</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/gruntjs-or-how-i-learned-to-stop-worrying-and-automate-everything/" alt="Grunt.js or How I learned to Stop Worrying and Automate Everything.">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Grunt.js or How I learned to Stop Worrying and Automate Everything.</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

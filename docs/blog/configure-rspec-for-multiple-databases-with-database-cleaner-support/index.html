@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Raleway:300,300i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",function(){
+      let node = document.querySelector('.preload-transitions');
+      node.classList.remove('preload-transitions');
+    });
+  </script>
+
+  <link rel="alternate" type="application/rss+xml" title="Development Simplified" href="/feed.xml">
+
+  <!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Configure RSpec for multiple databases with Database Cleaner support | Development Simplified</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Configure RSpec for multiple databases with Database Cleaner support" />
+<meta name="author" content="Josh Frankel (@joshmfrankel)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="When working with multiple databases, code can become intertangled with records spanning across the systems. Seperating database domain reponsibilities away from each other is challenging but a good end goal. Sometimes this isn’t possible which in the case of testing clean-up can make for some tricky configuration details." />
+<meta property="og:description" content="When working with multiple databases, code can become intertangled with records spanning across the systems. Seperating database domain reponsibilities away from each other is challenging but a good end goal. Sometimes this isn’t possible which in the case of testing clean-up can make for some tricky configuration details." />
+<link rel="canonical" href="http://joshfrankel.me/blog/configure-rspec-for-multiple-databases-with-database-cleaner-support/" />
+<meta property="og:url" content="http://joshfrankel.me/blog/configure-rspec-for-multiple-databases-with-database-cleaner-support/" />
+<meta property="og:site_name" content="Development Simplified" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-22T16:52:00+00:00" />
+<script type="application/ld+json">
+{"datePublished":"2020-04-22T16:52:00+00:00","dateModified":"2020-04-22T16:52:00+00:00","headline":"Configure RSpec for multiple databases with Database Cleaner support","mainEntityOfPage":{"@type":"WebPage","@id":"http://joshfrankel.me/blog/configure-rspec-for-multiple-databases-with-database-cleaner-support/"},"url":"http://joshfrankel.me/blog/configure-rspec-for-multiple-databases-with-database-cleaner-support/","author":{"@type":"Person","name":"Josh Frankel (@joshmfrankel)"},"@type":"BlogPosting","description":"When working with multiple databases, code can become intertangled with records spanning across the systems. Seperating database domain reponsibilities away from each other is challenging but a good end goal. Sometimes this isn’t possible which in the case of testing clean-up can make for some tricky configuration details.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  <meta name="theme-color" content="#61b8d0"/>
+</head>
+
+  <body class="preload-transitions">
+    <header class="Container Container-flex Container--smallMargin Header">
+
+  <a href="/" class="Logo-container">
+    <div class="Logo-avatarContainer">
+      <img src="/img/layout/josh-frankel-author-100x100.jpg" class="Logo Logo-avatar" alt="Josh Frankel (Author)" />
+      <img src="/img/layout/josh-frankel-author-hover-100x100.jpg" class="Logo Logo-avatarHover" alt="Josh Frankel (Author)" />
+    </div>
+    <div class="Logo Logo-logo">
+      <span class="Logo Logo-first-name">Development</span>
+      <span class="Logo Logo-last-name">Simplified</span>
+    </div>
+  </a>
+
+  <nav class="flex-right">
+    
+      
+      <a href="/blog" >Blog</a>
+    
+      
+      <a href="/blog/categories" >Categories</a>
+    
+      
+      <a href="/blog/tags" >Tags</a>
+    
+      
+      <a href="/blog/archives" >Archives</a>
+    
+      
+      <a href="/" >About</a>
+    
+  </nav>
+</header>
+
+
+    <div class="Banner">
+  <div class="Container Container-flex Container--wrap">
+    <h1 class="Banner-heading">Configure RSpec for multiple databases with Database Cleaner support</h1>
+
+    
+      <p class="Banner-information">
+        <time>April 22, 2020</time>
+      </p>
+    
+  </div>
+</div>
+
+
+    <div class="Content Container Container-flex">
+      <article class="Post">
+  
+
+
+
+
+
+  <p>When working with multiple databases, code can
+become intertangled with records spanning across the systems. Seperating
+database domain reponsibilities away from each other is challenging but a good
+end goal. Sometimes this isn’t possible which in the case of testing clean-up
+can make for some tricky configuration details.
+<!--excerpt--></p>
+
+<h2 id="setting-up-multiple-databases">Setting up multiple databases</h2>
+
+<p>First you’ll want to create multiple <code class="language-plaintext highlighter-rouge">database.yml</code> files within your <code class="language-plaintext highlighter-rouge">config/</code>
+directory. These should be named appropriately to your external databases. For example:</p>
+
+<ul>
+  <li>statistics_database.yml</li>
+  <li>events_database.yml</li>
+  <li>database.yml (for core application)</li>
+</ul>
+
+<p><a href="https://guides.rubyonrails.org/active_record_multiple_databases.html">Unless you’re running Rails 6.0</a>, multiple database support will be a manual process for schema and migration loading. Running SQL commands in the console isn’t sustainable in the long run
+so I recommend checking out <a href="http://www.ostinelli.net/setting-multiple-databases-rails-definitive-guide/">Robert Ostinelli’s post</a> which has a section on setting up
+Rake tasks for each database.</p>
+
+<p>Back to your <code class="language-plaintext highlighter-rouge">database.yml</code> files, they should each follow the best practices set forth from <a href="https://edgeguides.rubyonrails.org/configuring.html#configuring-a-database">Rails Guides</a>.</p>
+
+<p>Once created, we can use namespaces to segment models based on database. This allows
+for a discrete namespace to database mapping. I’ve written a brief example below
+of what this would look like for the <code class="language-plaintext highlighter-rouge">statistics_database.yml</code> configuration within
+the <code class="language-plaintext highlighter-rouge">Statistics</code> namespace.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Statistics</span>
+  <span class="c1"># Directly loads YAML configuration from filesystem by current Rails environment</span>
+  <span class="no">DATABASE</span> <span class="o">=</span> <span class="no">YAML</span><span class="p">.</span><span class="nf">load_file</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="no">Rails</span><span class="p">.</span><span class="nf">root</span><span class="p">,</span> <span class="s2">"config"</span><span class="p">,</span> <span class="s2">"statistics_database.yml"</span><span class="p">))[</span><span class="no">Rails</span><span class="p">.</span><span class="nf">env</span><span class="p">]</span>
+
+  <span class="k">class</span> <span class="nc">ApplicationRecord</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+
+    <span class="c1"># Ensure that this class:</span>
+    <span class="c1"># * cannot be instantiated</span>
+    <span class="c1"># * does not represent an available database table</span>
+    <span class="nb">self</span><span class="p">.</span><span class="nf">abstract_class</span> <span class="o">=</span> <span class="kp">true</span>
+
+    <span class="c1"># Connect to the secondary database</span>
+    <span class="c1"># NOTE: We use this in the base class and have new models inherit from it</span>
+    <span class="c1">#       to limit how many database connections are active at one time.</span>
+    <span class="n">establish_connection</span> <span class="no">DATABASE</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">ActiveRecord::Base.establish_connection</code> or just <code class="language-plaintext highlighter-rouge">establish_connection</code> since we’re
+inside the ActiveRecord::Base scope, allows for direct connection to a new database
+based on the supplied configuration.</p>
+
+<p><code class="language-plaintext highlighter-rouge">YAML.load_file(File.join(Rails.root, "config", "statistics_database.yml"))[Rails.env]</code> really just says: Build a filepath, supply it to YAML.load_file, and extract out environment
+specific configuration values. Here’s an example of it in the console:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>YAML.load_file(File.join(Rails.root, "config", "statistics_database.yml"))[Rails.env]
+=&gt; {"adapter"=&gt;"postgresql", "host"=&gt;"localhost", "username"=&gt;"postgres", "encoding"=&gt;"unicode", "database"=&gt;"statistics_development", "pool"=&gt;5}
+</code></pre></div></div>
+
+<p>Finally <code class="language-plaintext highlighter-rouge">self.abstract_class</code> ensures we never directly use this class but instead have
+other classes inherit from it. Additionally, it ensures that it doesn’t map to a database
+table.</p>
+
+<p>Now that we’ve setup a second database connection what about testing multiple
+databases?</p>
+
+<h2 id="database-cleaner-configuration">Database Cleaner Configuration</h2>
+
+<p>Database Cleaner is a fantastic gem for making test cleanup and teardown simple.
+We’re going to work with a simple configuration which looks like the following:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:suite</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean_with</span><span class="p">(</span><span class="ss">:truncation</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">strategy</span> <span class="o">=</span> <span class="ss">:transaction</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">start</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">append_after</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Now presently this will only connect to the default database for the application.
+Not a great situation if we want to ensure data remains cleaned up before/after
+tests. Similar to the ApplicationRecord abstract model above, we’ll need to
+connect to the database using <code class="language-plaintext highlighter-rouge">establish_connection</code>. I’ve made the assumption that
+you’ve followed the first part of the guide settings up constants in the respective
+namespaces: <code class="language-plaintext highlighter-rouge">Statistics::DATABASE</code>, <code class="language-plaintext highlighter-rouge">Events::DATABASE</code>, <code class="language-plaintext highlighter-rouge">Core::DATABASE</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:suite</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Statistics</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean_with</span><span class="p">(</span><span class="ss">:truncation</span><span class="p">)</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Events</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean_with</span><span class="p">(</span><span class="ss">:truncation</span><span class="p">)</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Core</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean_with</span><span class="p">(</span><span class="ss">:truncation</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Statistics</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">strategy</span> <span class="o">=</span> <span class="ss">:transaction</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">start</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Events</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">strategy</span> <span class="o">=</span> <span class="ss">:transaction</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">start</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Core</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">strategy</span> <span class="o">=</span> <span class="ss">:transaction</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">start</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">append_after</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Statistics</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Events</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Core</span><span class="o">::</span><span class="no">DATABASE</span>
+    <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Verbose no? We have to specify the Database Cleaner configuration for each database connection. We’ll make this better in a second.</p>
+
+<p>One thing that isn’t clear from above is that the database connections above
+are order dependent. Meaning <strong>the last <code class="language-plaintext highlighter-rouge">establish_connection</code> call should be to
+your core application database</strong>. I’m not completely certain why this is but it seems
+like without it the database won’t be setup properly.</p>
+
+<h2 id="improving-database-cleaner">Improving Database Cleaner</h2>
+
+<p>So the above is really wordy. Let’s imagine that you have 10 external databases to
+connect to. That is a lot of repetition. Luckily we can lean into the <code class="language-plaintext highlighter-rouge">yield</code> keyword
+here to make it simple. Additionally, we can enforce the order of database connections.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">EXTERNAL_DATABASE_CONNECTIONS</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="no">Statistics</span><span class="o">::</span><span class="no">DATABASE</span><span class="p">,</span>
+  <span class="no">Events</span><span class="o">::</span><span class="no">DATABASE</span>
+<span class="p">]</span>
+
+<span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:suite</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">connect_to_available_databases</span> <span class="k">do</span>
+      <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean_with</span><span class="p">(</span><span class="ss">:truncation</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">connect_to_available_databases</span> <span class="k">do</span>
+      <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">strategy</span> <span class="o">=</span> <span class="ss">:transaction</span>
+      <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">start</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">append_after</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">connect_to_available_databases</span> <span class="k">do</span>
+      <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">connect_to_available_databases</span>
+    <span class="no">EXTERNAL_DATABASE_CONNECTIONS</span><span class="p">.</span><span class="nf">concat</span><span class="p">(</span><span class="no">Core</span><span class="o">::</span><span class="no">Database</span><span class="p">).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">db_connection</span><span class="o">|</span>
+      <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="n">db_connection</span>
+      <span class="k">yield</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>From the above we’ve defined a new array to contain all available external
+database connections (<code class="language-plaintext highlighter-rouge">EXTERNAL_DATABASE_CONNECTIONS</code>).</p>
+
+<p>Next, we have a new method <code class="language-plaintext highlighter-rouge">#connect_to_available_databases</code> which takes the
+array and concatenates the core (or default application) database onto the end of the
+array to ensure it it loaded last.</p>
+
+<p>We then establish_connection directly to ActiveRecord::Base like we’ve been doing.</p>
+
+<p>Finally, the <code class="language-plaintext highlighter-rouge">yield</code> keyword allows us to use a block syntax and pass in the Database Cleaner
+configuration to be executed against the currently connected database. Looking at the current code again, the following:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">connect_to_available_databases</span> <span class="k">do</span>
+  <span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>will translate to</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Statistics</span><span class="o">::</span><span class="no">DATABASE</span>
+<span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+<span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Events</span><span class="o">::</span><span class="no">DATABASE</span>
+<span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+<span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">establish_connection</span> <span class="no">Core</span><span class="o">::</span><span class="no">DATABASE</span>
+<span class="no">DatabaseCleaner</span><span class="p">.</span><span class="nf">clean</span>
+</code></pre></div></div>
+
+<p>With this final change Database Cleaner is configured to run for multiple databases. Now
+go write some tests!</p>
+
+
+  <!-- Prev Posts -->
+  <div class="Post-actions">
+    
+      <a class="Post-actions--prev TooltipContainer" href="/blog/configuring-letter-opener-for-hanami-development-environment/" alt="Configuring Letter Opener for Hanami development environment">&#171; Previous Post<div class="TooltipContainer-text TooltipContainer-text--post">Configuring Letter Opener for Hanami development environment</div></a>
+    
+    
+      <a class="Post-actions--next TooltipContainer" href="/blog/fix-missing-template-for-request-format-and-variant-while-testing-ajax-request-in-request-spec/" alt="Fix "missing template for request format and variant" while testing Ajax request in a Request Spec">Next Post &#187;<div class="TooltipContainer-text TooltipContainer-text--post">Fix "missing template for request format and variant" while testing Ajax request in a Request Spec</div></a>
+    
+  </div>
+
+  <!-- Comments System -->
+  <div class="Comments">
+    <h2>Join the conversation</h2>
+
+    <div id="disqus_thread"></div>
+  </div>
+
+  <script type="text/javascript">
+      var disqus_shortname = 'joshmfrankel';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+    </div>
+
+    <footer class="Footer">
+  <div class="Container Container-flex Container--smallMargin">
+    <section class="Footer-links">
+      
+        
+        <a href="/blog" >Blog</a>
+      
+        
+        <a href="/blog/categories" >Categories</a>
+      
+        
+        <a href="/blog/tags" >Tags</a>
+      
+        
+        <a href="/blog/archives" >Archives</a>
+      
+        
+        <a href="/" >About</a>
+      
+    </section>
+  </div>
+
+  <div class="Footer-actions">
+    <div class="Container Container--smallMargin">
+      <div class="FooterActions">
+        <section class="FooterActions-posts">
+          <h2 class="FooterActions-title">Latest Posts</h2>
+          <nav>
+            
+              <a href="/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">When is an Array an Array? Strategies for checking Array equality in Ruby</a>
+            
+              <a href="/blog/how-to-fix-homebrew-postgres-error-256/">How to fix homebrew postgres error 256</a>
+            
+              <a href="/blog/dont-slack-on-site-reliability/">Don't Slack on Site Reliability</a>
+            
+              <a href="/blog/creating-blurred-background-images-with-overlay-text-in-css/">Creating blurred background images with overlay text in CSS</a>
+            
+              <a href="/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</a>
+            
+              <a href="/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</a>
+            
+          </nav>
+        </section>
+
+        <section class="FooterActions-contact">
+          <h2 class="FooterActions-title">Get in Contact with Me</h2>
+          <nav>
+            <a href="mailto:joshmfrankel+website@gmail.com">
+              <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;
+              I'm easy to get a hold of
+            </a>
+
+            <a href="https://github.com/joshmfrankel">
+              <i class="fab fa-github-alt" aria-hidden="true"></i>&nbsp;
+              I have no (git) commit hangups
+            </a>
+
+            <a href="https://rubyonrails-link.slack.com/messages/@joshmfrankel/">
+              <i class="fab fa-slack-hash" aria-hidden="true"></i>&nbsp;
+              I share what I learn
+            </a>
+
+            <a href="https://stackoverflow.com/users/906974/josh-frankel">
+              <i class="fab fa-stack-overflow" aria-hidden="true"></i>&nbsp;
+              I give back to the community
+            </a>
+
+            <a href="https://twitter.com/Joshmfrankel">
+              <i class="fab fa-twitter" aria-hidden="true"></i>&nbsp;
+              I like to be social
+            </a>
+
+            <a href="https://www.linkedin.com/in/joshmfrankel/">
+              <i class="fab fa-linkedin" aria-hidden="true"></i>&nbsp;
+              I take professionalism seriously
+            </a>
+          </nav>
+        </section>
+      </div>
+
+      <section class="Footer-actions-copyright">
+        <p>© 2011-2023+ Josh Frankel. Development Simplified. All rights reserved</p>
+      </section>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40607351-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+  </body>
+</html>

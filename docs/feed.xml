@@ -1,0 +1,1488 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.2">Jekyll</generator><link href="http://joshfrankel.me/feed.xml" rel="self" type="application/atom+xml" /><link href="http://joshfrankel.me/" rel="alternate" type="text/html" /><updated>2023-07-28T14:23:19+00:00</updated><id>http://joshfrankel.me/feed.xml</id><title type="html">Development Simplified</title><subtitle>A blog about ruby, sql, performance, and patterns. By Josh Frankel.
+</subtitle><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><entry><title type="html">When is an Array an Array? Strategies for checking Array equality in Ruby</title><link href="http://joshfrankel.me/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/" rel="alternate" type="text/html" title="When is an Array an Array? Strategies for checking Array equality in Ruby" /><published>2023-07-28T00:00:00+00:00</published><updated>2023-07-28T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby</id><content type="html" xml:base="http://joshfrankel.me/blog/when-is-an-array-an-array-strategies-for-checking-array-equality-in-ruby/">&lt;p&gt;Object equality is an interesting topic. You can check for matching values (with or without ordering). You can
+also check to see if the object has the same in-memory id. I’ve written code to diff two arrays before but
+I’ve never sat down to think about all the ways to accomplish this. Also I was able to explore what I believe
+are the most optimal approaches.&lt;/p&gt;
+
+&lt;!--excerpt--&gt;
+
+&lt;h2 id=&quot;basic-equality&quot;&gt;Basic equality&lt;/h2&gt;
+&lt;p&gt;The most basic example of checking two objects is the equality method &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;==&lt;/code&gt;. This is a common check done between Ruby
+objects and Array is no different. So what exactly does it do? According to the documentation, it will check the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.size&lt;/code&gt;
+of both arrays along with each individual index value against the other array. Looking at the &lt;a href=&quot;https://ruby-doc.org/3.2.2/Array.html#method-i-3D-3D&quot;&gt;source code for == in Ruby 3.2.2&lt;/a&gt;
+we can see this at work:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;rb_ary_equal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;VALUE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ary1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;VALUE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ary1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Qtrue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;RB_TYPE_P&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;T_ARRAY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rb_respond_to&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;idTo_ary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Qfalse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rb_equal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ary1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;RARRAY_LEN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ary1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;RARRAY_LEN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Qfalse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;RARRAY_CONST_PTR_TRANSIENT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ary1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;RARRAY_CONST_PTR_TRANSIENT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Qtrue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rb_exec_recursive_paired&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recursive_equal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ary1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ary2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The first conditional checks to see if the arrays are identical in memory:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;if (ary1 == ary2) return Qtrue;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;The third conditional is an early return false if the size of the two array’s doesn’t match:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;if (RARRAY_LEN(ary1) != RARRAY_LEN(ary2)) return Qfalse;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;The last line is a recursive call which I assume is the iteratively check every index’s value
+against the other array. The remainder of the method (conditional 2 and 4) I’m less sure about but looking
+at the code they both can perform early returns to break out of the recursive method call. Assumedly either
+when there are no more indexes to check against or the arrays are found not to match.&lt;/p&gt;
+
+&lt;p&gt;Now working our way back to the higher-level Ruby implementation, what does a practical example of this look like?&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The above checks the two arrays against each other and finds them identical.&lt;/p&gt;
+
+&lt;p&gt;There are two other strategies you can take here. Both the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Array#eql?&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Array#&amp;lt;=&amp;gt;&lt;/code&gt; methods will allow you to check array equality. They work
+  slightly differently from each other:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Array#eql?&lt;/code&gt; - Similiar to Array#== but utilizes Object#== internally&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Array#&amp;lt;=&amp;gt;&lt;/code&gt; - Generally used within sort_by blocks to check difference in arrays. Returns 0 for matching, 1 when there are extra indexes, and -1 when there are missing indexes.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here’s a quick example of each:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;eql?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; true&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Spaceship operator returns: 0 (equal), -1 (elements less than other array), 1 (elements more than other array)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Personally, I find &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;==&lt;/code&gt; to be the easiest to read. This is all well and good but what happens if the arrays are in different orders?&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now they are no longer equivalent according to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;==&lt;/code&gt;. So from this we can infer that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;==&lt;/code&gt; is order-dependent. We’ll need
+another strategy in order, ;-), to test for equality properly.&lt;/p&gt;
+
+&lt;h2 id=&quot;equality-without-order-dependence&quot;&gt;Equality without order dependence&lt;/h2&gt;
+
+&lt;p&gt;Using our above example, let’s say we want the two arrays to return true when checking equality. We don’t care if they
+are in the same order just that they contain the same elements. We can achieve that simply by first sorting the arrays.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sort&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The above ensures that the array elements are sorted using the same algorithm keeping them in identical ordering.&lt;/p&gt;
+
+&lt;p&gt;Now there is the additional processing overhead of having to first sort the arrays (1 iteration per array) and then check the index
+values against the other array (another iteration). This means that it will be slightly less efficient in checking since it
+needs to iterate once on each array and then another time to check for equality.&lt;/p&gt;
+
+&lt;p&gt;Before we improve efficiency, let’s throw another challenge in the mix. What happens if one of the array’s contains duplicate elements?&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sort&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Even though array_1 and array_2 have the exact same values within them, array_2 contains duplicates of the value 2. This
+fails the equality check.&lt;/p&gt;
+
+&lt;h2 id=&quot;equality-without-duplicates&quot;&gt;Equality without duplicates&lt;/h2&gt;
+
+&lt;p&gt;Taking a line from the above approach we can add yet another iteration to our arrays ontop of the existing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.sort&lt;/code&gt; to
+remove the duplicate values. We achieve this by using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.uniq&lt;/code&gt; which iterates through the array and removes duplicates.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;uniq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sort&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;uniq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sort&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We’ve now succeeded in checking the equality between two arrays without regard for order or duplicate values. Internally sort and uniq work like so:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;#uniq&lt;/code&gt; - “self is traversed in order, and the &lt;a href=&quot;https://apidock.com/ruby/Array/first&quot;&gt;first&lt;/a&gt; occurrence is kept.”&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;#sort&lt;/code&gt; - “Comparisons for the &lt;a href=&quot;https://apidock.com/ruby/Array/sort&quot;&gt;sort&lt;/a&gt; will be done using the &amp;lt;=&amp;gt; operator”&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Now each array undergoes two iterations (sort and uniq) before finally having an equality iteration. This becomes even
+less efficient and requires a bit more overhead to understand. There’s one more Array strategy I want to discuss next regarding
+array intersections before moving onto my preferred strategy.&lt;/p&gt;
+
+&lt;h2 id=&quot;equality-with-array-intersection&quot;&gt;Equality with Array intersection&lt;/h2&gt;
+
+&lt;p&gt;This approach utilizes a lesser used syntax to perform an &lt;a href=&quot;https://ruby-doc.org/3.2.2/Array.html#method-i-26&quot;&gt;array intersection&lt;/a&gt;. An array intersection means to take
+two arrays and find the common elements without duplicates. It utilizes the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Array#&amp;amp;&lt;/code&gt; syntax like I’ve demostrated below:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; [1, 2, 3]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I’ve split the above into two steps. The first is performing the intersection on the two arrays. The result of doing this
+is a new array that contains common values using the ordering of the first array utilizes. By using that last statement,
+we know that if the ordering of the first array is used and duplicates are removed then if the result is equal to the
+first array the arrays must be equivalent. Shown as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;(array_1 &amp;amp; array_2) == array_1&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Internally this is iterating through values along with checking for duplicates with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;eql?&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Outside of the Array class there is an alternative which I find to be highly readable in code. Let’s take a look at an
+improved readability approach.&lt;/p&gt;
+
+&lt;h2 id=&quot;array-equality-with-sets&quot;&gt;Array Equality with Sets&lt;/h2&gt;
+
+&lt;blockquote class=&quot;Info Info--full&quot;&gt;
+  
+
+  &lt;p&gt;
+    &lt;i class=&quot;fas fa-quote-left&quot;&gt;&lt;/i&gt;
+    Set implements a collection of unordered values with no duplicates. This is a hybrid of Array&apos;s intuitive inter-operation facilities and Hash&apos;s fast lookup.
+  &lt;/p&gt;
+
+  
+    &lt;a href=&quot;https://ruby-doc.org/stdlib-2.7.1/libdoc/set/rdoc/Set.html&quot;&gt;https://ruby-doc.org/&lt;/a&gt;
+  
+&lt;/blockquote&gt;
+
+&lt;p&gt;A Set is like an array but by definition is an enumerable without duplicates and order independent. Therefore we can convert
+our arrays to Sets and achieve the same effect as we did with the chained &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.uniq.sort&lt;/code&gt; above.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;no&quot;&gt;Set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; true&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;array_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_set&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;array_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_set&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Very clean looking and readable. Interestingly enough, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Set#==&lt;/code&gt; internally uses &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Object#==&lt;/code&gt; identically to have &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Array#eql?&lt;/code&gt; achieves
+equality checks. &lt;a href=&quot;https://ruby-doc.org/stdlib-2.7.1/libdoc/set/rdoc/Set.html#method-i-3D-3D&quot;&gt;Here’s the documentation for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Set#==&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;so-which-strategy-is-the-best&quot;&gt;So which strategy is the best?&lt;/h2&gt;
+
+&lt;p&gt;Honestly, it depends. Personally I believe that the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Set.new&lt;/code&gt; approach above is the most elegant and simplest solution to understand, though there
+are merits to the explict straightforwardness of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.uniq.sort&lt;/code&gt; or the slickness of array intersection. Ultimately, its up to you to decide which is best for
+your own coding style. I will say that one of the above strategies may prove to be more performant than another. My guess would be
+that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Set.new&lt;/code&gt; is the fastest strategy but I have not performed benchmarks to verify this.&lt;/p&gt;
+
+&lt;p&gt;Do you have another Array equality strategy I missed? Know of a more efficient method? I’d love to discuss in the comments below.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="ruby" /><summary type="html">Object equality is an interesting topic. You can check for matching values (with or without ordering). You can also check to see if the object has the same in-memory id. I’ve written code to diff two arrays before but I’ve never sat down to think about all the ways to accomplish this. Also I was able to explore what I believe are the most optimal approaches.</summary></entry><entry><title type="html">How to fix homebrew postgres error 256</title><link href="http://joshfrankel.me/blog/how-to-fix-homebrew-postgres-error-256/" rel="alternate" type="text/html" title="How to fix homebrew postgres error 256" /><published>2023-07-20T00:00:00+00:00</published><updated>2023-07-20T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/how-to-fix-homebrew-postgres-error-256</id><content type="html" xml:base="http://joshfrankel.me/blog/how-to-fix-homebrew-postgres-error-256/">&lt;p&gt;At home, I’m a Linux user but at work most companies use Mac for engineers. It’s been
+a couple years since I’ve used Mac so I’m learning my way back around it along with
+Homebrew. One issue I ran into the other day was postgresql service not starting
+sucessfully. No amount of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;brew services restart postgresql&lt;/code&gt; would fix it. Turns
+out to be a pretty simple fix.&lt;/p&gt;
+
+&lt;!--excerpt--&gt;
+
+&lt;p&gt;I first noticed the issue when trying to run a Ruby on Rails server locally. The response
+from running &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails s&lt;/code&gt; looked something like:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;psql: could not connect to server: No such file or directory
+    Is the server running locally and accepting
+    connections on Unix domain socket &lt;span class=&quot;s2&quot;&gt;&quot;/tmp/.s.PGSQL.5432&quot;&lt;/span&gt;?
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Alright, so this is saying the server isn’t running or listening to requests. Checking
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;brew services list&lt;/code&gt; to see the output rendered:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/brew-service-list.png&quot; alt=&quot;Brew services list output&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Next was looking up what a 256 error which led me to an excellent &lt;a href=&quot;https://stackoverflow.com/questions/39710384/cannot-connect-to-postgres-server-running-through-brew-services&quot;&gt;StackOverflow post&lt;/a&gt;.
+Following the post suggested three step process of: stopping the service, removing the pid file, and restarting the service.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/brew-services-stop.png&quot; alt=&quot;Brew services stop output&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The pid file can be found in one of two locations:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/usr/local/var/postgres/postmaster.pid&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/opt/homebrew/var/postgresql/postmaster.pid&lt;/code&gt; (Apple M1)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I found mine within the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/opt/&lt;/code&gt; directory. Last was just restarting the service.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/brew-services-start.png&quot; alt=&quot;Brew services start output&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After this running &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails s&lt;/code&gt; worked as expected.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading it was a quick one.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="mac" /><category term="postgres" /><summary type="html">At home, I’m a Linux user but at work most companies use Mac for engineers. It’s been a couple years since I’ve used Mac so I’m learning my way back around it along with Homebrew. One issue I ran into the other day was postgresql service not starting sucessfully. No amount of brew services restart postgresql would fix it. Turns out to be a pretty simple fix.</summary></entry><entry><title type="html">Don’t Slack on Site Reliability</title><link href="http://joshfrankel.me/blog/dont-slack-on-site-reliability/" rel="alternate" type="text/html" title="Don&apos;t Slack on Site Reliability" /><published>2023-01-17T00:00:00+00:00</published><updated>2023-01-17T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/dont-slack-on-site-reliability</id><content type="html" xml:base="http://joshfrankel.me/blog/dont-slack-on-site-reliability/">&lt;p&gt;Alright, bit of a clickbait title but if you know me you’ll know my love for
+bad puns. Ensuring a healthy running application is an important part of your
+infrastructure reliability. Site Reliabiltiy is an entire discipline by itself as there
+are a wealth of topics and concepts associated with it. That being said having
+really solid Site Reliability as a start-up isn’t always the first priority.
+This article details some of the steps I’ve taken to have basic application
+monitoring in place easily and cheaply.&lt;/p&gt;
+
+&lt;!--excerpt--&gt;
+
+&lt;p&gt;Going into this article I’ll assume you have an error reporting service tracking
+application errors, &lt;a href=&quot;https://www.honeybadger.io/&quot;&gt;I use Honeybadger&lt;/a&gt;, along with
+a communication platform, such as Slack.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/dangerous-to-go-alone.jpg&quot; alt=&quot;Its dangerous to go alone. Take this. Honeybadger and Slack&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;site-reliability-and-start-up-life&quot;&gt;Site Reliability and Start-up life&lt;/h1&gt;
+
+&lt;p&gt;Start-ups are scrappy little things that move fast and break things. This mentality
+really resonates with me as you can get a lot done if you practice “good enough” programming. However,
+we still need a way to ensure if (more like when) we break things we are able to recover and track them.
+With that said here are the goals we’re looking to gain greater visibility with:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Error Reporting&lt;/li&gt;
+  &lt;li&gt;Application uptime&lt;/li&gt;
+  &lt;li&gt;Infrastructure &amp;amp; Service outtages&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Slack happens to be a great tool for ensuring communication stays open between contributors
+within an organization. I find myself nowadays using it almost exclusively over Email.
+Given how often I’m in there I wanted to also consolidate my application notifications there as well.
+This helps avoid context switching between external services, email, etc.&lt;/p&gt;
+
+&lt;p&gt;With that in mind let’s dig into making a foundational site reliability layer for our application.&lt;/p&gt;
+
+&lt;h1 id=&quot;errors-in-realtime&quot;&gt;Errors in realtime&lt;/h1&gt;
+
+&lt;p&gt;First off we’ll need some new channels in Slack to monitor application statuses. You can name these however you want. I
+personally used the following: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devops&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devops-staging&lt;/code&gt; to denote production and staging environments.&lt;/p&gt;
+
+&lt;p&gt;In your Error Reporting service of choice (again we’ll be using Honeybadger), there should be some way of
+setting up and integration for Slack. Honeybadger’s is &lt;strong&gt;located under Settings -&amp;gt; Alerts &amp;amp; Integrations&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/honeybadger-integration.png&quot; alt=&quot;Honeybadger create integration&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This will send you through an Oauth process and ask permission from Slack to post to a specific
+channel on behalf of the Honeybadger bot.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/honeybadger-oauth.png&quot; alt=&quot;Slack authorizing Honeybadger OAuth&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;From this point you can decide what types of Error messaging is sent to your Slack channel. Additionally,
+you can specify environment to monitor. This is super useful for our first channel &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devops&lt;/code&gt; as it can focus
+on production and demo environments which are high-impact to customers. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devops-staging&lt;/code&gt; can instead specify
+staging and review environments while still important can be moved to a seperate channel. It’s a good idea
+to expose errors in both your production and staging environments, as staging can give you early warning to
+an issue that is about to be deployed to production.&lt;/p&gt;
+
+&lt;blockquote class=&quot;Info Info--full&quot;&gt;
+  
+
+  &lt;p&gt;
+    &lt;i class=&quot;fas fa-quote-left&quot;&gt;&lt;/i&gt;
+    It&apos;s a good idea
+to expose errors in both your production and staging environments, as staging can give you early warning to
+an issue that is about to be deployed to production.
+  &lt;/p&gt;
+
+  
+&lt;/blockquote&gt;
+
+&lt;p&gt;With this in place, you’ll begin seeing errors appear in real-time within Slack. A tip with managing Error Reporting
+services, is to always ensure the total number of unresolved errors is zero. As errors emerge they should be immediately
+remediated either through code or leaving comments on them within the Error Reporting service.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/honeybadger-slack-error.png&quot; alt=&quot;Slack displaying Honeybadger error&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Conviently having your errors within Slack allows fast notification as well as helpful actions that can be taken
+directly from Slack.&lt;/p&gt;
+
+&lt;h1 id=&quot;application-uptime&quot;&gt;Application uptime&lt;/h1&gt;
+
+&lt;p&gt;In addition to error reporting, we also want to know if the application stops responding to web requests. This is known
+as application uptime. When this occurs it should be resolved immediately to reduce service disruption.
+Honeybadger still has our back here as there is a specific page for uptime checks.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/honeybadger-uptime-setup.png&quot; alt=&quot;Honeybadger uptime setup page&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Using your production application’s url, will allow Honeybadger to periodically check to ensure a 200 success is received. If at
+any point the check fails (or a redirect occurs), it will notify the Honeybadger service. In order to put this into Slack
+as well we’ll need to modify the previously created Slack integration (reminder: Settings -&amp;gt; Alerts &amp;amp; Integrations). On the
+integration setup page there is a section down the page which allows for us to attach configured uptime checks to the Slack
+integration&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/honeybadger-uptime-integration.png&quot; alt=&quot;Honeybadger uptime integration setup&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you look on the right side of the above picture, you’ll see Uptime Sites “marketing site”. I find it useful if you
+are running an application which has both a marketing url and application url if both are monitored through your Slack
+notifications. With this in place we’ll start receiving alerts for application outtages.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/slack-honeybadger-uptime-alert.png&quot; alt=&quot;Slack notification from Honeybadger on application uptime&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;infrastructure--service-outtages&quot;&gt;Infrastructure &amp;amp; Service outtages&lt;/h1&gt;
+
+&lt;p&gt;Similiar to Application Uptime, we have external services which our application relies on but which we have little
+to no control over. Such services as Heroku, Github, AWS, and others which power web applications. We’d like to be aware
+of these in case customers (and internal team members) experience issues that we can describe the underlying issue with
+clarity.&lt;/p&gt;
+
+&lt;p&gt;We still want to see these outtages within Slack. So how do we accomplish that? There are definitely some plugins (most paid)
+which allow for setting up uptime alerts but there’s a free and simple way to get these. Slack gives access to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/feed&lt;/code&gt;
+command which allows a specific channel to subscribe to an RSS or atom news feed. Given that most services have status pages
+with subscription options we can leverage that to add these to a feed listing.&lt;/p&gt;
+
+&lt;p&gt;Often services use the naming convention of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;status.service-name.com&lt;/code&gt; for their status page. Generally these contain
+methods for subscribing to the raw feed url. Sometimes these urls are hidden or require subscribing with an email. Heroku’s
+for instance is in a drop-down menu under their RSS icon labeled “Heroku Status”.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/heroku-status-feed.png&quot; alt=&quot;Heroku status feed&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Mailgun on the other hand is much easier to find being under the subscribe menu’s rss icon.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/mailgun-rss.png&quot; alt=&quot;Mailgun status feed&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once you’ve discovered the feed urls for your services, you can easily add them to a Slack channel using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/feed subscribe url-to-feed&lt;/code&gt;.
+I’d recommend these are added to a seperate channel than &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devops&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devops-staging&lt;/code&gt;. Personally I used &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vendor-status&lt;/code&gt;. With this
+in place you’ll begin to see notifications for infrastructure service disruptions.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2023/github-status-feed.png&quot; alt=&quot;Github service disruption Slack message&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;With the above in place, we have a basic level of monitoring in place for our early application. This allows for application
+status to be communicated through Slack giving greater visibility and faster remediation response times.&lt;/p&gt;
+
+&lt;p&gt;Like I’ve mentioned before this is geared towards a start-up application. That is an early application. This is not meant
+to be a in-depth or full harness for monitoring an application. Merely this is a way to keep a pulse on application health
+while at the beginning stages of a new product.&lt;/p&gt;
+
+&lt;p&gt;What’d you think of moving application status into Slack? Got a tip that could be added to this article? I’d love
+to discuss in the comments below.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="site reliability" /><summary type="html">Alright, bit of a clickbait title but if you know me you’ll know my love for bad puns. Ensuring a healthy running application is an important part of your infrastructure reliability. Site Reliabiltiy is an entire discipline by itself as there are a wealth of topics and concepts associated with it. That being said having really solid Site Reliability as a start-up isn’t always the first priority. This article details some of the steps I’ve taken to have basic application monitoring in place easily and cheaply.</summary></entry><entry><title type="html">Creating blurred background images with overlay text in CSS</title><link href="http://joshfrankel.me/blog/creating-blurred-background-images-with-overlay-text-in-css/" rel="alternate" type="text/html" title="Creating blurred background images with overlay text in CSS" /><published>2022-08-09T12:18:00+00:00</published><updated>2022-08-09T12:18:00+00:00</updated><id>http://joshfrankel.me/blog/creating-blurred-background-images-with-overlay-text-in-css</id><content type="html" xml:base="http://joshfrankel.me/blog/creating-blurred-background-images-with-overlay-text-in-css/">&lt;p&gt;Blurring images is a common style on the web. It can give needed contrast and visual
+interest. Now you can pre-blur an image with a photo editing program, but for the
+purpose of this article we’ll be focused on CSS approaches.&lt;/p&gt;
+
+&lt;!--excerpt--&gt;
+
+&lt;h2 id=&quot;a-simple-animated-blur&quot;&gt;A Simple Animated Blur&lt;/h2&gt;
+
+&lt;p&gt;The first type of blur is for background images that &lt;strong&gt;don’t&lt;/strong&gt; have content overlays. They are simply an image that needs to be blurred out.
+This can be useful for blurring an image and then bringing it into focus when the hover state is activated. Try hovering over the following background image.&lt;/p&gt;
+
+&lt;style&gt;
+  .demo-container {
+    outline: 1px solid #000;
+    width: 150px;
+  }
+  .simple-background {
+    height: 150px;
+    width: 150px;
+    background-image: url(/img/2022/brave-browser.png);
+    background-size: cover;
+    filter: blur(30px);
+    transition: 100ms filter linear;
+  }
+  .simple-background:hover {
+    filter: none;
+  }
+&lt;/style&gt;
+
+&lt;div class=&quot;demo-container&quot;&gt;
+  &lt;div class=&quot;simple-background&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This is achieved by using the following css:&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;.simple-background&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;150px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;150px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background-image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;sx&quot;&gt;url(/img/2022/brave-browser.png)&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background-size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cover&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blur&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;30px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;transition&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100ms&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;linear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;.simple-background&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:hover&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;none&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;First we set a Gaussian blur on the element using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;filter: blur(30px);&lt;/code&gt;. Next after we’ve set the url for the background-image we supply&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;background-size: cover;&lt;/code&gt;. This scales the image to fit the container and helps o avoid a tiling effect. Next a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;transition: 100ms filter linear;&lt;/code&gt; on the starting style to allow for the element to transition its blur effect. Last, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;filter: none;&lt;/code&gt; is used when hovering over the element.&lt;/p&gt;
+
+&lt;h2 id=&quot;a-blurred-image-with-overlay-text&quot;&gt;A blurred image with overlay text&lt;/h2&gt;
+
+&lt;p&gt;Things become more complex if you want to blur the background while also having a text overlay. Let’s take a look at the following example:&lt;/p&gt;
+
+&lt;style&gt;
+  .content-example {
+    background-image: url(/img/2022/brave-browser.png);
+    height: 150px;
+    width: 150px;
+    background-size: cover;
+    position: relative;
+  }
+  .content-example--badBlur {
+    filter: blur(30px);
+  }
+  .content-example p {
+    color: #fff;
+    background: #ccc;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 40% 0%;
+  }
+&lt;/style&gt;
+
+&lt;div class=&quot;demo-container&quot;&gt;
+  &lt;div class=&quot;content-example&quot;&gt;
+    &lt;p&gt;Sample content&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;content-example&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;p&amp;gt;&lt;/span&gt;Sample content&lt;span class=&quot;nt&quot;&gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We have content that needs to sit on top of a background-image. Watch what happens
+if we try to blur the background-image by adding &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;filter: blur(30px);&lt;/code&gt; to the .content-example class.&lt;/p&gt;
+
+&lt;div class=&quot;demo-container&quot;&gt;
+  &lt;div class=&quot;content-example content-example--badBlur&quot;&gt;
+    &lt;p&gt;Sample content&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The inner text also became blurred. This might be obvious since we blurred the parent
+element that all children would also become blurred. So, how do we blur the background-image
+without blurring the text?&lt;/p&gt;
+
+&lt;p&gt;That’s where &lt;strong&gt;backdrop-filter&lt;/strong&gt; comes in handy.&lt;/p&gt;
+
+&lt;h3 id=&quot;introducing-backdrop-filter&quot;&gt;Introducing backdrop filter&lt;/h3&gt;
+
+&lt;p&gt;Backdrop-filter allows you to blur the background behind an element instead of the element
+itself. Now in order for this to work with background-image we’ll need to structure our
+html so that the parent div has the background-image while the inner has the backdrop-filter. Then the inner div needs to fill the remaining width and height to overlay the image.&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;advanced__background&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;advanced__backgroundBody&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;p&amp;gt;&lt;/span&gt;Sample content&lt;span class=&quot;nt&quot;&gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We require one additional div to add the backdrop-filter attribute. From the above
+example &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;advanced__backgroundBody&lt;/code&gt; blurs the background by utilizing the width and height of
+its parent element. So while &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;advanced__backgroundBody&lt;/code&gt; doesn’t have any color applied to it
+the element sits in the same position as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;advanced__background&lt;/code&gt; where the background-image is
+located. This allows for blurring to occur in the background while preserving the foreground text “Sample content”. Below is the matching css for the new HTML structure:&lt;/p&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;.advanced__background&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background-image&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;sx&quot;&gt;url(/img/2022/brave-browser.png)&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;150px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;150px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background-size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cover&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;.advanced__backgroundBody&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  &lt;span class=&quot;nb&quot;&gt;relative&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;py&quot;&gt;backdrop-filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blur&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;30px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;transition&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100ms&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;backdrop-filter&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;linear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;.advanced__backgroundBody&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:hover&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;py&quot;&gt;backdrop-filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;none&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nc&quot;&gt;.advanced__backgroundBody&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#fff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#ccc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;position&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;absolute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;top&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;bottom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;right&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;40%&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Similiar to the simple blur, we need nearly the same css. The main difference as mentioned above
+is that the child div (&lt;strong&gt;advanced__backgroundBody&lt;/strong&gt;) now has &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;backdrop-filter: blur(30px); width: 100%; height: 100%;&lt;/code&gt; set on it. The filter and sizing work together to blur out anything behind the element. We even have a transition for the backdrop while hovering. Here’s the final result:&lt;/p&gt;
+
+&lt;style&gt;
+  .advanced__background {
+    background-image: url(/img/2022/brave-browser.png);
+    height: 150px;
+    width: 150px;
+    background-size: cover;
+  }
+  .advanced__backgroundBody {
+    position:  relative;
+    height: 100%;
+    width: 100%;
+    backdrop-filter: blur(30px);
+    transition: 100ms backdrop-filter linear;
+  }
+  .advanced__backgroundBody:hover {
+    backdrop-filter: none;
+  }
+  .advanced__backgroundBody p {
+    color: #fff;
+    background: #ccc;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 40% 0%;
+  }
+&lt;/style&gt;
+
+&lt;div class=&quot;demo-container&quot;&gt;
+  &lt;div class=&quot;advanced__background&quot;&gt;
+    &lt;div class=&quot;advanced__backgroundBody&quot;&gt;
+      &lt;p&gt;Sample content&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;And that’s it! You now have a background image which is blurred out for effect
+while retaining the legibility of the foreground text.&lt;/p&gt;
+
+&lt;p&gt;As always, thanks for reading.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="css" /><summary type="html">Blurring images is a common style on the web. It can give needed contrast and visual interest. Now you can pre-blur an image with a photo editing program, but for the purpose of this article we’ll be focused on CSS approaches.</summary></entry><entry><title type="html">Lemme pencil you in: Using iCalendar and Rails to sync calendar events</title><link href="http://joshfrankel.me/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/" rel="alternate" type="text/html" title="Lemme pencil you in: Using iCalendar and Rails to sync calendar events" /><published>2022-05-09T00:00:00+00:00</published><updated>2022-05-09T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events</id><content type="html" xml:base="http://joshfrankel.me/blog/lemme-pencil-you-in-using-icalendar-and-rails-to-sync-calendar-events/">&lt;p&gt;If you’ve worked with calendars, then you know the frustration of having two systems not keep events in sync. There are essentially three levels to keeping events in sync. The first is integration with every email provider you wish to support. Not a light initiative. The second is to find a product which aggregates multiple providers into a single API interface. Better solution, but open your wallet. Lastly, build a lightweight system that relies on the iCalendar standard. This last option is the focus of the article. Throughout the remainder of this post, we’ll explore pushing an event to an external provider’s calendar and keeping it in sync across systems without writing a single API request or integration.
+&lt;!--excerpt--&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;what-were-building&quot;&gt;What we’re building&lt;/h2&gt;
+
+&lt;p&gt;To start, let’s say we want an application that stores a calendar event as a database record. What is the easiest way to ensure that the event stays in sync between the database and an attendee’s personal calendar?&lt;/p&gt;
+
+&lt;p&gt;Let’s add some guardrails to this project. This way we can avoid scope creep.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Creating a new calendar event adds it to an attendee’s external calendar application&lt;/li&gt;
+  &lt;li&gt;Updating or cancelling event effect the attendee’s event details&lt;/li&gt;
+  &lt;li&gt;Event organizers receive attendee RSVP status updates&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;how-this-works&quot;&gt;How this works&lt;/h2&gt;
+
+&lt;p&gt;Here’s a basic sequence diagram of the various layers to this process. Looks like a lot, but most of this is implemented by the provider email account, such as Gmail or Outlook.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/icalendar-workflow-example.png&quot; alt=&quot;Basic iCalendar workflow for adding calendar events&quot; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Organizer creates an event&lt;/li&gt;
+  &lt;li&gt;Our application generates an iCalendar attachment and sends the attendee an email&lt;/li&gt;
+  &lt;li&gt;Attendee’s mail client parses incoming email and adds valid iCalendar attachments to their connected Calendar&lt;/li&gt;
+  &lt;li&gt;Attendee changes their RSVP status, which sends email to Organizer&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Really, the only thing we can control is steps 1 and 2. Step 3 and 4 are entirely in the hands of whatever the mail client is. This is a good time to call out a caveat with this approach, which is we are at the mercy of how the mail client parses incoming mail and iCalendar files. That being said, iCalendar is a widely accepted standard.&lt;/p&gt;
+
+&lt;p&gt;The above sequence diagram illustrates how we’ll accomplish a zero-integration strategy for placing calendar events on attendee calendars. This works by following the &lt;abbr title=&quot;Internet Calendaring and Scheduling Core Object Specification&quot;&gt;iCalendar&lt;/abbr&gt; standard for attaching calendar events to emails. For Mail Clients that have connected calendars (e.g. Gmail &amp;amp; Google Calendar), they parse incoming emails. When the email contains a valid iCalendar file, it is automatically added to the attendee’s calendar.&lt;/p&gt;
+
+&lt;p&gt;Pretty slick right?&lt;/p&gt;
+
+&lt;p&gt;The documentation regarding iCalendar is thorough and useful when working with calendar event attachments. &lt;a href=&quot;https://datatracker.ietf.org/doc/html/rfc5545&quot;&gt;Check it out here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now, there are a couple caveats with using this approach.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Updating an event in your external calendar will not update it in the application&lt;/li&gt;
+  &lt;li&gt;The organizer won’t have the event on their calendar unless they are also added as an attendee&lt;/li&gt;
+  &lt;li&gt;Relies on iCalendar specification while standard, is up to the provider to implement correctly&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;With that out of the way, let’s build ourselves a basic Rails application to work with.&lt;/p&gt;
+
+&lt;h2 id=&quot;creating-a-new-application&quot;&gt;Creating a new application&lt;/h2&gt;
+
+&lt;p&gt;We’ll need to generate a new sample application for this functionality.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rails new ics_demo &lt;span class=&quot;nt&quot;&gt;--skip-javascript&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--skip-helpers&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Setup ActionMailbox&lt;/span&gt;
+rails action_mailbox:install
+rails db:migrate
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Add &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gem &apos;icalendar&apos;&lt;/code&gt; to your Gemfile. This gem implements the iCalendar standard within Ruby, making it dead simple to craft calendar attachments.&lt;/p&gt;
+
+&lt;p&gt;Next we’ll need a mailer for which our attachments will be placed on. Run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails generate mailer EventInvitation event_create event_update event_cancel&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rails generate mailer EventInvitation event_create event_update event_cancel
+      create  app/mailers/event_invitation_mailer.rb
+      invoke  erb
+      create    app/views/event_invitation_mailer
+      invoke  test_unit
+      create    &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;/mailers/event_invitation_mailer_test.rb
+      create    &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt;/mailers/previews/event_invitation_mailer_preview.rb
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Change the receiver email address to an email you can access. You’ll want this to be different from your primary Gmail address (more on this later).&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;EventInvitationMailer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ApplicationMailer&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;event_create&lt;/span&gt;
+    &lt;span class=&quot;vi&quot;&gt;@greeting&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Event created&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;mail&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;to: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;[your_email]@gmail.com&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;event_update&lt;/span&gt;
+    &lt;span class=&quot;vi&quot;&gt;@greeting&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Event Updated&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;mail&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;to: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;[your_email]@gmail.com&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;event_cancel&lt;/span&gt;
+    &lt;span class=&quot;vi&quot;&gt;@greeting&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Event Cancelled&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;mail&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;to: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;[your_email]@gmail.com&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# event_invitation_mailer.html.erb&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sx&quot;&gt;%= @greeting %&amp;gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Change delivery error setting in development.rb for easier debugging&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;action_mailer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;raise_delivery_errors&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now, in order to test this we’ll need a reliable way to send emails in development. Google Apps to the rescue!&lt;/p&gt;
+
+&lt;h3 id=&quot;google-app-password-for-development&quot;&gt;Google App Password for development&lt;/h3&gt;
+
+&lt;p&gt;First we need to create new app password for your Google account: &lt;a href=&quot;https://myaccount.google.com/apppasswords&quot;&gt;https://myaccount.google.com/apppasswords&lt;/a&gt;. The reason we use an app password is it allows us to provide an authorized SMTP setup without having to deal with two-factor authentication.&lt;/p&gt;
+
+&lt;blockquote class=&quot;Info Info--full&quot;&gt;
+  
+
+  &lt;p&gt;
+    &lt;i class=&quot;fas fa-quote-left&quot;&gt;&lt;/i&gt;
+    Make sure that the receiver address is different from your email used for the Google App password, or else you won&apos;t be able
+to associate calendar events correctly.
+  &lt;/p&gt;
+
+  
+&lt;/blockquote&gt;
+
+&lt;p&gt;Select &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mail&lt;/code&gt; for app and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Other&lt;/code&gt; for device. Name the app Rails Mailer or what you like. Make sure to save the app password.&lt;/p&gt;
+
+&lt;p&gt;Add the &lt;a href=&quot;https://github.com/bkeepers/dotenv&quot;&gt;dotenv&lt;/a&gt; gem to your gemfile. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gem &apos;dotenv-rails&apos;, groups: [:development, :test]&lt;/code&gt;. This allows us to create a root level &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.env&lt;/code&gt; file which contains environment variables. Make sure to re-bundle.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# .env&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;GMAIL_USERNAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;your_email@gmail.com&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;GMAIL_PASSWORD&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;XXXX-your-app-password&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Following the &lt;a href=&quot;https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration-for-gmail&quot;&gt;Rails guide for setting up Gmail as an ActionMailer provider&lt;/a&gt;, you’ll end up with the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# development.rb&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;action_mailer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;delivery_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:smtp&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;action_mailer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;smtp_settings&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;address:              &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;smtp.gmail.com&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;port:                 &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;587&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;domain:               &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;example.com&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;user_name:            &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ENV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;GMAIL_USERNAME&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;password:             &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ENV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;GMAIL_PASWWORD&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;authentication:       &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;plain&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;enable_starttls_auto: &lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Emails can be sent from development by running the following code in your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails console&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;EventInvitationMailer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event_create&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;deliver_now&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Check your inbox to confirm you’ve received the message. Time to see those events popping up on your calendar. Check your spam or filters if you don’t see the message appear.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/icalendar-basic-example.png&quot; alt=&quot;Basic email sent via Google App&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;attaching-an-icalendar-event-to-an-email&quot;&gt;Attaching an iCalendar event to an email&lt;/h2&gt;
+
+&lt;p&gt;Now that we’ve configured our basic application for mail delivery, we should start sending
+calendar events out as email attachments. Add the following to the body of your mailer’s &lt;strong&gt;rsvp&lt;/strong&gt; method:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;event_create&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Calendar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;dtstart&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;hour&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;from_now&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;dtend&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;hours&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;from_now&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sequence&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ip_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;REQUEST&quot;&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;attachments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;invite.ics&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;mime_type: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text/calendar; method=REQUEST&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;content: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_ical&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;mail&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;to: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;different_address@gmail.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;subject: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;My First Event&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;dtstart&lt;/strong&gt; indicates the starting time of the event and is required. &lt;strong&gt;dtend&lt;/strong&gt; indicates the ending time and is required.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Sequence&lt;/strong&gt; is the order in which an iCalendar file is received in. It determines which action should take place. Additionally, it prevents out-of-sequence updates (e.g. updating an event before it is created).&lt;/p&gt;
+
+&lt;p&gt;Try sending yourself an email. You should see it come through along with the
+calendar event being placed on your associated calendar. Again, make sure that the email address you are sending to is different than the address you used for the Google App password.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/icalendar-auto-event-in-mail.png&quot; alt=&quot;Basic ics Attachment&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The new event looks pretty nice in our mailbox. If you hover over the email in
+Gmail’s listing view there is also now a new button called RSVP with some quick
+actions.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/icalendar-rsvp-from-inbox.png&quot; alt=&quot;Rsvp from inbox&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Super handy!&lt;/p&gt;
+
+&lt;p&gt;Now the above is the absolute minimum to enable this process and will only create events currently. Updating or Canceling an event take different request
+parameters which we’ll investigate next. But, before we dig into updating and canceling, we need a
+mechanism for telling external systems that the event we’re updating or cancelling refers to the
+same event we created. This is where the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;event.uid&lt;/code&gt; property comes in handy.&lt;/p&gt;
+
+&lt;h2 id=&quot;tying-events-together&quot;&gt;Tying events together&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Event uid&lt;/strong&gt; is the unique identifier for the event. Think about this like a primary key for the calendar event. It allows multiple iCalendar files to be sent through email and will associate them to the same uid. Useful for if the same event gets sent multiple times or updated. This way it won’t keep adding new ones to your calendar. We can utilize the built-in iCalendar gem method &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;new_uid&lt;/code&gt; to generate a new uid.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Calendar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;uid&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new_uid&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;uid&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uid&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Alternatively, if you have a uuid on your database record which is associated with the calendar event, you can utilize that to ensure
+stability between your system and the external calendar. I prefer this approach in the long-run.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# Creating a record that represents the calendar event&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;some_record&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#=&amp;gt; &amp;lt;Event uid=&quot;1c4bd300-ab99-425a-82fd-1e2720d23cdb&quot;&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Calendar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;uid&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;some_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;uid&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# Use the record to map the icalendar files uid&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Onto updating and cancelling events.&lt;/p&gt;
+
+&lt;h2 id=&quot;updating-an-event&quot;&gt;Updating an Event&lt;/h2&gt;
+
+&lt;p&gt;In order to update the calendar event, the only real change to our &lt;strong&gt;event_create&lt;/strong&gt; method is to specify the
+sequence number and ensure the uid matches the original event. Sequence number maps to the order in which iCalendar files
+were recieved in. If you notice the creating of an event example above, I used
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;event.sequence = 1&lt;/code&gt;. That’s because when an event is first created it will
+always be the first.&lt;/p&gt;
+
+&lt;p&gt;Now for updating an event we need sequence to be greater than 1.
+However, do we really want to manage the number for how many updates were made? Probably, not.
+This is why I came up with a nifty little trick using the integer representation of Time. Seen
+below as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;event.sequence = Time.now.to_i&lt;/code&gt;. Using this will ensure that the order in which
+updates are made always stays accurate with the upside of us not having to care about saving
+the current sequence number.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;event_update&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Calendar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;dtstart&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;hour&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;from_now&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;dtend&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;hours&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;from_now&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# Now we don&apos;t need to store which sequence number we&apos;re on&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sequence&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# This should be the equal to the id used when the event was created&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;uid&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;some_record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;uid&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ip_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;REQUEST&quot;&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;attachments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;invite.ics&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;mime_type: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text/calendar; method=REQUEST&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;content: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_ical&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;mail&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;to: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;different_address@gmail.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;subject: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;My Test Email&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now if you have your Calendar open you can watch in real-time as the event’s time changes. You can test this out in your console with:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;EventInvitationMailer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event_update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;deliver_now&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/auto-update-demo.gif&quot; alt=&quot;Auto update calendar event&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;cancelling-an-event&quot;&gt;Cancelling an Event&lt;/h2&gt;
+
+&lt;blockquote class=&quot;Info Info--full&quot;&gt;
+  
+
+  &lt;p&gt;
+    &lt;i class=&quot;fas fa-quote-left&quot;&gt;&lt;/i&gt;
+    Surprisingly, the dtstart property is required for cancelling an event
+  &lt;/p&gt;
+
+  
+&lt;/blockquote&gt;
+
+&lt;p&gt;Like updating event you’ll need to maintain the same &lt;strong&gt;uid&lt;/strong&gt; and ensure that the &lt;strong&gt;sequence&lt;/strong&gt; is further along than previous calendar events. The important change here
+is the addition of the &lt;strong&gt;status&lt;/strong&gt; property with value “CANCELLED”. This tell’s the
+calendar that the event has been cancelled by the organizer and therefore should
+be removed from attendee’s calendars.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;event_cancel&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Calendar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# Suprisingly, dtstart is required in order to properly cancel an event&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;dtstart&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;hour&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;from_now&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sequence&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;uid&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uid&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;status&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;CANCELLED&quot;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# Required&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ip_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;REQUEST&quot;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# &quot;CANCEL&quot; also seems valid&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;attachments&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;invite.ics&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;mime_type: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text/calendar; method=REQUEST&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# &quot;CANCEL&quot; also seems valid&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;content: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_ical&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;mail&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;to: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;different_address@gmail.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;subject: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;My Test Email&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If done correctly, you’ll receive an email with a header that states the event
+was cancelled.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/event-cancelled.png&quot; alt=&quot;Cancelled event in inbox&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Additionally, you can watch the calendar event disappear from your Google calendar.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/cancel-event-demo.gif&quot; alt=&quot;Cancel event demo in Calendar&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There’s the basics of using iCalendar with external systems. Now, we’ve really only scratched the surface of what is possible here. We also haven’t solved our third goal, “3. Event organizers receive attendee RSVP status updates”. Let’s dig into solving that, along with some settings I recommend making your events more robust.&lt;/p&gt;
+
+&lt;h2 id=&quot;recommended-settings&quot;&gt;Recommended settings&lt;/h2&gt;
+
+&lt;p&gt;I’ve compiled my own recommendations to help make iCalendar events
+more detailed and useful. Each of these adds more context to the calendar event, which is helpful
+to inform prospective attendees.&lt;/p&gt;
+
+&lt;h3 id=&quot;organizer&quot;&gt;Organizer&lt;/h3&gt;
+
+&lt;p&gt;This is whoever created the event. RSVPing to the event should send the organizer an email. &lt;strong&gt;CN&lt;/strong&gt; stands for displayable name. This is a great way to make invites
+look more personal for both organizers and attendees. Adding this also satisfies our third goal, hooray!&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;organizer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Values&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CalAddress&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+  &lt;span class=&quot;s2&quot;&gt;&quot;MAILTO:organizer@gmail.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;cn: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Josh F&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;blockquote class=&quot;Info Info--full&quot;&gt;
+  
+
+  &lt;p&gt;
+    &lt;i class=&quot;fas fa-quote-left&quot;&gt;&lt;/i&gt;
+    A gotcha with receiving rsvp status changes as an organizer is that if you use a Gmail address, it must be verified as also the event&apos;s creator. I was able to test this locally by instead using an outlook.com address
+  &lt;/p&gt;
+
+  
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/organizer-rsvp-receipt.png&quot; alt=&quot;Organizer rsvp receipt&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Without this, your event will display “Unknown Organizer”. Additionally, if RSVPing to the event sends an email within your Calendar client, without a valid email address you’ll receive a bounce back saying the mail failed to deliver. You can disable this functionality by specifying an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rsvp&lt;/code&gt; value for the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;attendee&lt;/code&gt; of false, like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;attendee&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Values&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CalAddress&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+  &lt;span class=&quot;s2&quot;&gt;&quot;mailto:different_address@gmail.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;rsvp: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;FALSE&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you utilize organizer, you’ll also need to specify it when you &lt;strong&gt;cancel&lt;/strong&gt; an event, or else the calendar system will not remove the event as it will think you’re trying to change organizers.&lt;/p&gt;
+
+&lt;h3 id=&quot;summary&quot;&gt;Summary&lt;/h3&gt;
+
+&lt;p&gt;This is the title of the Event placed on the calendar. Without this, your
+events will display “No title”. Useful information to show your event attendees. &lt;a href=&quot;https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.12&quot;&gt;See documentation&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;summary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Test Event 15&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;description&quot;&gt;Description&lt;/h3&gt;
+
+&lt;p&gt;This is the body of the calendar event. This contains a more detailed
+message regarding the nature of the event itself. &lt;a href=&quot;https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.5&quot;&gt;See documentation&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;description&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;This is the description&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;sequence&quot;&gt;Sequence&lt;/h3&gt;
+
+&lt;p&gt;This is the order in which an iCalendar file is received in. It determines which action should take place. Additionally, it prevents out-of-sequence updates (e.g. updating an event before it is created). &lt;a href=&quot;https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.7.4&quot;&gt;See documentation&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;A trick you can do here is to use the current time as an integer value to ensure that the sequence is always increasing without having the burden of managing the next number in the sequence.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Calendar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sequence&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;to_i&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;location&quot;&gt;Location&lt;/h3&gt;
+
+&lt;p&gt;This is the physical location where an event is taking place at. Both Gmail and Outlook display this as part of the calendar invite. &lt;a href=&quot;https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.7&quot;&gt;See documentation&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;location&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;201 E Randolph St, Chicago, IL 60602&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Below is an example of what a calendar event looks like when you fill out all its details:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/event-details.png&quot; alt=&quot;Example of event details&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;attendee-automatically-planned-attendance&quot;&gt;Attendee automatically planned attendance&lt;/h3&gt;
+
+&lt;p&gt;In addition to having the event on your calendar, you can also specify an attendee’s initial rsvp status. This allows you to automatically RSVP attenee’s as planning to attend. In order to activate this, we need to provide additional details about the attendee for the event. Add the following to your ical.event block:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ical&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;attendee&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Icalendar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Values&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CalAddress&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;mailto:different_address@gmail.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;partstat: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;accepted&quot;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;partstat&lt;/strong&gt; refers to the attendee’s participation status. In our case, marking it as
+&lt;strong&gt;accepted&lt;/strong&gt; sets the attendee as planning on coming as well as making it visible on their calendar.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/auto-calendar-event.gif&quot; alt=&quot;Auto calendar event demo&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There are several other properties that can be added to CalAddress which &lt;a href=&quot;https://datatracker.ietf.org/doc/html/rfc5545#section-3.2&quot;&gt;can be found here&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;wrapping-up&quot;&gt;Wrapping up&lt;/h2&gt;
+
+&lt;p&gt;Now we have a basic no-integration method for adding events to attendee’s calendar application. Like mentioned earlier, there is a lot more that can be done here. I’m actually working
+on a potential tech spike which incorporates ActionMailbox. Stay tuned for more.&lt;/p&gt;
+
+&lt;p&gt;Was this helpful for your calendar event system? Did you have any tips for working
+with iCalendar? I’d love to hear about them in the comments below. Thanks for reading.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="rails" /><category term="calendar" /><summary type="html">If you’ve worked with calendars, then you know the frustration of having two systems not keep events in sync. There are essentially three levels to keeping events in sync. The first is integration with every email provider you wish to support. Not a light initiative. The second is to find a product which aggregates multiple providers into a single API interface. Better solution, but open your wallet. Lastly, build a lightweight system that relies on the iCalendar standard. This last option is the focus of the article. Throughout the remainder of this post, we’ll explore pushing an event to an external provider’s calendar and keeping it in sync across systems without writing a single API request or integration.</summary></entry><entry><title type="html">Introducing SimpleCov+ Action: A Github action for ensuring test coverage</title><link href="http://joshfrankel.me/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/" rel="alternate" type="text/html" title="Introducing SimpleCov+ Action: A Github action for ensuring test coverage" /><published>2022-05-06T00:00:00+00:00</published><updated>2022-05-06T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage</id><content type="html" xml:base="http://joshfrankel.me/blog/introducing-simplecov+-action-a-github-action-for-ensuring-test-coverage/">&lt;p&gt;Testing your code thoroughly is an important part of a well functioning
+and easy to change application. Lack of adequate test coverage can be frustrating
+when refactoring, upgrading, or tracking down a bug. I’ve always wanted a way
+to ensure that each file maintains
+a minimum test coverage and if not fail continuous integration checks. After much
+searching, I decided to go ahead and build my own. Introducing SimpleCov+ Action
+for use within your Github actions.
+&lt;!--excerpt--&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;why-use-it&quot;&gt;Why use it&lt;/h2&gt;
+
+&lt;p&gt;So why would you want to use this in your build workflow?&lt;/p&gt;
+
+&lt;p&gt;SimpleCov+ Action provides a mechanism for reading SimpleCov results and using them
+to either pass or fail your Github workflow. Many of the solutions I came across concerned me, as failing a build based on test coverage could become a blocker for new work. I wanted a solution that was configurable based on coverage threshold and was accurate for my test suite. In general, averages (as in average test coverage), are easily influenced by outlier results. This was another concern I had with using such a system.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/simple-cov-check-basic.png&quot; alt=&quot;SimpleCov Basic line view&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;So here are the basic functions that I’ve built-in to this Github action.&lt;/p&gt;
+
+&lt;h3 id=&quot;minimum-coverage-threshold&quot;&gt;Minimum coverage threshold&lt;/h3&gt;
+
+&lt;p&gt;By default, it will fail builds, if the overall test suite coverage is lower than 90%.
+This can be configured using the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;minimum_coverage&lt;/code&gt; key and an integer value. Since
+you can configure the value, you can slowly raise it as you cover more and more code.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/simple-cov-check-basic-detailed.png&quot; alt=&quot;SimpleCov Basic line view&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;line-vs-branch&quot;&gt;Line vs Branch&lt;/h3&gt;
+
+&lt;p&gt;As in the name, it relies on the SimpleCov gem, so that needs to be both
+installed and configured correctly. With the newer versions of SimpleCov, you can
+specify line vs branch coverage. This allows you to specify how well tested things
+like conditional logic branches are vs simple line-by-line coverage.&lt;/p&gt;
+
+&lt;p&gt;The configuration value to change coverage type is called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;minimum_coverage_type&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;per-file-test-coverage&quot;&gt;Per file test coverage&lt;/h3&gt;
+
+&lt;p&gt;If you also utilize the simplecov-json gem, you can activate the advanced mode, which will
+fail builds based on file coverage percentage. This is really useful for
+avoiding some well tested files throwing the results of our overall test suite.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-its-awesome&quot;&gt;Why it’s awesome&lt;/h2&gt;
+
+&lt;p&gt;Test coverage is an important, albeit overlooked, part of a great test suite and healthy application.
+SimpleCov+ Action helps in several key ways to improve overall confidence in your testing suite.&lt;/p&gt;
+
+&lt;h3 id=&quot;it-is-incremental&quot;&gt;It is incremental&lt;/h3&gt;
+
+&lt;p&gt;Let’s say you’re adding test coverage to your application for the first time.
+You’re likely going to find many files that are lacking adequate test coverage (or if you’re lucky just a few). By using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;minimum_coverage&lt;/code&gt; configuration, you can incrementally increase
+test coverage a little, a bit at a time. I’ve personally used this to identify what my lowest covered file is and then set the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;minimum_coverage&lt;/code&gt; to 10% greater. This way you can chunk out the work necessary to increase overall test suite coverage a little at a time.&lt;/p&gt;
+
+&lt;h3 id=&quot;it-gives-accurate-results&quot;&gt;It gives accurate results&lt;/h3&gt;
+
+&lt;p&gt;Using the advanced version via simplecov-json, gives the ability to avoid situations where
+one file is 100% covered and another is 20% covered, skewing your overall test suite coverage. Let’s say your minimum coverage threshold is 50%. In the case above, the coverage would calculate to 60%, but you’ve got a file at 20%. That isn’t a great metric for ensuring good test coverage when outliers throw results. That’s why I recommend using the advanced file-by-file coverage version. Now for the above situation we’ll keep the same threshold of 50%. Applied to the example, the build would now fail and display the file that only has 20% coverage as the failure point. This is much more useful for ensuring quality code coverage.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/simple-cov-check-advanced-detailed.png&quot; alt=&quot;SimpleCov Advanced detail view&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The screenshot above shows the result panel of the action, which will display each file
+that failed to meet the minimum test coverage.&lt;/p&gt;
+
+&lt;h3 id=&quot;it-ensures-new-features-are-well-tested&quot;&gt;It ensures new features are well tested&lt;/h3&gt;
+
+&lt;p&gt;Having a minimum coverage necessary to deploy code, locks your application into a
+base level of coverage. This means that if new features want to be released to production
+they must contain proper test coverage. With this action in place, your code coverage
+never drops below your minimum coverage threshold.&lt;/p&gt;
+
+&lt;h3 id=&quot;it-increases-test-suite-confidence&quot;&gt;It increases test suite confidence&lt;/h3&gt;
+
+&lt;p&gt;Good test coverage ensures that refactoring code goes smoothly. There’s nothing more
+frustrating than realizing a large section of the codebase needs reworking only to find
+out there is no test coverage of it. Now you have two jobs: refactoring the feature and adding the missing test coverage.
+With test coverage becoming a priority, you reduce engineer frustration as well as make the system easier to change.&lt;/p&gt;
+
+&lt;h2 id=&quot;so-what-are-you-waiting-for&quot;&gt;So what are you waiting for?&lt;/h2&gt;
+
+&lt;p&gt;Go ahead and try it out. You can start with a low &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;minimum_coverage&lt;/code&gt; and work your way
+up to a larger percentage. Every bit of coverage helps in the longevity of
+an application.&lt;/p&gt;
+
+&lt;p&gt;The current version can be found in the &lt;a href=&quot;https://github.com/marketplace/actions/simplecov-action&quot;&gt;Github marketplace&lt;/a&gt;. SimpleCov+ Action also utilizes itself to ensure the action’s code maintains adequate test coverage. Because of this, there is a great example for how to set this up in your workflow. &lt;a href=&quot;https://github.com/marketplace/actions/simplecov-action#example-configuration&quot;&gt;Check out example configurations here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;If you end up using this in your project, let me know how it goes in the comments below! Thanks for reading.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="testing" /><category term="github" /><summary type="html">Testing your code thoroughly is an important part of a well functioning and easy to change application. Lack of adequate test coverage can be frustrating when refactoring, upgrading, or tracking down a bug. I’ve always wanted a way to ensure that each file maintains a minimum test coverage and if not fail continuous integration checks. After much searching, I decided to go ahead and build my own. Introducing SimpleCov+ Action for use within your Github actions.</summary></entry><entry><title type="html">Simulating a select dropdown change in Jest</title><link href="http://joshfrankel.me/blog/simulating-a-select-dropdown-change-in-jest/" rel="alternate" type="text/html" title="Simulating a select dropdown change in Jest" /><published>2022-04-20T00:00:00+00:00</published><updated>2022-04-20T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/simulating-a-select-dropdown-change-in-jest</id><content type="html" xml:base="http://joshfrankel.me/blog/simulating-a-select-dropdown-change-in-jest/">&lt;p&gt;While building a mobile friendly tab component, I created a select dropdown that allowed the user to control
+the displayed content. This worked in tandem with the existing click the name of the tab setup. Testing a simple
+click event is trivial by using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.click()&lt;/code&gt; but I quickly found that simulating a select dropdown change wasn’t as
+straightforward nor as documented. I stumbled on the following solution which hopefully helps someone else stuck.
+&lt;!--excerpt--&gt;&lt;/p&gt;
+
+&lt;p&gt;A typical Jest test for a click event may look like:&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;it&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;applies a class to an element&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tabs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;querySelectorAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[data-tabs-target=&apos;tab&apos;]&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;// Simulate clicking the third tab&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;tabs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;click&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;expect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tabs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;className&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;includes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;active&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toEqual&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The above is a good representation of what it looks like for the user to click
+the third tab element.&lt;/p&gt;
+
+&lt;p&gt;Ok, so what about a select element?&lt;/p&gt;
+
+&lt;p&gt;First off, select elements dispatch a change event. This means that simply clicking
+the select and then the option doesn’t work. Now there are a couple different methods
+for changing the current select elements value.&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;querySelector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;#mySelect&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Change the value&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;tab 3&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Change the selected value&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selected&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;tab 3&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Change the selected index&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;selectedIndex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// set expectations&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I found that the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;select.value =&lt;/code&gt; option to work best with my scenario. There’s a problem here though. Jest doesn’t know that the select element has changed. That’s because the event wasn’t emmitted yet. We can do that by explictly telling the select
+element that it triggered a change event.&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;querySelector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;#mySelect&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;tab 3&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dispatchEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;change&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// set expectations&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;With &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dispatchEvent(new Event(&apos;change&apos;))&lt;/code&gt; the select element now properly sends
+the change event with the previously updated value. This simulates a select dropdown
+change and allows for testing your JavaScript components which rely upon them.&lt;/p&gt;
+
+&lt;p&gt;That’s it! Thanks for reading.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="jest" /><category term="testing" /><category term="javascript" /><summary type="html">While building a mobile friendly tab component, I created a select dropdown that allowed the user to control the displayed content. This worked in tandem with the existing click the name of the tab setup. Testing a simple click event is trivial by using .click() but I quickly found that simulating a select dropdown change wasn’t as straightforward nor as documented. I stumbled on the following solution which hopefully helps someone else stuck.</summary></entry><entry><title type="html">How to test redirect_back_or_to</title><link href="http://joshfrankel.me/blog/how-to-test-redirect-back-or-to/" rel="alternate" type="text/html" title="How to test redirect_back_or_to" /><published>2022-04-11T00:00:00+00:00</published><updated>2022-04-11T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/how-to-test-redirect-back-or-to</id><content type="html" xml:base="http://joshfrankel.me/blog/how-to-test-redirect-back-or-to/">&lt;p&gt;Have you ever successfully used &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redirect_back_or_to&lt;/code&gt; in your application only to find out that testing was a challenge? Both methods rely on browser history which is generally not available within controller test and request specs. Recently I ran into this and after digging in came up with a simple solution.
+&lt;!--excerpt--&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;first-what-is-redirect_back_or_to&quot;&gt;First what is redirect_back_or_to&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redirect_back_or_to&lt;/code&gt; and its deprecated alias &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redirect_back&lt;/code&gt; both have the goal
+of request flow control. Depending on what information is available in browser history they can either redirect to the previously visited page or to a specified fallback location. In both cases, the fallback location is required. This was the primary issue I ran into while testing.&lt;/p&gt;
+
+&lt;p&gt;Let’s take a look at an example. Note: We’ll be looking at Minitest as a testing framework but the concepts explored here should function for RSpec as well.&lt;/p&gt;
+
+&lt;h2 id=&quot;quick-example&quot;&gt;Quick example&lt;/h2&gt;
+
+&lt;p&gt;Let’s say you have the following Minitest controller test. Our desired behavior
+is that when a user updates their password but does not include a number it should
+redirect them and display a error message.&lt;/p&gt;
+
+&lt;p&gt;We’re using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redirect_back_or_to&lt;/code&gt; in our code with a fallback location of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;root_path&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;redirect_back_or_to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;root_path&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Our controller test looks like the following:&lt;/p&gt;
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;PATCH #update&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;should&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;be invalid with password in wrong format&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;sign_in&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@user&lt;/span&gt;
+
+      &lt;span class=&quot;n&quot;&gt;patch&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;user_passwords_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;params: &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;id: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;user: &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;password: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;invalid without numbers&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+      &lt;span class=&quot;n&quot;&gt;assert_redirected_to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edit_user_passwords_path&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now the above looks accurate but the problem with controller tests there is no
+context as the user’s last visited location. We’re essentially sending a request directly to an endpoint above without first visiting the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;edit_user_passwords_path&lt;/code&gt; which is typically how a user would interact. The result of the above is a failing test as instead of being redirected to the edit page we end up on the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;root_path&lt;/code&gt;. Not ideal.&lt;/p&gt;
+
+&lt;p&gt;We know the issue is a lack of browser history for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redirect_back_or_to&lt;/code&gt; to utilize. This is the first nod to how the method works. Also, the documentation gives a great hint as well:&lt;/p&gt;
+
+&lt;blockquote class=&quot;Info Info--full&quot;&gt;
+  
+
+  &lt;p&gt;
+    &lt;i class=&quot;fas fa-quote-left&quot;&gt;&lt;/i&gt;
+    Redirects the browser to the page that issued the request (the referrer) if possible, otherwise redirects to the provided default fallback location. The referrer information is pulled from the HTTP Referer (sic) header on the request. This is an optional header and its presence on the request is subject to browser security settings and user preferences. If the request is missing this header, the fallback_location will be used.
+  &lt;/p&gt;
+
+  
+    &lt;a href=&quot;https://api.rubyonrails.org/classes/ActionController/Redirecting.html#method-i-redirect_back&quot;&gt;api.rubyonrails.org&lt;/a&gt;
+  
+&lt;/blockquote&gt;
+
+&lt;p&gt;Basically the only way that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;redirect_back_or_to&lt;/code&gt; can reliably navigate the user back in history is to look at the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Referer&lt;/code&gt; header. With that knowledge we’ve got a solution.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-solution&quot;&gt;The solution&lt;/h2&gt;
+
+&lt;p&gt;We only need to adjust the original test slightly to get the desired result. Focusing on including the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;referer&lt;/code&gt; header when making the endpoint request ensures that we redirect to the correct location.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;patch&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;user_passwords_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;params:
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;id: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;user: &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;ss&quot;&gt;password: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;invalid without numbers&quot;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;ss&quot;&gt;headers: &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;referer: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edit_user_passwords_url&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that instead of using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;edit_user_passwords_path&lt;/code&gt; we instead utilize the fully qualified url with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_url&lt;/code&gt; helper. This ensures that our test behaves the same way that the browser would.&lt;/p&gt;
+
+&lt;p&gt;With that everything is green and good to go.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="rails" /><category term="testing" /><summary type="html">Have you ever successfully used redirect_back_or_to in your application only to find out that testing was a challenge? Both methods rely on browser history which is generally not available within controller test and request specs. Recently I ran into this and after digging in came up with a simple solution.</summary></entry><entry><title type="html">Tips I learned working with ActiveStorage</title><link href="http://joshfrankel.me/blog/tips-i-learned-working-with-activestorage/" rel="alternate" type="text/html" title="Tips I learned working with ActiveStorage" /><published>2022-03-30T00:00:00+00:00</published><updated>2022-03-30T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/tips-i-learned-working-with-activestorage</id><content type="html" xml:base="http://joshfrankel.me/blog/tips-i-learned-working-with-activestorage/">&lt;p&gt;ActiveStorage is a great system for configuring your cloud file storage. It takes
+care of much of the details and allows you to focus on the most important parts: file upload and file download. Recently, I had the opportunity to work through an uploader on Rails 7 within the Administrate admin interface. Fun journey that left me with a couple tricks up my sleeve the next time I reach for ActiveStorage.&lt;/p&gt;
+
+&lt;!--excerpt--&gt;
+
+&lt;h2 id=&quot;table-of-contents&quot;&gt;Table of contents&lt;/h2&gt;
+&lt;p&gt;Only care about one tip? Here’s a table of contents to get you moving along&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#setting-a-custom-filename&quot;&gt;Setting a custom filename&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#querying-records-with-existing-file-attachments&quot;&gt;Querying records with existing file attachments&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#adding-bi-direction-polymorphic-association-between-model-and-attachment&quot;&gt;Adding bi-direction polymorphic association between model and attachment&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#uploading-files-within-the-administrate-gem&quot;&gt;Uploading files within the Administrate gem&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;setting-a-custom-filename&quot;&gt;Setting a custom filename&lt;/h2&gt;
+
+&lt;p&gt;File asset can be easily downloaded using the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;link_to&lt;/code&gt; helper. For example:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;link_to&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Link Text&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;url_to_asset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;download: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;your custom filename&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;However, when working with ActiveStorage the same mechanism does not work. Instead the following syntax is necessary:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;link_to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rails_blob_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;disposition: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;attachment&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;blockquote class=&quot;Info Info--full&quot;&gt;
+  
+
+  &lt;p&gt;
+    &lt;i class=&quot;fas fa-quote-left&quot;&gt;&lt;/i&gt;
+    To create a download link, use the rails_blob_{path|url} helper. Using this helper allows you to set the disposition.
+  &lt;/p&gt;
+
+  
+    &lt;a href=&quot;https://edgeguides.rubyonrails.org/active_storage_overview.html#serving-files&quot;&gt;Rails Guides Active Storage Overview&lt;/a&gt;
+  
+&lt;/blockquote&gt;
+
+&lt;p&gt;While using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rails_blob_path&lt;/code&gt; for ActiveStorage asssets be default you can’t adjust filenames. One method which works well to allow more control over filename is to modify files on upload. Below is a simple &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;after_save&lt;/code&gt; callback which makes this happen:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyModel&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ApplicationRecord&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;has_one_attached&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:file&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;file_attached?&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;attached?&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;n&quot;&gt;after_save&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:set_filename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;if: :file_attached?&lt;/span&gt;
+
+  &lt;span class=&quot;kp&quot;&gt;private&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;set_filename&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;extension&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;extension&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;blob&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;filename: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;extension&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Assuming you have an attached virtual field called “file” and a column called “name”, the above will update
+the file blob’s filename upon saving. Note the preservation of file extension as part of the update.&lt;/p&gt;
+
+&lt;p&gt;With the above in place you can utilize&lt;/p&gt;
+
+&lt;h2 id=&quot;querying-records-with-existing-file-attachments&quot;&gt;Querying records with existing file attachments&lt;/h2&gt;
+
+&lt;p&gt;ActiveStorage provides a nice scope for avoiding n+1 queries for objects with files called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;with_attached_file&lt;/code&gt;. Now this works great for eager loading but what about querying by records that have a valid file attachment? I dug into the internals of ActiveStorage::Attachment to discover that the way in which it works is a polymorphic join onto record. Record in this case being whatever is set to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;has_one_attached :file&lt;/code&gt;. With this knowledge, we can derive a query using arel:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;has_one_attached&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:file&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;with_attachments&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;active_storage_arel&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActiveStorage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Attachment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;arel_table&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;with_attached_file&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;joins&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;arel_table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;active_storage_arel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;arel_table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+          &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;eq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;active_storage_arel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:record_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+          &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;and&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;active_storage_arel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:record_type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;eq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;join_sources&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The above uses the eager loading of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;with_attached_file&lt;/code&gt; along with polymorphically joining onto the ActiveStorage::Attachment from the current table. This is accomplished from the following:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Utilize &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;arel_table[:id]&lt;/code&gt; to represent the current model’s id&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;name&lt;/code&gt; refers to the current model’s database table name&lt;/li&gt;
+  &lt;li&gt;Retrieving &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ActiveStorage::Attachment&lt;/code&gt; as an arel table&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;adding-bi-direction-polymorphic-association-between-model-and-attachment&quot;&gt;Adding bi-direction polymorphic association between model and attachment&lt;/h2&gt;
+
+&lt;p&gt;While I was digging into the querying example above, I also noted that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ActiveStorage::Attachment&lt;/code&gt; contains the following association:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;belongs_to&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;polymorphic: &lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;touch: &lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;From this we can also create our own association from within our model. This gives
+easy access to available file attachments.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyModel&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;has_one_attached&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:file&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;has_one&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:file_attachment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;as: :record&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;class_name: &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ActiveStorage::Attachment&quot;&lt;/span&gt;
+
+  &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I opted not to use the above and instead work through the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;has_one_attached&lt;/code&gt; interface but the above working was cool nonetheless.&lt;/p&gt;
+
+&lt;h2 id=&quot;uploading-files-within-the-administrate-gem&quot;&gt;Uploading files within the Administrate gem&lt;/h2&gt;
+
+&lt;p&gt;Administrate is in my opinion a much friendlier alternative to gems like ActiveAdmin. It is simple and mostly adheres to ruby standards without a DSL.&lt;/p&gt;
+
+&lt;p&gt;That being said it tries to not do everything so there are times when you’ll
+need to reach for a second gem. In this case, when you specify that you have a
+field that needs to be a file upload things get complex fast. I spent several hours digging through the gem’s source code and forums until &lt;a href=&quot;https://github.com/Dreamersoul/administrate-field-active_storage&quot;&gt;I discovered a gem dedicated
+to solving this issue&lt;/a&gt;. Called administrate-field-active_storage, all that is necessary is to utilize the new field type called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Field::ActiveStorage&lt;/code&gt; and you can begin
+uploading files.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# Gemfile&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;gem&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;administrate-field-active_storage&quot;&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Administrate Dashboard for model&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;MyModelDashboard&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Administrate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;BaseDashboard&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;# Hash to set the types for each column&lt;/span&gt;
+  &lt;span class=&quot;no&quot;&gt;ATTRIBUTE_TYPES&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;id: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Field&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;file: &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Field&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ActiveStorage&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;# Displayed on model form&lt;/span&gt;
+  &lt;span class=&quot;no&quot;&gt;FORM_ATTRIBUTES&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+    &lt;span class=&quot;ss&quot;&gt;:file&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;freeze&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That’s it for now. Let me know what you think or if you’ve got any tasty tricks.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="rails" /><summary type="html">ActiveStorage is a great system for configuring your cloud file storage. It takes care of much of the details and allows you to focus on the most important parts: file upload and file download. Recently, I had the opportunity to work through an uploader on Rails 7 within the Administrate admin interface. Fun journey that left me with a couple tricks up my sleeve the next time I reach for ActiveStorage.</summary></entry><entry><title type="html">Automating Accessibility with Ruby and Axe Core</title><link href="http://joshfrankel.me/blog/automating-accessibility-with-ruby-and-axe-core/" rel="alternate" type="text/html" title="Automating Accessibility with Ruby and Axe Core" /><published>2022-03-17T00:00:00+00:00</published><updated>2022-03-17T00:00:00+00:00</updated><id>http://joshfrankel.me/blog/automating-accessibility-with-ruby-and-axe-core</id><content type="html" xml:base="http://joshfrankel.me/blog/automating-accessibility-with-ruby-and-axe-core/">&lt;p&gt;Building an accessible application can be challenging. Keeping an application accessible can be impossible. Without dedicated roles or full team support, accessibility regressions are easy to introduce.&lt;/p&gt;
+
+&lt;p&gt;In the past, I’ve used &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;eslint-plugin-jsx-a11y&lt;/code&gt; for ensuring React components are accessible, and it helped tremendously. Recently, I’ve dived into Hotwire &amp;amp; Stimulus and needed a solution for ensuring an accessible application. Now as a disclaimer, all automated accessibility checkers have gaps between them and being fully accessible. Striving for a dedicated position or policy to ensure compliance is still something that automation can’t replace. That being said, automation can help keep regresssion at bay.&lt;/p&gt;
+
+&lt;!--excerpt--&gt;
+
+&lt;h2 id=&quot;what-makes-for-an-accessible-application&quot;&gt;What makes for an accessible application?&lt;/h2&gt;
+
+&lt;p&gt;First off, what does it mean for an application to be accessible. The Web Content Accessibility Guidelines 2.1 (or WCAG) outline four principles of accessible media.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Perceivable&lt;/strong&gt; - Information and user interface components must be presentable to users in ways they can perceive.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Operable&lt;/strong&gt; - User interface components and navigation must be operable.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Understandable&lt;/strong&gt; - Information and the operation of user interface must be understandable.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Robust&lt;/strong&gt; - Content must be robust enough that it can be interpreted reliably by a wide variety of user agents, including assistive technologies.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Source&lt;/strong&gt;: &lt;a href=&quot;https://www.w3.org/WAI/WCAG21/Understanding/intro#understanding-the-four-principles-of-accessibility&quot;&gt;w3.org&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote class=&quot;Info Info--full&quot;&gt;
+  
+
+  &lt;p&gt;
+    &lt;i class=&quot;fas fa-quote-left&quot;&gt;&lt;/i&gt;
+    If any of these are not true, users with disabilities will not be able to use the Web.
+  &lt;/p&gt;
+
+  
+    &lt;a href=&quot;hhttps://www.w3.org/WAI/WCAG21/Understanding/intro#understanding-the-four-principles-of-accessibility&quot;&gt;Understanding the Four Principles of Accessibility&lt;/a&gt;
+  
+&lt;/blockquote&gt;
+
+&lt;p&gt;Any website or application that doesn’t adhere to the above, will create challenges
+for those in need of accessible requirements.&lt;/p&gt;
+
+&lt;p&gt;So the above contain overarching principles of good accessible design, but what about
+specifics? WCAG has that covered as well as part of a three tier compliance recommendation. The tiers are defined as:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A - minimal compliance&lt;/li&gt;
+  &lt;li&gt;AA - general compliance&lt;/li&gt;
+  &lt;li&gt;AAA - high compliance&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In order to meet one of the above tiers, all recommendations for that level must be met. Looking for a full list of all the recommendations? The following link provides in-depth explanations: https://www.w3.org/TR/WCAG21/#abstract&lt;/p&gt;
+
+&lt;p&gt;There is a wealth of information on Accessibility for the web out there, and I am by no means an expert. This post is merely the tip of the iceberg into the subject.&lt;/p&gt;
+
+&lt;p&gt;With the stage set, let’s get into how to implement your own automated accessibility check.&lt;/p&gt;
+
+&lt;h2 id=&quot;initial-approach&quot;&gt;Initial Approach&lt;/h2&gt;
+
+&lt;p&gt;The goal for this initiative was to enforce &lt;a href=&quot;https://www.w3.org/WAI/standards-guidelines/wcag/&quot;&gt;WCAG&lt;/a&gt; AA (at least) compliance programmatically. Either through a linter check or testing. While looking for a solution, I came up with two potential strategies:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Linting raw HTML elements within ERB templates&lt;/li&gt;
+  &lt;li&gt;Testing application pages for accessibility compliance within feature test&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Approach one felt more inline with how &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;eslint-plugin-jsx-a11y&lt;/code&gt; works. That is linting the html that will be rendered. One downside with this is that it is further
+away from the actual end-user. Additionally, I couldn’t find anything that quite worked for checking ERB templates against accessibility requirements.&lt;/p&gt;
+
+&lt;p&gt;For approach two, I searched for a library that would help fail a testing suite as well as print what needed to be fixed. I discovered a company dedicated to this purpose called Deque. They have several solutions which are really handy for testing accessibility (one of which is a ruby gem). So with that found, I moved into implementation.&lt;/p&gt;
+
+&lt;h2 id=&quot;testing-for-accessibility&quot;&gt;Testing for accessibility&lt;/h2&gt;
+
+&lt;p&gt;Deque’s gem &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;axe-core&lt;/code&gt; has a nice capybara plugin called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;axe-core-capybara&lt;/code&gt;. Now for those of you using RSpec there’s additionally a great &lt;a href=&quot;https://github.com/dequelabs/axe-core-gems/blob/develop/packages/axe-core-rspec/README.md&quot;&gt;axe-core-rspec&lt;/a&gt; gem which takes care of configuration. For me, I was using minitest and needed a separate solution.&lt;/p&gt;
+
+&lt;p&gt;First off, let’s add &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;axe-core-capybara&lt;/code&gt; to our Gemfile. I’m also assuming you have capybara and webdrivers for running feature tests.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# Gemfile&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;group&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:test&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;gem&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;capybara&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&amp;gt;= 3.26&quot;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;gem&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;selenium-webdriver&quot;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;gem&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;webdrivers&quot;&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;# Axe-core&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;gem&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;axe-core-capybara&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, within your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ApplicationSystemTestCase&lt;/code&gt; you’ll need to require the axe matchers.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;require&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;axe/matchers/be_axe_clean&quot;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ApplicationSystemTestCase&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActionDispatch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;SystemTestCase&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;From here what we require is to use the internal axe matcher within a similarly named dsl style method to what we see in Capybara. What I mean by that is, a naming convention that follows the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;assert_&lt;/code&gt; prefix but indicates we’re testing for accessibility. The following gives us the new &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;assert_accessible&lt;/code&gt; method to be used on the current page rendered.&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;assert_accessible&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;matcher&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Axe&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Matchers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;BeAxeClean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;according_to&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:wcag21aa&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;best-practice&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;audit_result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;matcher&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;audit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;audit_result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;passed?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;audit_result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;failure_message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Above, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;matcher&lt;/code&gt; can be overridden, but by default is the internal BeAxeClean matcher. Note that I have it set to AA compliance as well as best practices. For a description of all available rules, you can visit the &lt;a href=&quot;https://github.com/dequelabs/axe-core/blob/master/doc/rule-descriptions.md#rule-descriptions&quot;&gt;following documentation&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;audit&lt;/code&gt; refers to the internal &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Axe::Api::Audit&lt;/code&gt; class which can be &lt;a href=&quot;https://github.com/dequelabs/axe-core-gems/blob/develop/packages/axe-core-api/lib/axe/api/audit.rb&quot;&gt;found here&lt;/a&gt;. This provides several nice helper methods like: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;passed?&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;failure_message&lt;/code&gt;. Using these we can generate a simple assertion by saying, if the matcher result doesn’t pass then display the failure message from axe.&lt;/p&gt;
+
+&lt;p&gt;With that, we can utilize the new matcher for our feature tests like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# Accessibility System test&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;require&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;application_system_test_case&quot;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;AccessibilityTest&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ApplicationSystemTestCase&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;landing page is accessible&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;visit&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;root_path&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;assert_accessible&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;bonus-browser-extension-for-testing-accessibility&quot;&gt;Bonus: Browser Extension for testing Accessibility&lt;/h2&gt;
+
+&lt;p&gt;Now, axe doesn’t just have libraries for auditing page accessibility, they also have a great Chrome extension. I highly recommend installing this if you plan to do automated accessibility testing, as it helps track down failing issues. Additionally, it can find accessibility recommendations that the automated testing above misses. &lt;a href=&quot;https://chrome.google.com/webstore/detail/axe-devtools-web-accessib/lhdoppojpmngadmnindnejefpokejbdd?hl=en-US&quot;&gt;Download the extension here&lt;/a&gt;. The free version works great&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2022/axe-dev-tools-demo.png&quot; alt=&quot;Axe DevTools example&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;We now have a test suite which can fail on Accessibility being outside of compliance. This will help reduce any accessibility regressions being introduced into the application. I don’t think this is a full solution for ensuring accessibility compliance. As far as I’ve found, you need an actual person conducting accessibility auditing. So keep that in mind when working towards a more accessible application.&lt;/p&gt;
+
+&lt;p&gt;We’ve only scratched the surface of automated accessibility testing. What have you found to make accessibility testing easier? Is there a tool or process you love? I’d love to hear about them and discuss in the comments below.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading.&lt;/p&gt;</content><author><name>Josh Frankel (@joshmfrankel)</name><uri>http://joshfrankel.me/</uri></author><category term="accessibility" /><category term="testing" /><category term="minitest" /><summary type="html">Building an accessible application can be challenging. Keeping an application accessible can be impossible. Without dedicated roles or full team support, accessibility regressions are easy to introduce. In the past, I’ve used eslint-plugin-jsx-a11y for ensuring React components are accessible, and it helped tremendously. Recently, I’ve dived into Hotwire &amp;amp; Stimulus and needed a solution for ensuring an accessible application. Now as a disclaimer, all automated accessibility checkers have gaps between them and being fully accessible. Striving for a dedicated position or policy to ensure compliance is still something that automation can’t replace. That being said, automation can help keep regresssion at bay.</summary></entry></feed>
