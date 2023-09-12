@@ -3,23 +3,18 @@
   text-align: center;
   padding: 30px 0;
 
-  span {
-    color: #515151;
-  }
-
-  li {
+  a {
     list-style: none;
-    display: inline-block;
     margin: 0 5px;
+    border: none;
 
-    &.selected a {
-      background: $accent-color;
-      border-radius: 50px;
-      color: #fff;
-    }
+    @extend .w-7;
+    @extend .aspect-square;
 
-    a {
-      @include link-with-circle;
+    &:hover {
+      @extend .bg-accent;
+      @extend .rounded-full;
+      @extend .text-white;
     }
   }
 

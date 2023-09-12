@@ -1,6 +1,7 @@
 <footer class="Footer">
   <div class="Container Container-flex Container--smallMargin">
     <section class="Footer-links">
+      <a href="{{ site.github.url }}/" {% if page.url == site.github.url %} class="active" {% endif %}>Home</a>
       {% for nav in site.data.navigation %}
         {% assign nav_page_url = nav.url | prepend: "/" | append: "/index.html" %}
         <a href="{{ site.github.url }}/{{ nav.url }}" {% if page.url == nav_page_url %} class="active" {% endif %}>{{ nav.name }}</a>

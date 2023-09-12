@@ -22,14 +22,8 @@ author:
 excerpt_separator: "<!--excerpt--"
 permalink: /blog/:title/
 
-pagination:
-  enabled: true
-  per_page: 10
-  sort_reverse: true
-  title: :title
-  trail:
-    before: 2
-    after: 2
+paginate: 10
+paginate_path: "/blog/page:num/"
 
 github: [metadata]
 highlighter: rouge
@@ -46,7 +40,7 @@ sass:
 plugins:
   - jekyll-feed
   - jekyll-sitemap
-  - jekyll-paginate-v2
+  - jekyll-paginate
   - jekyll-seo-tag
   - jekyll-compose
   - jekyll-redirect-from

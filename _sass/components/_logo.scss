@@ -1,29 +1,47 @@
 .Logo-container {
   @extend .flex-container;
-  transition: none;
   align-items: center;
   border: none;
 
-  &:hover * {
-    color: $darker-gray-hover;
+  .Logo-avatarContainer {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border: 3px solid transparent;
+
+    @extend .transition-colors;
+  }
+
+  .Logo-avatar,
+  .Logo-avatarHover {
+    position: absolute;
+
+    @extend .transition-opacity;
+  }
+
+  .Logo-avatar {
+    opacity: 1;
+  }
+  .Logo-avatarHover {
+    opacity: 0;
   }
 
   &:hover {
     border-bottom: none;
 
-    .Logo-avatar {
-      opacity: 0;
-      display: none;
-    }
-    .Logo-avatarHover {
-      opacity: 1;
-      display: block;
-    }
     .Logo-avatarContainer {
       border: 3px solid $accent-color;
     }
+
+    .Logo-avatar {
+      opacity: 0;
+    }
+    .Logo-avatarHover {
+      opacity: 1;
+    }
   }
 }
+
 .Logo {
   @extend .flex-column;
 
@@ -36,16 +54,6 @@
     box-shadow: 0 0 0 1px $lighter-gray;
     overflow: hidden;
     box-sizing: border-box;
-  }
-
-  &-avatar {
-   opacity: 1;
-   display: block;
-   transition: 300ms opacity;
-  }
-  &-avatarHover {
-    opacity: 0;
-    display: none;
   }
 
   &-logo {

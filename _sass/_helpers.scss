@@ -67,7 +67,6 @@
 @mixin link-with-circle($size: 30px, $color: $accent-color) {
   border-radius: 50px;
   color: $color;
-  display: inline-block;
   width: $size;
   height: $size;
 

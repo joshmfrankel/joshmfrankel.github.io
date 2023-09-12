@@ -1,0 +1,63 @@
+.inline-flex {
+  display: inline-flex;
+}
+
+.p-2\.5 {
+  padding: 10px;
+}
+
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+/**
+ * Colors
+ **/
+
+.bg-accent {
+  background-color: $accent-color;
+}
+
+.text-white {
+  color: #fff;
+}
+
+/**
+ * Borders
+ **/
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/**
+ * Flex
+ **/
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+/**
+ * Transitions
+ **/
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/**
+ * Sizing
+ **/
+.w-7 {
+  width: 28px;
+}
