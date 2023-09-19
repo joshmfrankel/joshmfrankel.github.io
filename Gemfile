@@ -3,10 +3,8 @@
 source "https://rubygems.org"
 ruby RUBY_VERSION
 
-gem "html-proofer", "~> 5"
 gem "jekyll", "~> 4"
 gem "kramdown-parser-gfm"
-gem "rake", "~> 12"
 gem "webrick"
 
 gem "rubocop"
