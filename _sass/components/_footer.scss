@@ -75,7 +75,13 @@ $smallWidth: 790px;
         color: $pale-slighty-lighter-gray;
         font-size: 1.3rem;
         font-weight: 600;
-        text-align: center;
+      }
+
+      .Footer-actions-copyright-small {
+        color: $pale-night-text;
+        font-size: 1rem;
+        font-style: italic;
+        line-height: 1.5;
       }
     }
   }
