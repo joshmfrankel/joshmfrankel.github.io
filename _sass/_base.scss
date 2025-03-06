@@ -51,7 +51,9 @@ mark {
   cursor: help;
   font-style: italic;
 }
-p, blockquote, li {
+p,
+blockquote,
+li {
   font: 300 2rem/32px $railway;
 }
 blockquote {
@@ -59,7 +61,8 @@ blockquote {
   margin: 0;
   padding: 20px;
 
-  p, li {
+  p,
+  li {
     line-height: 40px;
   }
   a {
@@ -84,13 +87,15 @@ blockquote {
 ul {
   padding-left: 25px;
 }
-p, li {
+p,
+li {
   color: $p-color;
 }
 .highlight {
   margin: 0;
   font-size: 1.7rem;
   clear: both; // Prevent .Info from compacting code
+  border-radius: 4px;
 }
 abbr {
   text-decoration: none;
@@ -120,7 +125,8 @@ table {
       color: $darker-gray-hover;
     }
   }
-  th, td {
+  th,
+  td {
     padding: 15px;
   }
   tbody tr:nth-child(even) {

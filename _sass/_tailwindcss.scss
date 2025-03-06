@@ -1,13 +1,21 @@
-.inline-flex {
-  display: inline-flex;
-}
-
 .p-2\.5 {
   padding: 10px;
 }
 
 .aspect-square {
   aspect-ratio: 1 / 1;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+/**
+ * Typography
+ **/
+
+.text-right {
+  text-align: right;
 }
 
 /**
@@ -40,6 +48,30 @@
   justify-content: center;
 }
 
+.justify-between {
+  justify-content: space-between;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.flex-even {
+  flex: 1 1 0px;
+}
+
 /**
  * Transitions
  **/
@@ -50,7 +82,8 @@
 }
 
 .transition-colors {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
