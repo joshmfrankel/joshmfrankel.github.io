@@ -10,6 +10,14 @@
   margin-top: 8px;
 }
 
+.mr-8 {
+  margin-right: 32px;
+}
+
+.ml-7 {
+  margin-left: 28px;
+}
+
 /**
  * Typography
  **/
@@ -18,6 +26,9 @@
   text-align: right;
 }
 
+.-indent-7 {
+  text-indent: -28px;
+}
 /**
  * Colors
  **/
