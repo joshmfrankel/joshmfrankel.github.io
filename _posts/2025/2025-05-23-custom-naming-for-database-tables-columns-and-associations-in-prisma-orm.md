@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Customizing Database Table, Column, and Association Naming in Prisma ORM
+title: Custom Naming for Database Tables, Columns, and Associations in Prisma ORM
 categories:
   - articles
 tags:
