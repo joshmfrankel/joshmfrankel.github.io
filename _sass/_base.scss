@@ -57,31 +57,35 @@ li {
   font: 300 2rem/32px $railway;
 }
 blockquote {
+  @extend .Info, .Info--full;
+
   border-left: 5px solid $primary-color;
   margin: 0;
   padding: 20px;
 
-  p,
+  ul {
+    margin: 0;
+  }
+
   li {
-    line-height: 40px;
+    color: $lightest-gray;
+    line-height: 1;
+    list-style-type: "- ";
   }
+
   a {
-    // color: $primary-color;
+    font-weight: 600;
+
+    &:hover {
+      border-bottom: 1px solid $lightest-gray;
+      color: $lightest-gray;
+    }
   }
+
   cite {
     display: block;
     margin-top: 20px;
     word-break: break-all;
-
-    a {
-      // color: $white;
-      font-weight: 600;
-
-      &:hover {
-        // color: $white;
-        border-bottom: 1px solid $white;
-      }
-    }
   }
 }
 ul {
