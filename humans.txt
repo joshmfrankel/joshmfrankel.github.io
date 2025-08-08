@@ -1,5 +1,13 @@
 # humanstxt.org/
 
+# License
+
+  THE ANTIRACIST ETHICAL SOURCE LICENSE (ATR)
+
+  Copyright (c) 2011 Josh Frankel
+
+  - https://joshfrankel.me/license.txt
+
 # TEAM
 
   Josh Frankel -- Developer -- joshmfrankel
