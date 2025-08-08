@@ -4,3 +4,7 @@
 
 My personal development blog
 [http://joshfrankel.me](http://joshfrankel.me)
+
+# License
+
+[http://joshfrankel.me/license.txt](http://joshfrankel.me/license.txt)
