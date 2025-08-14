@@ -68,7 +68,7 @@ $smallWidth: 790px;
       }
     }
     &-copyright {
-      border-top: 1px solid $pale-light-gray;
+      border-top: 2px solid $pale-light-gray;
       margin-top: 25px;
 
       p {
@@ -77,11 +77,21 @@ $smallWidth: 790px;
         font-weight: 600;
       }
 
+      .Footer-actions-copyright-author {
+        text-align: center;
+      }
+
       .Footer-actions-copyright-small {
         color: $pale-night-text;
         font-size: 1rem;
         font-style: italic;
         line-height: 1.5;
+      }
+
+      a {
+        &:hover {
+          color: lighten($pale-night-text, 10%);
+        }
       }
     }
   }
