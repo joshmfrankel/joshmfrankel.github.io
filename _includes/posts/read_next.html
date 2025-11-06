@@ -1,0 +1,25 @@
+<div class="Post-actions flex justify-between">
+  {% if page.previous.url %}
+  <div class="flex-even">
+    <a
+      class="Post-actions--prev TooltipContainer"
+      href="{{ page.previous.url }}"
+      alt="{{ page.previous.title }}"
+    >
+      Previous
+    </a>
+    <p class="mt-2">{{ page.previous.title }}</p>
+  </div>
+  {% endif %} {% if page.next.url %}
+  <div class="flex-even flex flex-col items-end">
+    <a
+      class="Post-actions--next TooltipContainer"
+      href="{{ page.next.url }}"
+      alt="{{ page.next.title }}"
+    >
+      Next
+    </a>
+    <p class="mt-2 text-right">{{ page.next.title }}</p>
+  </div>
+  {% endif %}
+</div>

@@ -54,7 +54,7 @@ mark {
 p,
 blockquote,
 li {
-  font: 300 2rem/32px $railway;
+  font: 300 2rem/28px $railway;
 }
 blockquote {
   @extend .Info, .Info--full;
@@ -62,6 +62,7 @@ blockquote {
   border-left: 5px solid $primary-color;
   margin: 0;
   padding: 20px;
+  position: relative;
 
   ul {
     margin: 0;
@@ -86,6 +87,16 @@ blockquote {
     display: block;
     margin-top: 20px;
     word-break: break-all;
+  }
+
+  &::before {
+    content: "“";
+    display: block;
+    font-size: 90px;
+    font-family: cursive;
+    position: absolute;
+    top: 56px;
+    margin-left: -56px;
   }
 }
 ul {

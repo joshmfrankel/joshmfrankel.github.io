@@ -3,62 +3,8 @@ layout: default
 ---
 
 <article class="Post">
-  {% include series.html %} {{ content }}
-
-  <!-- Prev Posts -->
-  <div class="Post-actions flex justify-between">
-    {% if page.previous.url %}
-    <div class="flex-even">
-      <a
-        class="Post-actions--prev TooltipContainer"
-        href="{{ page.previous.url }}"
-        alt="{{ page.previous.title }}"
-      >
-        Previous
-      </a>
-      <p class="mt-2">{{ page.previous.title }}</p>
-    </div>
-    {% endif %} {% if page.next.url %}
-    <div class="flex-even flex flex-col items-end">
-      <a
-        class="Post-actions--next TooltipContainer"
-        href="{{ page.next.url }}"
-        alt="{{ page.next.title }}"
-      >
-        Next
-      </a>
-      <p class="mt-2 text-right">{{ page.next.title }}</p>
-    </div>
-    {% endif %}
-  </div>
-
-  <!-- Comments System -->
-  <div class="Comments">
-    <h2>Join the conversation</h2>
-
-    <div id="disqus_thread"></div>
-  </div>
-
-  <script type="text/javascript">
-    var disqus_shortname = "joshmfrankel";
-    (function () {
-      var dsq = document.createElement("script");
-      dsq.type = "text/javascript";
-      dsq.async = true;
-      dsq.src = "//" + disqus_shortname + ".disqus.com/embed.js";
-      (
-        document.getElementsByTagName("head")[0] ||
-        document.getElementsByTagName("body")[0]
-      ).appendChild(dsq);
-    })();
-  </script>
-  <noscript
-    >Please enable JavaScript to view the
-    <a href="http://disqus.com/?ref_noscript"
-      >comments powered by Disqus.</a
-    ></noscript
-  >
-  <a href="http://disqus.com" class="dsq-brlink"
-    >comments powered by <span class="logo-disqus">Disqus</span></a
-  >
+  {% include series.html %} 
+  {{ content }} 
+  {% include posts/read_next.html %} 
+  {% include posts/disqus.html %}
 </article>

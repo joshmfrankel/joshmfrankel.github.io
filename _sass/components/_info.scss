@@ -4,8 +4,8 @@ $margin-spacing: 20px;
   background-color: $primary-color;
   border-left: 5px solid darken($primary-color, 15%);
   color: $lightest-gray;
-  margin:0;
-  padding:20px;
+  margin: 0;
+  padding: 20px;
 
   a {
     color: $white;
@@ -21,13 +21,13 @@ $margin-spacing: 20px;
     margin-right: -33.33%;
     padding: 40px 33.33%;
     font-style: italic;
-    font-family: 'Lato';
+    font-family: "Lato";
     font-size: 24px;
 
     a {
       font-size: 20px;
       margin-top: 15px;
-      display: inline-block;
+      display: block;
     }
 
     svg {
@@ -46,11 +46,11 @@ $margin-spacing: 20px;
     margin-top: 0;
   }
 
-  &::before,
-  &::after {
-    content: "";
-    display: none;
-  }
+  // &::before,
+  // &::after {
+  //   content: "";
+  //   display: none;
+  // }
 
   &-accent {
     background-color: $accent-color;
