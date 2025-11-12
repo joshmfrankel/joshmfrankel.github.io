@@ -2,7 +2,7 @@
 layout: post
 title: A Perfect terminal with Zsh, Antidote, Oh My Zsh, Powerlevel10k, and Mise.
 categories:
-  - tutorial
+  - tutorials
 tags:
   - zsh
   - terminal
