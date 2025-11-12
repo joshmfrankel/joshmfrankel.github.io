@@ -43,9 +43,15 @@
   }
 
   &-actions {
+    display: flex;
+    flex-direction: column;
     border-top: 1px solid $lightest-gray-border;
     margin-top: 30px;
     padding-top: 30px;
+
+    @media screen and (min-width: 600px) {
+      flex-direction: row;
+    }
 
     a {
       font-size: 2rem;

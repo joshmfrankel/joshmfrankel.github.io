@@ -12,16 +12,29 @@ $smallWidth: 790px;
   &-links {
     display: flex;
     flex: 1;
-    font: 300 2.1rem/30px $railway, sans-serif;
+    font: 300 1.7rem/30px $railway, sans-serif;
+    flex-direction: column;
 
     a {
       @extend .expand-hover-border-from-center;
 
-      padding: 7px 10px;
+      padding: 7px 0;
+
+      &:first-of-type {
+        padding-left: 0;
+      }
+      &:last-of-type {
+        padding-right: 0;
+      }
     }
 
-    @media screen and (max-width: 600px) {
-      font-size: 1.7rem;
+    @media screen and (min-width: 600px) {
+      font-size: 2.1rem;
+      flex-direction: row;
+
+      a {
+        padding: 7px 10px;
+      }
     }
   }
   &-social {
@@ -115,7 +128,10 @@ $smallWidth: 790px;
   }
   &-posts {
     flex: 1;
-    padding-right: 100px;
+
+    @media screen and (min-width: 600px) {
+      padding-right: 100px;
+    }
   }
   &-contact {
     nav {

@@ -89,14 +89,16 @@ blockquote {
     word-break: break-all;
   }
 
-  &::before {
-    content: "“";
-    display: block;
-    font-size: 90px;
-    font-family: cursive;
-    position: absolute;
-    top: 56px;
-    margin-left: -56px;
+  @media screen and (min-width: 600px) {
+    &::before {
+      content: "“";
+      display: block;
+      font-size: 90px;
+      font-family: cursive;
+      position: absolute;
+      top: 56px;
+      margin-left: -56px;
+    }
   }
 }
 ul {
