@@ -10,7 +10,7 @@
   }
   &-category {
     color: $lighter-gray;
-    font: 300 2rem/30px $lato, sans-serif;
+    font: 300 2rem/1.5 $lato, sans-serif;
     margin-top: 0px;
     margin-bottom: 0px;
     text-transform: none;
@@ -44,8 +44,8 @@
   &-tags {
     a {
       font: 300 1.8rem/30px "Raleway", sans-serif;
-      border:none;
-      padding:0 3px;
+      border: none;
+      padding: 0 3px;
 
       &:hover {
         color: $accent-color;
