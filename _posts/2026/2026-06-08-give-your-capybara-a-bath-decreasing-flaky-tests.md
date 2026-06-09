@@ -47,6 +47,9 @@ Common flaky smells you may see include:
 * Attempting to click hidden or background elements
 * Areas of high interactivity and/or animation timing
 
+These code smells indicate low confidence tests. If **retry** or **sleep** is necessary for a test to pass
+there is generally a better process or standard which will eliminate the need for these patches.
+
 Wouldn't it be nice if we could automatically detect these smells and make them easier to spot? That's
 where Rubocop comes in.
 
