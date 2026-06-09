@@ -46,6 +46,10 @@ Set movement of workspaces to utilize the newly mapped `Control (^) key`
 
 With that, you have basic keyboard configuration setup. Next up let's adjust the Mouse and Trackpad.
 
+### Keyboard -> Keyboard
+
+Remove the shortcut, "Move focus to next window" as it reserves the helpful <code>Control (^) + `</code> key.
+
 ## Mouse and Trackpad
 
 My preference is to disable Natural Scrolling for both mouse wheel and trackpad. This means that scrolling up on the mouse wheel moves the scrollbar up the page instead of down.
